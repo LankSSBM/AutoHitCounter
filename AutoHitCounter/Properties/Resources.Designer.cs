@@ -248,14 +248,14 @@ namespace AutoHitCounter.Properties {
         ///50                      push   rax
         ///41 50                   push   r8
         ///48 8b 1d 00 00 00 00    mov    rbx,QWORD PTR [rip+0x0]        # b &lt;_main+0xb&gt;
+        ///48 85 db                test   rbx,rbx
+        ///0f 84 bf 00 00 00       je     d3 &lt;skip&gt;
         ///48 8b 9b 08 e5 01 00    mov    rbx,QWORD PTR [rbx+0x1e508]
+        ///48 85 db                test   rbx,rbx
+        ///0f 84 af 00 00 00       je     d3 &lt;skip&gt;
         ///48 8b 83 90 01 00 00    mov    rax,QWORD PTR [rbx+0x190]
-        ///48 39 08                cmp    QWORD PTR [rax],rcx
-        ///0f 85 96 00 00 00       jne    b8 &lt;skip&gt;
-        ///4c 8b 83 78 01 00 00    mov    r8,QWORD PTR [rbx+0x178]
-        ///4d 8b 40 08             mov    r8,QWORD PTR [r8+0x8]
-        ///
-        ///0 [rest of string was truncated]&quot;;.
+        ///48 85 c0                test   rax,rax
+        ///0f 8 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EldenRingSpEffectTickDamage {
             get {
