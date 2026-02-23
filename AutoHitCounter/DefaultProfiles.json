@@ -1,2 +1,142 @@
 {
+  "Elden Ring": [
+    {
+      "Name": "Any%",
+      "GameName": "Elden Ring",
+      "Splits": [
+        {
+          "EventId": 10000850,
+          "Name": "Margit, the Fell Omen",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Margit, the Fell Omen",
+          "IsAuto": true
+        },
+        {
+          "EventId": 10000800,
+          "Name": "Godrick the Grafted",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Godrick the Grafted",
+          "IsAuto": true
+        },
+        {
+          "EventId": 1252380800,
+          "Name": "Starscourge Radahn",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Starscourge Radahn",
+          "IsAuto": true
+        },
+        {
+          "EventId": 1045520800,
+          "Name": "Draconic Tree Sentinel",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Draconic Tree Sentinel",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11000850,
+          "Name": "Godfrey, the First Elden Lord (Golden Shade)",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Godfrey, the First Elden Lord (Golden Shade)",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11000800,
+          "Name": "Morgott, the Omen King",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Morgott, the Omen King",
+          "IsAuto": true
+        },
+        {
+          "EventId": 1252520800,
+          "Name": "Fire Giant",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Fire Giant",
+          "IsAuto": true
+        },
+        {
+          "EventId": 13000850,
+          "Name": "Godskin Duo",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Godskin Duo",
+          "IsAuto": true
+        },
+        {
+          "EventId": 13000800,
+          "Name": "Maliketh, the Black Blade",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Maliketh, the Black Blade",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11050850,
+          "Name": "Sir Gideon Ofnir, the All-Knowing",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Sir Gideon Ofnir, the All-Knowing",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11050800,
+          "Name": "Hoarah Loux, Warrior",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Hoarah Loux, Warrior",
+          "IsAuto": true
+        },
+        {
+          "EventId": 19000800,
+          "Name": "Radagon of the Golden Order \u0026 Elden Beast",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Radagon of the Golden Order \u0026 Elden Beast",
+          "IsAuto": true
+        }
+      ]
+    }
+  ]
 }
