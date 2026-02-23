@@ -331,7 +331,7 @@
                         <TextBlock HorizontalAlignment="Right"
                                    VerticalAlignment="Bottom"
                                    Margin="0,0,5,5"
-                                   Text="{Binding InGameTime, StringFormat=hh\\:mm\\:ss}" />
+                                   Text="{Binding InGameTimeFormatted}" />
                     </Grid>
 
                 </Grid>
