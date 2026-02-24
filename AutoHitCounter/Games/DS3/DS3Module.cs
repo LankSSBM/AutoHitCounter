@@ -42,10 +42,16 @@ public class DS3Module : IGameModule
     {
         InitializeOffsets();
 
+        DS3CustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
+        
+#if DEBUG
+        Console.WriteLine($@"Code cave: 0x{(long)DS3CustomCodeOffsets.Base:X}");
+#endif
+
         _hitService = new DS3HitService(_memoryService, _hookManager);
         _eventService = new DS3EventService(_memoryService, _hookManager, _events);
         // _eventService.InstallHook();
-        // _hitService.InstallHooks();
+        _hitService.InstallHooks();
         // _igtPtr = _memoryService.Read<nint>(GameDataMan.Base) + GameDataMan.Igt;
         // _tickService.RegisterGameTick(Tick);
     }

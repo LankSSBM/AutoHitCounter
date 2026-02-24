@@ -60,6 +60,25 @@ namespace AutoHitCounter.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 7 &lt;_main+0x7&gt;
+        ///48 85 c0                test   rax,rax
+        ///74 29                   je     35 &lt;dead&gt;
+        ///48 8b 80 80 00 00 00    mov    rax,QWORD PTR [rax+0x80]
+        ///48 85 c0                test   rax,rax
+        ///74 1d                   je     35 &lt;dead&gt;
+        ///48 8b 80 90 1f 00 00    mov    rax,QWORD PTR [rax+0x1f90]
+        ///48 85 c0                test   rax,rax
+        ///74 11                   je     35 &lt;dead&gt;
+        ///48 8b 40 18             mov    rax,QWORD PTR [rax+0x18]
+        ///48 85 c0       [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string DS3CheckPlayerDead {
+            get {
+                return ResourceManager.GetString("DS3CheckPlayerDead", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 50                      push   rax
         ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 8 &lt;_main+0x8&gt;
         ///48 3b 98 08 e5 01 00    cmp    rbx,QWORD PTR [rax+0x1e508]

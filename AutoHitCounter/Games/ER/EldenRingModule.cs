@@ -55,7 +55,6 @@ public class EldenRingModule : IGameModule, IDisposable
         _eventService.InstallHook();
         _hitService.InstallHooks();
         _igtPtr = _memoryService.Read<nint>(GameDataMan.Base) + GameDataMan.Igt;
-        Console.WriteLine($@"{(long)_igtPtr:X}");
         _tickService.RegisterGameTick(Tick);
     }
 

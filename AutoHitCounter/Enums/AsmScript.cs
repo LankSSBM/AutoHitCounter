@@ -14,6 +14,8 @@ public enum AsmScript
     ScholarIgtStop,
     ScholarIgtLoadGame,
     
+    DS3CheckPlayerDead,
+    
     
     
     EldenRingHit,

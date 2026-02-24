@@ -129,6 +129,7 @@
         <Compile Include="Games\DS2\DS2VanillaModule.cs" />
         <Compile Include="Games\DS2\DS2VanillaOffsets.cs" />
         <Compile Include="Games\DS2\DS2VanillaVersion.cs" />
+        <Compile Include="Games\DS3\DS3CustomCodeOffsets.cs" />
         <Compile Include="Games\DS3\DS3EventService.cs" />
         <Compile Include="Games\DS3\DS3HitService.cs" />
         <Compile Include="Games\DS3\DS3Module.cs" />
@@ -245,7 +246,9 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
       <Content Include="FodyWeavers.xml" />
-      <Content Include="Overlay\Overlay.html" />
+      <Content Include="Overlay.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Import Project="..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" />
@@ -260,4 +263,7 @@
     </Target>
     <Import Project="..\packages\Fody.6.9.3\build\Fody.targets" Condition="Exists('..\packages\Fody.6.9.3\build\Fody.targets')" />
     <Import Project="..\packages\Costura.Fody.6.0.0\build\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.6.0.0\build\Costura.Fody.targets')" />
+    <Target Name="PackageRelease" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+        <Exec Command="powershell -Command &quot;Compress-Archive -Force -Path '$(OutputPath)AutoHitCounter.exe', '$(OutputPath)DefaultProfiles.json', '$(OutputPath)Overlay.html' -DestinationPath '$(OutputPath)AutoHitCounter.zip'&quot;" />
+    </Target>
 </Project>
