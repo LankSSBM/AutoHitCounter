@@ -367,14 +367,14 @@ namespace AutoHitCounter.Properties {
         /// <summary>
         ///   Looks up a localized string similar to c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 7 &lt;_main+0x7&gt;
         ///c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # e &lt;_main+0xe&gt;
-        ///50                      push   rax
-        ///e8 00 00 00 00          call   14 &lt;_main+0x14&gt;
-        ///58                      pop    rax
-        ///0f 84 4c 01 00 00       je     167 &lt;skip_all&gt;
         ///48 89 5c 24 08          mov    QWORD PTR [rsp+0x8],rbx
+        ///50                      push   rax
+        ///e8 00 00 00 00          call   19 &lt;_main+0x19&gt;
+        ///58                      pop    rax
+        ///0f 84 54 01 00 00       je     174 &lt;skip_all&gt;
         ///48 85 d2                test   rdx,rdx
-        ///74 23                   je     48 &lt;null_attacker&gt;
-        ///81 7a 60 40 42 0f 00    cmp    DWORD PTR [ [rest of string was truncated]&quot;;.
+        ///74 30                   je     55 &lt;null_attacker&gt;
+        ///81 7a 60 00 b4 c4 04    cmp    DWORD PTR [ [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EldenRingHit {
             get {
