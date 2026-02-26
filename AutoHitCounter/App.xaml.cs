@@ -32,7 +32,7 @@ namespace AutoHitCounter
             GameModuleFactory gameModuleFactory =
                 new GameModuleFactory(memoryService, stateService, hookManager, tickService);
 
-            var settingsViewModel = new SettingsViewModel(stateService);
+            var settingsViewModel = new SettingsViewModel(stateService, overlayServerService);
             var hotkeysViewModel = new HotkeyTabViewModel(hotkeyManager, stateService);
 
             var mainViewModel = new MainViewModel(memoryService, hotkeyManager, gameModuleFactory, profileService, stateService,

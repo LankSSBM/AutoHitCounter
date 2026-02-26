@@ -163,6 +163,7 @@
         <Compile Include="Memory\HookManager.cs" />
         <Compile Include="Memory\Kernel32.cs" />
         <Compile Include="Models\Game.cs" />
+        <Compile Include="Models\OverlayConfig.cs" />
         <Compile Include="Models\OverlayState.cs" />
         <Compile Include="Models\Profile.cs" />
         <Compile Include="Models\SplitEntry.cs" />

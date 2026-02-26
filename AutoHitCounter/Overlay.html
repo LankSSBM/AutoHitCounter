@@ -26,14 +26,13 @@
 
         .header {
             display: grid;
-            grid-template-columns: 3fr 0.5fr 0.5fr 0.5fr;
             padding: 4px 8px;
             font-size: 11px;
             font-weight: 600;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: #777;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             margin-bottom: 2px;
         }
 
@@ -43,7 +42,6 @@
 
         .split-row {
             display: grid;
-            grid-template-columns: 3fr 0.5fr 0.5fr 0.5fr;
             padding: 4px 8px;
             font-size: 15px;
             font-weight: 400;
@@ -52,7 +50,7 @@
         }
 
         .split-row:nth-child(even) {
-            background: rgba(255,255,255,0.02);
+            background: rgba(255, 255, 255, 0.02);
         }
 
         .split-row .col-name {
@@ -69,7 +67,7 @@
 
         .split-row.current {
             border-left-color: #00cc66;
-            background: rgba(0,204,102,0.06);
+            background: rgba(0, 204, 102, 0.06);
         }
 
         .split-row.parent {
@@ -88,9 +86,17 @@
             visibility: hidden;
         }
 
-        .diff-pos { color: #ff4c4c; }
-        .diff-neg { color: #00cc66; }
-        .diff-zero { color: #555; }
+        .diff-pos {
+            color: #ff4c4c;
+        }
+
+        .diff-neg {
+            color: #00cc66;
+        }
+
+        .diff-zero {
+            color: #555;
+        }
 
         .footer {
             display: flex;
@@ -98,7 +104,7 @@
             align-items: center;
             padding: 6px 8px 2px;
             margin-top: 4px;
-            border-top: 1px solid rgba(255,255,255,0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             font-size: 13px;
             color: #888;
         }
@@ -126,12 +132,7 @@
 </head>
 <body>
 <div id="overlay">
-    <div class="header">
-        <span>Split</span>
-        <span>Hits</span>
-        <span>Diff</span>
-        <span>PB</span>
-    </div>
+    <div class="header" id="header"></div>
     <div id="splits"></div>
     <div class="footer">
         <div class="totals" id="totals"></div>
@@ -145,13 +146,26 @@
         const WS_URL = 'ws://localhost:16200';
         const RECONNECT_INTERVAL = 3000;
 
+        const DEFAULTS = {
+            maxSplits: 12,
+            prevSplits: 4,
+            nextSplits: 8,
+            showDiff: true,
+            showPb: true,
+            showIgt: true
+        }
+
+        let config = {...DEFAULTS}
+
         const overlay = document.getElementById('overlay');
+        const headerEl = document.getElementById('header');
         const splitsEl = document.getElementById('splits');
         const totalsEl = document.getElementById('totals');
         const igtEl = document.getElementById('igt');
         const runCompleteEl = document.getElementById('runComplete');
 
         let ws = null;
+        let lastState = null;
 
         function connect() {
             ws = new WebSocket(WS_URL);
@@ -171,37 +185,53 @@
                 const msg = JSON.parse(event.data);
 
                 if (msg.type === 'state') {
+                    lastState = msg.data;
                     renderState(msg.data);
                 } else if (msg.type === 'igt') {
                     igtEl.textContent = msg.data;
+                } else if (msg.type === 'config') {
+                    Object.assign(config, msg.data);
+                    applyLayout();
+                    if (lastState) renderState(lastState);
                 }
             };
         }
 
+        function getGridColumns() {
+            let cols = '3fr 0.5fr';
+            if (config.showDiff) cols += ' 0.5fr';
+            if (config.showPb) cols += ' 0.5fr';
+            return cols;
+        }
+
+        function applyLayout() {
+            headerEl.style.gridTemplateColumns = getGridColumns();
+
+            headerEl.innerHTML = `<span>Split</span><span>Hits</span>`
+                + (config.showDiff ? '<span>Diff</span>' : '')
+                + (config.showPb ? '<span>PB</span>' : '');
+
+            igtEl.style.display = config.showIgt ? '' : 'none';
+        }
+
         function renderState(state) {
+            const cols = getGridColumns();
             let html = '';
-            for (let i = 0; i < state.splits.length; i++) {
-                const s = state.splits[i];
-                let classes = 'split-row';
-                if (s.isParent) classes += ' parent';
-                if (s.isCurrent) classes += ' current';
 
-                var diffClass = s.diff > 0 ? 'diff-pos' : s.diff < 0 ? 'diff-neg' : 'diff-zero';
-                var diffText = s.diff > 0 ? '+' + s.diff : s.diff.toString();
+            const limit = Math.min(state.splits.length, config.maxSplits);
 
-                html += '<div class="' + classes + '">'
-                    + '<span class="col-name">' + escapeHtml(s.name) + '</span>'
-                    + '<span class="col-hits">' + s.hits + '</span>'
-                    + '<span class="col-diff ' + diffClass + '">' + diffText + '</span>'
-                    + '<span class="col-pb">' + s.pb + '</span>'
-                    + '</div>';
+            for (let i = 0; i < limit; i++) {
+                html += buildRow(state.splits[i], cols);
             }
             splitsEl.innerHTML = html;
 
-            totalsEl.innerHTML = '<span><span class="label">Hits </span><span class="value">' + state.totalHits + '</span></span>'
-                + '<span><span class="label">PB </span><span class="value">' + state.totalPb + '</span></span>';
+            let totalsHtml = `<span><span class="label">Hits </span><span class="value">${state.totalHits}</span></span>`;
+            if (config.showPb) {
+                totalsHtml += `<span><span class="label">PB </span><span class="value">${state.totalPb}</span></span>`;
+            }
+            totalsEl.innerHTML = totalsHtml;
 
-            if (state.inGameTime) {
+            if (config.showIgt && state.inGameTime) {
                 igtEl.textContent = state.inGameTime;
             }
 
@@ -214,6 +244,21 @@
             return div.innerHTML;
         }
 
+        function buildRow(s, cols) {
+            const current = s.isCurrent ? ' current' : '';
+            const parent = s.isParent ? ' parent' : '';
+            const diffClass = s.diff > 0 ? 'diff-pos' : s.diff < 0 ? 'diff-neg' : 'diff-zero';
+            const diffText = s.diff > 0 ? `+${s.diff}` : `${s.diff}`;
+
+            return `<div class="split-row${parent}${current}" style="grid-template-columns: ${cols}">
+                <span class="col-name">${escapeHtml(s.name)}</span>
+                <span class="col-hits">${s.hits}</span>
+                ${config.showDiff ? `<span class="col-diff ${diffClass}">${diffText}</span>` : ''}
+                ${config.showPb ? `<span class="col-pb">${s.pb}</span>` : ''}
+            </div>`;
+        }
+
+        applyLayout();
         connect();
     })();
 </script>

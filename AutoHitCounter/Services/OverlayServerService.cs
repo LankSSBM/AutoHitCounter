@@ -16,6 +16,7 @@ public class OverlayServerService : IDisposable
     private readonly object _lock = new();
 
     private string _lastStateJson;
+    private string _lastConfigJson;
 
     private const int Port = 16200;
 
@@ -30,6 +31,8 @@ public class OverlayServerService : IDisposable
                 {
                     lock (_lock) _clients.Add(socket);
 
+                    if (_lastConfigJson != null)
+                        socket.Send(_lastConfigJson);
                     if (_lastStateJson != null)
                         socket.Send(_lastStateJson);
                 };
@@ -62,6 +65,15 @@ public class OverlayServerService : IDisposable
     public void BroadcastIgt(string formatted)
     {
         var json = JsonSerializer.Serialize(new { type = "igt", data = formatted });
+        Broadcast(json);
+    }
+
+    public void BroadcastConfig(OverlayConfig config)
+    {
+        var json = JsonSerializer.Serialize(
+            new { type = "settings", data = config },
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        _lastConfigJson = json;
         Broadcast(json);
     }
 

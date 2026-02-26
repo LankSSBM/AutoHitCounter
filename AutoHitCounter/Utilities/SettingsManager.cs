@@ -33,6 +33,18 @@ public class SettingsManager
     public bool ShowNotesSection { get; set; }
     public bool AllowManualSplitOnAutoSplits { get; set; }
     public bool PracticeMode { get; set; }
+    [DefaultValue(12)]
+    public int MaxSplits { get; set; }
+    [DefaultValue(4)]
+    public int PrevSplits { get; set; }
+    [DefaultValue(8)]
+    public int NextSplits { get; set; }
+    [DefaultValue(true)]
+    public bool ShowDiff { get; set; }
+    [DefaultValue(true)]
+    public bool ShowPb { get; set; }
+    [DefaultValue(true)]
+    public bool ShowIgt { get; set; }
 
     public void Save()
     {
