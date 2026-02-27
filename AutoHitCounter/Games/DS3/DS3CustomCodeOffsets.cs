@@ -19,8 +19,8 @@ public static class DS3CustomCodeOffsets
 
     public const int LastJailerCountTime = 0x700;
     public const int JailerDrain = 0x710;
-    public const int FallDamage = 0x800;
-    public const int ApplyHealthDelta = 0xA00;
+    public const int ApplyHealthDelta = 0x800;
+    public const int KillBox = 0xA00;
     
     
     public const int EventLogWriteIdx = 0x2000;

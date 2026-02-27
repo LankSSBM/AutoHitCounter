@@ -26,8 +26,8 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         InstallLethalFallHook();
         InstallAuxHitHooks();
         InstallJailerDrainHook();
-        // InstallFallDamageHook();
         InstallApplyHealthDeltaHook();
+        InstallKillBoxHook();
     }
 
     public bool HasHit()
@@ -65,9 +65,9 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         
         AsmHelper.WriteRelativeOffsets(bytes, [
             (code + 0x1, checkPlayerDeadFunc, 5, 0x1 + 1),
-            (code + 0x15, WorldChrMan.Base, 7, 0x15 + 3),
-            (code + 0x7B, hit, 6, 0x7B + 2),
-            (code + 0x8D, Hooks.Hit + 8, 5, 0x8D + 1),
+            (code + 0x14, WorldChrMan.Base, 7, 0x14 + 3),
+            (code + 0x8B, hit, 6, 0x8B + 2),
+            (code + 0x9D, Hooks.Hit + 8, 5, 0x9D + 1),
         ]);
         
         memoryService.WriteBytes(code, bytes);
@@ -162,7 +162,7 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         memoryService.WriteBytes(code, bytes);
         hookManager.InstallHook(code, Hooks.HasJailerDrain, [0x76, 0x04, 0xf3, 0x0f, 0x59, 0xf0]);
     }
-    
+
     private void InstallApplyHealthDeltaHook()
     {
         var bytes = AsmLoader.GetAsmBytes(AsmScript.DS3ApplyHealthDelta);
@@ -177,5 +177,23 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         
         memoryService.WriteBytes(code, bytes);
         hookManager.InstallHook(code, Hooks.ApplyHealthDelta, [0x48, 0x8B, 0x49, 0x08, 0x41, 0x0F, 0xB6, 0xD0]);
+    }
+
+    private void InstallKillBoxHook()
+    {
+        var bytes = AsmLoader.GetAsmBytes(AsmScript.DS3KillBox);
+        var checkPlayerDeadFunc = Base + CheckPlayerDead;
+        var hit = Base + Hit;
+        var code = Base + KillBox;
+        
+        AsmHelper.WriteRelativeOffsets(bytes, [
+            (code + 0x6, checkPlayerDeadFunc, 5, 0x6 + 1),
+            (code + 0xF, WorldChrMan.Base, 7, 0xF + 3),
+            (code + 0x20, hit, 6, 0x20 + 2),
+            (code + 0x26, Hooks.KillBox + 5, 5, 0x26 + 1)
+        ]);
+        
+        memoryService.WriteBytes(code, bytes);
+        hookManager.InstallHook(code, Hooks.KillBox, [0x48, 0x89, 0xCB, 0x31, 0xD2]);
     }
 }

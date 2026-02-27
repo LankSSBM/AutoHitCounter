@@ -204,15 +204,15 @@ namespace AutoHitCounter.Properties {
         ///   Looks up a localized string similar to 50                      push   rax
         ///e8 00 00 00 00          call   6 &lt;_main+0x6&gt;
         ///58                      pop    rax
-        ///74 7c                   je     85 &lt;skip_all&gt;
-        ///48 85 d2                test   rdx,rdx
-        ///74 77                   je     85 &lt;skip_all&gt;
+        ///0f 84 88 00 00 00       je     95 &lt;skip_all&gt;
         ///50                      push   rax
         ///57                      push   rdi
         ///52                      push   rdx
         ///53                      push   rbx
         ///48 89 d7                mov    rdi,rdx
-        ///48 8b 15 00 00 00 00    mov    rdx,QWORD PTR [rip+0x0]        # 1c &lt;_main+0x1c [rest of string was truncated]&quot;;.
+        ///48 8b 15 00 00 00 00    mov    rdx,QWORD PTR [rip+0x0]        # 1b &lt;_main+0x1b&gt;
+        ///48 8b 82 80 00 00 00    mov    rax,QWORD PTR [rdx+0x80]
+        ///48 39 c7                cm [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DS3Hit {
             get {
@@ -238,6 +238,26 @@ namespace AutoHitCounter.Properties {
         internal static string DS3JailerDrain {
             get {
                 return ResourceManager.GetString("DS3JailerDrain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 48 89 cb                mov    rbx,rcx
+        ///31 d2                   xor    edx,edx
+        ///50                      push   rax
+        ///e8 00 00 00 00          call   b &lt;_main+0xb&gt;
+        ///58                      pop    rax
+        ///74 18                   je     26 &lt;exit&gt;
+        ///51                      push   rcx
+        ///48 8b 0d 00 00 00 00    mov    rcx,QWORD PTR [rip+0x0]        # 16 &lt;_main+0x16&gt;
+        ///48 3b 81 80 00 00 00    cmp    rax,QWORD PTR [rcx+0x80]
+        ///59                      pop    rcx
+        ///75 06                   jne    26 &lt;exit&gt;
+        ///ff 05 00 00 00 00    [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string DS3KillBox {
+            get {
+                return ResourceManager.GetString("DS3KillBox", resourceCulture);
             }
         }
         

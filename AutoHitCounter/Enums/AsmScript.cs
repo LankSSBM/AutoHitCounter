@@ -22,6 +22,7 @@ public enum AsmScript
     DS3GetSpEffect,
     DS3JailerDrain,
     DS3ApplyHealthDelta,
+    DS3KillBox,
     DS3EventLog,
     
     

@@ -70,6 +70,7 @@ public static class DS3Offsets
         public static nint AuxProc;
         public static nint HasJailerDrain;
         public static nint ApplyHealthDelta;
+        public static nint KillBox;
         public static nint SetEvent;
     }
 
@@ -245,6 +246,29 @@ public static class DS3Offsets
             Version1_15_2_0 => 0x1B9274C,
             _ => 0
         };
+        
+        Hooks.KillBox = moduleBase + Version switch
+        {
+            Version1_3_2_0 => 0x9A351A,
+            Version1_4_1_0 or Version1_4_2_0 or Version1_4_3_0 => 0x9A341A,
+            Version1_5_0_0 => 0x9A3F0A,
+            Version1_5_1_0 => 0x9A3D3A,
+            Version1_6_0_0 => 0x9A430A,
+            Version1_7_0_0 => 0x9A521A,
+            Version1_8_0_0 => 0x9B191A,
+            Version1_9_0_0 => 0x9B1EDA,
+            Version1_10_0_0 => 0x9B1F4A,
+            Version1_11_0_0 => 0x9BB8AA,
+            Version1_12_0_0 => 0x9BC2FA,
+            Version1_13_0_0 => 0x9BDC9A,
+            Version1_14_0_0 => 0x9BDF6A,
+            Version1_15_0_0 => 0x9BE06A,
+            Version1_15_1_0 => 0x9C815A,
+            Version1_15_2_0 => 0x9C828A,
+            _ => 0
+        };
+
+
 
         
         Hooks.SetEvent = moduleBase + Version switch
@@ -280,6 +304,7 @@ public static class DS3Offsets
         PrintOffset("Hooks.AuxProc", Hooks.AuxProc);
         PrintOffset("Hooks.HasJailerDrain", Hooks.HasJailerDrain);
         PrintOffset("Hooks.ApplyHealthDelta", Hooks.ApplyHealthDelta);
+        PrintOffset("Hooks.KillBox", Hooks.KillBox);
         PrintOffset("Hooks.SetEvent", Hooks.SetEvent);
 
            
