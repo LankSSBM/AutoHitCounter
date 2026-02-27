@@ -44,6 +44,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
         SaveCommand = new DelegateCommand(Save, () => SelectedProfile != null);
         DeleteCommand = new DelegateCommand(Delete, () => SelectedProfile != null);
 
+        Splits.CollectionChanged += (_, _) => OnPropertyChanged(nameof(SplitCount));
 
         if (activeProfile != null)
         {
@@ -109,6 +110,8 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
     public ObservableCollection<SplitEntry> FilteredEvents { get; } = new();
     
     public bool IsDirty { get; private set; }
+
+    public int SplitCount => Splits.Count(s => s.Type == SplitType.Child);
 
     #endregion
 
@@ -289,6 +292,15 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
     {
         if (entry.Type == SplitType.Parent)
         {
+            var childCount = Splits.Count(s => s.GroupId == entry.GroupId && s.Type == SplitType.Child);
+            if (childCount > 0)
+            {
+                var confirmed = MsgBox.ShowOkCancel(
+                    $"Delete \"{entry.Name}\" and its {childCount} split{(childCount == 1 ? "" : "s")}?",
+                    "Delete Group");
+                if (!confirmed) return;
+            }
+
             var toRemove = Splits
                 .Where(s => s.GroupId == entry.GroupId)
                 .ToList();
@@ -406,7 +418,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
     private void FilterEvents()
     {
         FilteredEvents.Clear();
-        
+
         foreach (var entry in AllEvents)
         {
             if (!string.IsNullOrEmpty(_searchText) &&
@@ -415,6 +427,8 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
 
             FilteredEvents.Add(entry);
         }
+
+        AddCommand.RaiseCanExecuteChange();
     }
 
     private void NewProfile()

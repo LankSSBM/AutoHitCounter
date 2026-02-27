@@ -111,13 +111,23 @@
                                                VerticalAlignment="Center"
                                                TextTrimming="CharacterEllipsis" />
                                     <Button HorizontalAlignment="Right" VerticalAlignment="Center"
-
-                                            Content="+"
                                             FontSize="14" FontWeight="Bold"
-                                            Foreground="#4a9eff"
                                             Command="{Binding DataContext.AddCommand,
                                                 RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                            CommandParameter="{Binding}" />
+                                            CommandParameter="{Binding}">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                <Setter Property="Content" Value="+" />
+                                                <Setter Property="Foreground" Value="#4a9eff" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsEnabled" Value="False">
+                                                        <Setter Property="Content" Value="✓" />
+                                                        <Setter Property="Foreground" Value="#4a7a4a" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -138,7 +148,7 @@
                                    Foreground="#aaa" />
                         <TextBlock HorizontalAlignment="Right" FontSize="11"
                                    Foreground="#555" FontFamily="JetBrains Mono"
-                                   Text="{Binding Splits.Count, StringFormat='{}{0} selected'}" />
+                                   Text="{Binding SplitCount, StringFormat='{}{0} selected'}" />
                     </Grid>
 
                     <!-- Action buttons -->
@@ -235,14 +245,6 @@
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                        <Button Content="↑" Margin="0,0,2,0"
-                                                Command="{Binding DataContext.MoveUpCommand,
-                                        RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                                CommandParameter="{Binding}" />
-                                        <Button Content="↓" Margin="0,0,2,0"
-                                                Command="{Binding DataContext.MoveDownCommand,
-                                        RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                                CommandParameter="{Binding}" />
                                         <Button Content="×" Foreground="#c05050"
                                                 Command="{Binding DataContext.RemoveCommand,
                                         RelativeSource={RelativeSource AncestorType=ListBox}}"
