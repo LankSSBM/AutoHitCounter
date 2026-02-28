@@ -60,14 +60,14 @@ public class EldenRingHitService(IMemoryService memoryService, HookManager hookM
             (code, stateInfoCheckFlag, 7, 2),
             (code + 0x7, deflectTearCheckFlag, 7, 0x7 + 2),
             (code + 0x14, checkPlayerDeadFunc, 5, 0x14 + 1),
-            (code + 0x5C, WorldChrMan.Base, 7, 0x5C + 3),
-            (code + 0xA8, Functions.ChrInsByHandle, 5, 0xA8 + 1),
-            (code + 0x112, deflectTearCheckFlag, 7, 0x112 + 2),
-            (code + 0x138, staggerCheckFlag, 7, 0x138 + 2),
-            (code + 0x149, stateInfoCheckFlag, 7, 0x149 + 2),
-            (code + 0x157, GameDataMan.Base, 7, 0x157 + 3),
-            (code + 0x16A, hit, 6, 0x16A + 2),
-            (code + 0x174, Hooks.Hit + 5, 5, 0x174 + 1),
+            (code + 0x66, WorldChrMan.Base, 7, 0x66 + 3),
+            (code + 0xB2, Functions.ChrInsByHandle, 5, 0xB2 + 1),
+            (code + 0x11C, deflectTearCheckFlag, 7, 0x11C + 2),
+            (code + 0x142, staggerCheckFlag, 7, 0x142 + 2),
+            (code + 0x153, stateInfoCheckFlag, 7, 0x153 + 2),
+            (code + 0x161, GameDataMan.Base, 7, 0x161 + 3),
+            (code + 0x174, hit, 6, 0x174 + 2),
+            (code + 0x17E, Hooks.Hit + 5, 5, 0x17E + 1),
         ]);
 
         memoryService.WriteBytes(code, bytes);

@@ -28,11 +28,12 @@ public enum AsmScript
     
     SKCheckPlayerDead,
     SKHit,
-    SKDeflectCheck,
     SKLethalFall,
     SKFadeFall,
     SKApplyHealthDelta,
-    
+    SKPostHit,
+    SKStaggerIgnoreCheck,
+
     EldenRingHit,
     EldenRingCheckPlayerDead,
     EldenRingFallDamage,

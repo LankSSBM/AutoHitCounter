@@ -454,9 +454,9 @@ namespace AutoHitCounter.Properties {
         ///50                      push   rax
         ///e8 00 00 00 00          call   19 &lt;_main+0x19&gt;
         ///58                      pop    rax
-        ///0f 84 54 01 00 00       je     174 &lt;skip_all&gt;
+        ///0f 84 5e 01 00 00       je     17e &lt;skip_all&gt;
         ///48 85 d2                test   rdx,rdx
-        ///74 30                   je     55 &lt;null_attacker&gt;
+        ///74 3a                   je     5f &lt;null_attacker&gt;
         ///81 7a 60 00 b4 c4 04    cmp    DWORD PTR [ [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EldenRingHit {
@@ -803,11 +803,11 @@ namespace AutoHitCounter.Properties {
         ///48 89 44 24 50          mov    QWORD PTR [rsp+0x50],rax
         ///50                      push   rax
         ///e8 00 00 00 00          call   12 &lt;_main+0x12&gt;
-        ///0f 84 9a 00 00 00       je     b2 &lt;skip_count&gt;
+        ///0f 84 b0 00 00 00       je     c8 &lt;skip_count&gt;
         ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 1f &lt;_main+0x1f&gt;
         ///48 8b 80 88 00 00 00    mov    rax,QWORD PTR [rax+0x88]
         ///48 39 d0                cmp    rax,rdx
-        ///0f 84 83 00 00 00       je     b2 &lt;skip_count&gt;
+        ///0f 84 99 00 00 00       je     c8 &lt;skip_count&gt;
         ///48 8b 80 f8 1f 00 0 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SKHit {
@@ -832,6 +832,48 @@ namespace AutoHitCounter.Properties {
         internal static string SKLethalFall {
             get {
                 return ResourceManager.GetString("SKLethalFall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 50                      push   rax
+        ///80 3d 00 00 00 00 00    cmp    BYTE PTR [rip+0x0],0x0        # 8 &lt;_main+0x8&gt;
+        ///74 70                   je     7a &lt;commit_skip&gt;
+        ///41 83 be e0 01 00 00    cmp    DWORD PTR [r14+0x1e0],0x0
+        ///00 
+        ///7f 50                   jg     64 &lt;commit_hit&gt;
+        ///41 80 be c7 01 00 00    cmp    BYTE PTR [r14+0x1c7],0x0
+        ///00 
+        ///75 55                   jne    73 &lt;commit_discard&gt;
+        ///41 80 be 64 01 00 00    cmp    BYTE PTR [r14+0x164],0x0
+        ///00 
+        ///75 3c                   jne    64 &lt;commit_hit&gt;
+        ///41 0f b6 46 24 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string SKPostHit {
+            get {
+                return ResourceManager.GetString("SKPostHit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 80 3d 00 00 00 00 00    cmp    BYTE PTR [rip+0x0],0x0        # 7 &lt;_main+0x7&gt;
+        ///74 11                   je     1a &lt;original&gt;
+        ///85 c0                   test   eax,eax
+        ///74 06                   je     13 &lt;exit&gt;
+        ///ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 13 &lt;exit&gt;
+        ///
+        ///000000000013 &lt;exit&gt;:
+        ///c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 1a &lt;original&gt;
+        ///
+        ///00000000001a &lt;original&gt;:
+        ///45 0f 57 c0             xorps  xmm8,xmm8
+        ///85 c0                   test   eax,eax
+        ///e9 00 00 00 00          [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string SKStaggerIgnoreCheck {
+            get {
+                return ResourceManager.GetString("SKStaggerIgnoreCheck", resourceCulture);
             }
         }
     }

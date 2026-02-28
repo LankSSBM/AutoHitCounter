@@ -47,11 +47,17 @@ public static class SKOffsets
 
     public static class Hooks
     {
-        public static nint DidSuccessfulDeflect;
         public static nint Hit;
         public static nint LethalFall;
         public static nint FadeFall;
         public static nint ApplyHealthDelta;
+        public static nint PostHit;
+        public static nint StaggerIgnoreCheck;
+    }
+
+    public static class Functions
+    {
+        public static nint HasSpEffectId;
     }
 
     private static void InitializeBaseAddresses(nint moduleBase)
@@ -73,14 +79,6 @@ public static class SKOffsets
             _ => 0
         };
         
-        Hooks.DidSuccessfulDeflect = moduleBase + Version switch
-        {
-            Version1_2_0 => 0xB56619,
-            Version1_3_0 or Version1_4_0 => 0xB56CC9,
-            Version1_5_0 or Version1_6_0 => 0xB6D2C9,
-            _ => 0
-        };
-
         
         Hooks.Hit = moduleBase + Version switch
         {
@@ -114,6 +112,31 @@ public static class SKOffsets
             _ => 0
         };
 
+        Hooks.PostHit = moduleBase + Version switch
+        {
+            Version1_2_0 => 0xB58475,
+            Version1_3_0 or Version1_4_0 => 0xB58B25,
+            Version1_5_0 or Version1_6_0 => 0xB6F125,
+            _ => 0
+        };
+        
+        Hooks.StaggerIgnoreCheck = moduleBase + Version switch
+        {
+            Version1_2_0 => 0xB55456,
+            Version1_3_0 or Version1_4_0 => 0xB55B06,
+            Version1_5_0 or Version1_6_0 => 0xB6C106,
+            _ => 0
+        };
+        
+        Functions.HasSpEffectId = moduleBase + Version switch
+        {
+            Version1_2_0 => 0xBE77E0,
+            Version1_3_0 or Version1_4_0 => 0xBE7E90,
+            Version1_5_0 or Version1_6_0 => 0xBFEFB0,
+            _ => 0
+        };
+
+
 
 
 #if DEBUG
@@ -125,14 +148,16 @@ public static class SKOffsets
 
 
         Console.WriteLine("\n--- Hooks ---");
-        PrintOffset("Hooks.DidSuccessfulDeflect", Hooks.DidSuccessfulDeflect);
         PrintOffset("Hooks.Hit", Hooks.Hit);
         PrintOffset("Hooks.LethalFall", Hooks.LethalFall);
         PrintOffset("Hooks.FadeFall", Hooks.FadeFall);
         PrintOffset("Hooks.ApplyHealthDelta", Hooks.ApplyHealthDelta);
+        PrintOffset("Hooks.PostHit", Hooks.PostHit);
+        PrintOffset("Hooks.StaggerIgnoreCheck", Hooks.StaggerIgnoreCheck);
 
 
         Console.WriteLine("\n--- Functions ---");
+        PrintOffset("Functions.HasSpEffectId", Functions.HasSpEffectId);
 
 
         Console.WriteLine("\n====================================\n");
