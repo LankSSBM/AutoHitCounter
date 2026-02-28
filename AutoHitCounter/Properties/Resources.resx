@@ -1188,44 +1188,57 @@ c3</value>
 48 89 44 24 50          mov    QWORD PTR [rsp+0x50],rax
 50                      push   rax
 e8 00 00 00 00          call   12 &lt;_main+0x12&gt;
-74 74                   je     88 &lt;skip_count&gt;
-48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 1b &lt;_main+0x1b&gt;
+0f 84 9a 00 00 00       je     b2 &lt;skip_count&gt;
+48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 1f &lt;_main+0x1f&gt;
 48 8b 80 88 00 00 00    mov    rax,QWORD PTR [rax+0x88]
 48 39 d0                cmp    rax,rdx
-74 61                   je     88 &lt;skip_count&gt;
+0f 84 83 00 00 00       je     b2 &lt;skip_count&gt;
 48 8b 80 f8 1f 00 00    mov    rax,QWORD PTR [rax+0x1ff8]
 48 3b 88 98 00 00 00    cmp    rcx,QWORD PTR [rax+0x98]
-75 51                   jne    88 &lt;skip_count&gt;
+75 73                   jne    b2 &lt;skip_count&gt;
 45 0f 57 ff             xorps  xmm15,xmm15
 45 0f 2f 38             comiss xmm15,DWORD PTR [r8]
-72 1c                   jb     5d &lt;check_is_phys_only&gt;
+72 1e                   jb     67 &lt;check_is_phys_only&gt;
 45 0f 2f 78 04          comiss xmm15,DWORD PTR [r8+0x4]
-72 3a                   jb     82 &lt;real_hit&gt;
+72 5c                   jb     ac &lt;real_hit&gt;
 45 0f 2f 78 08          comiss xmm15,DWORD PTR [r8+0x8]
-72 33                   jb     82 &lt;real_hit&gt;
+72 55                   jb     ac &lt;real_hit&gt;
 45 0f 2f 78 0c          comiss xmm15,DWORD PTR [r8+0xc]
-72 2c                   jb     82 &lt;real_hit&gt;
+72 4e                   jb     ac &lt;real_hit&gt;
 45 0f 2f 78 10          comiss xmm15,DWORD PTR [r8+0x10]
-72 25                   jb     82 &lt;real_hit&gt;
+72 47                   jb     ac &lt;real_hit&gt;
+eb 25                   jmp    8c &lt;check_stagger&gt;
 
-00000000005d &lt;check_is_phys_only&gt;:
+000000000067 &lt;check_is_phys_only&gt;:
 45 0f 2f 78 04          comiss xmm15,DWORD PTR [r8+0x4]
-72 1e                   jb     82 &lt;real_hit&gt;
+72 3e                   jb     ac &lt;real_hit&gt;
 45 0f 2f 78 08          comiss xmm15,DWORD PTR [r8+0x8]
-72 17                   jb     82 &lt;real_hit&gt;
+72 37                   jb     ac &lt;real_hit&gt;
 45 0f 2f 78 0c          comiss xmm15,DWORD PTR [r8+0xc]
-72 10                   jb     82 &lt;real_hit&gt;
+72 30                   jb     ac &lt;real_hit&gt;
 45 0f 2f 78 10          comiss xmm15,DWORD PTR [r8+0x10]
-72 09                   jb     82 &lt;real_hit&gt;
-c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 80 &lt;check_is_phys_only+0x23&gt;
-eb 06                   jmp    88 &lt;skip_count&gt;
+72 29                   jb     ac &lt;real_hit&gt;
+c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 8a &lt;check_is_phys_only+0x23&gt;
+eb 26                   jmp    b2 &lt;skip_count&gt;
 
-000000000082 &lt;real_hit&gt;:
-ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 88 &lt;skip_count&gt;
+00000000008c &lt;check_stagger&gt;:
+41 80 b8 d9 00 00 00    cmp    BYTE PTR [r8+0xd9],0x0
+00 
+75 16                   jne    ac &lt;real_hit&gt;
+41 83 b8 88 00 00 00    cmp    DWORD PTR [r8+0x88],0x0
+00 
+7d 0c                   jge    ac &lt;real_hit&gt;
+41 0f b6 40 24          movzx  eax,BYTE PTR [r8+0x24]
+ff c8                   dec    eax
+83 f8 0a                cmp    eax,0xa
+77 06                   ja     b2 &lt;skip_count&gt;
 
-000000000088 &lt;skip_count&gt;:
+0000000000ac &lt;real_hit&gt;:
+ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # b2 &lt;skip_count&gt;
+
+0000000000b2 &lt;skip_count&gt;:
 58                      pop    rax
-e9 00 00 00 00          jmp    8e &lt;skip_count+0x6&gt;</value>
+e9 00 00 00 00          jmp    b8 &lt;skip_count+0x6&gt;</value>
   </data>
   <data name="SKDeflectCheck" xml:space="preserve">
     <value>c7 45 c0 ff ff ff ff    mov    DWORD PTR [rbp-0x40],0xffffffff

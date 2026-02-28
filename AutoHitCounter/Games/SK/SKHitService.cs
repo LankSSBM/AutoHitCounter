@@ -52,10 +52,10 @@ public class SKHitService(IMemoryService memoryService, HookManager hookManager)
         AsmHelper.WriteRelativeOffsets(bytes, [
             (code, checkDeflectFlag, 7, 2),
             (code + 0xD, checkPlayerDeadFunc, 5, 0xD + 1),
-            (code + 0x14, WorldChrMan.Base, 7, 0x14 + 3),
-            (code + 0x79, checkDeflectFlag, 7, 0x79 + 2),
-            (code + 0x82, hit, 6, 0x82 + 2),
-            (code + 0x89, Hooks.Hit + 5, 5, 0x89 + 1),
+            (code + 0x18, WorldChrMan.Base, 7, 0x18 + 3),
+            (code + 0x83, checkDeflectFlag, 7, 0x83 + 2),
+            (code + 0xAC, hit, 6, 0xAC + 2),
+            (code + 0xB3, Hooks.Hit + 5, 5, 0xB3 + 1),
         ]);
         
         memoryService.WriteBytes(code, bytes);
