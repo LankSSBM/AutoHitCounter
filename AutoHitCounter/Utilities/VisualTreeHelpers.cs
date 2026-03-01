@@ -18,4 +18,18 @@ public static class VisualTreeHelpers
 
         return null;
     }
+
+    public static T FindDescendant<T>(DependencyObject parent, string name = null) where T : DependencyObject
+    {
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+            if (child is T typed && (name == null || (child is FrameworkElement fe && fe.Name == name)))
+                return typed;
+            var result = FindDescendant<T>(child, name);
+            if (result != null) return result;
+        }
+
+        return null;
+    }
 }

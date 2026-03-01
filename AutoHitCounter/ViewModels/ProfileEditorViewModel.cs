@@ -41,6 +41,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
         AddGroupCommand = new DelegateCommand(AddGroup);
         RenameSplitCommand = new DelegateCommand<SplitEntry>(RenameSplit);
         NewProfileCommand = new DelegateCommand(NewProfile);
+        RenameProfileCommand = new DelegateCommand(RenameProfile, () => SelectedProfile != null);
         SaveCommand = new DelegateCommand(Save, () => SelectedProfile != null);
         DeleteCommand = new DelegateCommand(Delete, () => SelectedProfile != null);
 
@@ -62,6 +63,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
     public DelegateCommand AddGroupCommand { get; }
     public DelegateCommand<SplitEntry> RenameSplitCommand { get; }
     public DelegateCommand NewProfileCommand { get; }
+    public DelegateCommand RenameProfileCommand { get; }
     public DelegateCommand SaveCommand { get; }
     public DelegateCommand DeleteCommand { get; }
 
@@ -84,6 +86,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
                 LoadProfile(value);
             SaveCommand.RaiseCanExecuteChanged();
             DeleteCommand.RaiseCanExecuteChanged();
+            RenameProfileCommand.RaiseCanExecuteChanged();
         }
     }
 
@@ -108,7 +111,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
     }
 
     public ObservableCollection<SplitEntry> FilteredEvents { get; } = new();
-    
+
     public bool IsDirty { get; private set; }
 
     public int SplitCount => Splits.Count(s => s.Type == SplitType.Child);
@@ -116,13 +119,13 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
     #endregion
 
     #region Public Methods
-    
+
     public void MoveItem(object draggedItem, int dropIndex)
     {
         if (draggedItem is SplitEntry entry)
             MoveSplit(entry, dropIndex);
     }
-    
+
 
     public void MoveSplit(SplitEntry draggedEntry, int dropIndex)
     {
@@ -144,7 +147,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
         AssignGroupFromPosition(draggedEntry, dropIndex);
         IsDirty = true;
     }
-    
+
     public void RebuildGroupAssignments()
     {
         string currentGroupId = null;
@@ -211,7 +214,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
         FilterEvents();
         IsDirty = true;
     }
-    
+
     private void InsertSplit(SplitEntry newEntry)
     {
         if (SelectedSplit?.Type == SplitType.Parent)
@@ -232,7 +235,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
             Splits.Add(newEntry);
         }
     }
-    
+
     private void AddGroup()
     {
         var name = MsgBox.ShowInput("Group Name", "", "New Group");
@@ -316,6 +319,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
         FilterEvents();
         IsDirty = true;
     }
+
     private void MoveUp(SplitEntry entry)
     {
         var index = Splits.IndexOf(entry);
@@ -398,7 +402,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
             IsDirty = true;
         }
     }
-    
+
     private int FindLastChildIndex(int parentIndex)
     {
         var lastIndex = parentIndex;
@@ -435,12 +439,13 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
     {
         var result = MsgBox.ShowInput("Profile Name", "", "New Profile");
 
-
         if (string.IsNullOrWhiteSpace(result))
         {
             MsgBox.Show("Profile name required", "New Profile");
             return;
         }
+
+        var currentSplits = Splits.ToList();
 
         var profile = new Profile
         {
@@ -449,9 +454,34 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
             Splits = []
         };
 
+        if (currentSplits.Any())
+        {
+            var keepSplits = MsgBox.ShowOkCancel(
+                $"Current splits list is not empty.{Environment.NewLine}Would you like to add the splits into the new profile?",
+                "New Profile");
+
+            if (keepSplits)
+                profile.Splits = currentSplits;
+        }
+
         _profileService.SaveProfile(profile);
         Profiles.Add(profile);
         SelectedProfile = profile;
+    }
+
+    private void RenameProfile()
+    {
+        if (_selectedProfile == null) return;
+
+        var newName = MsgBox.ShowInput("Profile Name", _selectedProfile.Name, "Rename Profile");
+        if (string.IsNullOrWhiteSpace(newName)) return;
+        if (newName == _selectedProfile.Name) return;
+
+        _profileService.DeleteProfile(_gameName, _selectedProfile.Name);
+        _selectedProfile.Name = newName;
+        _profileService.SaveProfile(_selectedProfile);
+
+        IsDirty = false;
     }
 
     private void Save()
@@ -473,7 +503,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
         Profiles.Remove(_selectedProfile);
         SelectedProfile = Profiles.FirstOrDefault();
     }
-    
+
     private void AssignGroupFromPosition(SplitEntry entry, int index)
     {
         if (entry.Type == SplitType.Parent) return;
@@ -490,8 +520,6 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
 
         entry.GroupId = groupId;
     }
-    
-    
 
     #endregion
 }

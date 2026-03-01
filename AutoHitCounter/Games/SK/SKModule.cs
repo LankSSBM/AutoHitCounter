@@ -9,13 +9,23 @@ using static AutoHitCounter.Games.SK.SKOffsets;
 
 namespace AutoHitCounter.Games.SK;
 
-public class SKModule : IGameModule, IDisposable
+public class SKModule : IGameModule, IDisposable, IVersionedGameModule
 {
     private readonly IMemoryService _memoryService;
     private readonly IStateService _stateService;
     private readonly HookManager _hookManager;
     private readonly ITickService _tickService;
     private readonly Dictionary<uint, string> _events;
+    
+    public string GameVersion => SKOffsets.Version switch
+{
+    SKVersion.Version1_2_0 => "1.2.0",
+    SKVersion.Version1_3_0 => "1.3.0.",
+    SKVersion.Version1_4_0 => "1.4.0.",
+	SKVersion.Version1_5_0 => "1.5.0.",
+	SKVersion.Version1_6_0 => "1.6.0.",
+    _ => "Unknown"
+};
     
     private DateTime? _lastHit;
     private nint _igtPtr;

@@ -110,6 +110,7 @@
         <Compile Include="Behaviors\SplitListDragDropBehavior.cs" />
         <Compile Include="Converters\ExpanderArrowConverter.cs" />
         <Compile Include="Converters\InverseBoolConverter.cs" />
+        <Compile Include="Converters\LockIconConverter.cs" />
         <Compile Include="Converters\ParentChildMarginConverter.cs" />
         <Compile Include="Core\DelegateCommand.cs" />
         <Compile Include="Enums\AsmScript.cs" />
@@ -160,6 +161,7 @@
         <Compile Include="Interfaces\ISettingsService.cs" />
         <Compile Include="Interfaces\IStateService.cs" />
         <Compile Include="Interfaces\ITickService.cs" />
+        <Compile Include="Interfaces\IVersionedGameModule.cs" />
         <Compile Include="Mappers\OverlayMapper.cs" />
         <Compile Include="Memory\HookManager.cs" />
         <Compile Include="Memory\Kernel32.cs" />

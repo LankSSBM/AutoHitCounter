@@ -9,7 +9,7 @@ using AutoHitCounter.Memory;
 
 namespace AutoHitCounter.Games.DS2S;
 
-public class DS2ScholarModule : IGameModule, IDisposable
+public class DS2ScholarModule : IGameModule, IDisposable, IVersionedGameModule
 {
     private readonly IMemoryService _memoryService;
     private readonly IStateService _stateService;
@@ -19,9 +19,16 @@ public class DS2ScholarModule : IGameModule, IDisposable
     private DS2ScholarEventService _eventService;
     private DS2ScholarIgtService _igtService;
     private readonly Dictionary<uint, string> _events;
-    
+
+    public string GameVersion => DS2ScholarOffsets.Version switch
+    {
+        DS2ScholarVersion.Version1_0_2 => "1.0.2",
+        DS2ScholarVersion.Version1_0_3 => "1.0.3",
+        _ => "Unknown"
+    };
+
     private DateTime? _lastHit;
-    
+
     public event Action<int> OnHit;
     public event Action OnEventSet;
     public event Action<long> OnIgtChanged;
@@ -42,20 +49,20 @@ public class DS2ScholarModule : IGameModule, IDisposable
     private void Initialize()
     {
         InitializeOffsets();
-        
+
         DS2ScholarCustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
-        
+
 #if DEBUG
         Console.WriteLine($@"Code cave: 0x{(long)DS2ScholarCustomCodeOffsets.Base:X}");
 #endif
-        
+
         _hitService = new DS2ScholarHitService(_memoryService, _hookManager);
         _hitService.InstallHooks();
         _eventService = new DS2ScholarEventService(_memoryService, _hookManager, _events);
         _eventService.InstallHook();
         _igtService = new DS2ScholarIgtService(_memoryService, _hookManager);
         _igtService.InstallHooks();
-        
+
         _tickService.RegisterGameTick(Tick);
     }
 
@@ -68,7 +75,7 @@ public class DS2ScholarModule : IGameModule, IDisposable
         var moduleBase = _memoryService.BaseAddress;
         DS2ScholarOffsets.Initialize(fileSize, moduleBase);
     }
-    
+
     private void Tick()
     {
         if (_hitService.HasHit() && (_lastHit == null || (DateTime.Now - _lastHit.Value).TotalSeconds > 3))

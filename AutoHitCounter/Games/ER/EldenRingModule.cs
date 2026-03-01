@@ -9,7 +9,7 @@ using static AutoHitCounter.Games.ER.EldenRingOffsets;
 
 namespace AutoHitCounter.Games.ER;
 
-public class EldenRingModule : IGameModule, IDisposable
+public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
 {
     private readonly IMemoryService _memoryService;
     private readonly IStateService _stateService;
@@ -18,6 +18,35 @@ public class EldenRingModule : IGameModule, IDisposable
     private readonly Dictionary<uint, string> _events;
     private EldenRingHitService _hitService;
     private EldenRingEventService _eventService;
+    public string GameVersion => EldenRingOffsets.Version switch
+{
+    EldenRingVersion.Version1_2_0 => "1.02",
+    EldenRingVersion.Version1_2_1 => "1.2.1",
+    EldenRingVersion.Version1_2_2 => "1.2.2",
+    EldenRingVersion.Version1_2_3 => "1.2.3",
+    EldenRingVersion.Version1_3_0 => "1.3.0",
+    EldenRingVersion.Version1_3_1 => "1.3.1",
+    EldenRingVersion.Version1_3_2 => "1.3.2",
+    EldenRingVersion.Version1_4_0 => "1.4.0",
+    EldenRingVersion.Version1_4_1 => "1.4.1",
+    EldenRingVersion.Version1_5_0 => "1.5.0",
+    EldenRingVersion.Version1_6_0 => "1.6.0",
+    EldenRingVersion.Version1_7_0 => "1.7.0",
+    EldenRingVersion.Version1_8_0 => "1.8.0",
+    EldenRingVersion.Version1_8_1 => "1.8.1",
+    EldenRingVersion.Version1_9_0 => "1.09",
+    EldenRingVersion.Version1_9_1 => "1.09.1",
+    EldenRingVersion.Version2_0_0 => "1.10",
+    EldenRingVersion.Version2_0_1 => "1.10.1",
+    EldenRingVersion.Version2_2_0 => "1.12.2",
+    EldenRingVersion.Version2_2_3 => "1.12.4",
+    EldenRingVersion.Version2_3_0 => "1.13.1",
+    EldenRingVersion.Version2_4_0 => "1.14.1",
+    EldenRingVersion.Version2_5_0 => "1.15",
+    EldenRingVersion.Version2_6_0 => "1.16",
+    EldenRingVersion.Version2_6_1 => "1.16.1",
+    _ => "Unknown"
+};
 
     private DateTime? _lastHit;
 

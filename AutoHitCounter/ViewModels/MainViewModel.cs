@@ -32,8 +32,8 @@ namespace AutoHitCounter.ViewModels
             public bool IsRunComplete { get; } = isRunComplete;
             public TimeSpan InGameTime { get; } = inGameTime;
         }
-        
-        
+
+
         private readonly Dictionary<string, RunSnapshot> _runSnapshots = new();
 
         public SettingsViewModel Settings { get; }
@@ -73,6 +73,17 @@ namespace AutoHitCounter.ViewModels
             SetPbCommand = new DelegateCommand(SetPb);
 
 
+            _isUnlocked = SettingsManager.Default.IsUnlocked;
+            ToggleLockCommand = new DelegateCommand(() =>
+            {
+                IsUnlocked = !IsUnlocked;
+                SettingsManager.Default.IsUnlocked = IsUnlocked;
+                SettingsManager.Default.Save();
+            });
+
+            InitialiseCommands();
+
+
             Games.Add(new Game { GameName = "Dark Souls Remastered", ProcessName = "darksoulsremastered" });
             Games.Add(new Game { GameName = "Dark Souls 2 Vanilla", ProcessName = "darksoulsii" });
             Games.Add(new Game { GameName = "Dark Souls 2 Scholar", ProcessName = "darksoulsii" });
@@ -103,6 +114,12 @@ namespace AutoHitCounter.ViewModels
         public DelegateCommand SetPbCommand { get; }
 
         public DelegateCommand SaveNotesCommand { get; }
+
+        public DelegateCommand ToggleLockCommand { get; set; }
+
+        public DelegateCommand ResetSelectedSplitHitsCommand { get; set; }
+
+        public DelegateCommand RenameSelectedSplitCommand { get; set; }
 
         #endregion
 
@@ -148,7 +165,7 @@ namespace AutoHitCounter.ViewModels
                     var outKey = $"{_selectedGame?.GameName}|{_activeProfile.Name}";
                     _runSnapshots[outKey] = CaptureSnapshot();
                 }
-        
+
                 SetProperty(ref _selectedGame, value);
                 _activeProfile = null;
 
@@ -158,6 +175,17 @@ namespace AutoHitCounter.ViewModels
 
                 ActiveProfile = Profiles.FirstOrDefault(p => p.Name == SettingsManager.Default.LastSelectedProfile)
                                 ?? Profiles.FirstOrDefault();
+                if (!Profiles.Any())
+                {
+                    _activeProfile = null;
+                    Splits.Clear();
+                    CurrentSplit = null;
+                    IsRunComplete = false;
+                    OnPropertyChanged(nameof(ActiveProfile));
+                    OnPropertyChanged(nameof(TotalHits));
+                    OnPropertyChanged(nameof(TotalPb));
+                    _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
+                }
             }
         }
 
@@ -185,7 +213,13 @@ namespace AutoHitCounter.ViewModels
         public SplitViewModel SelectedSplit
         {
             get => _selectedSplit;
-            set => SetProperty(ref _selectedSplit, value);
+            set
+            {
+                if (_selectedSplit != null && _selectedSplit.IsEditing)
+                    CommitRename(_selectedSplit);
+
+                SetProperty(ref _selectedSplit, value);
+            }
         }
 
         private SplitViewModel _currentSplit;
@@ -204,7 +238,7 @@ namespace AutoHitCounter.ViewModels
             set
             {
                 if (_activeProfile == value) return;
-                
+
                 if (_activeProfile != null)
                 {
                     var outKey = $"{_selectedGame?.GameName}|{_activeProfile.Name}";
@@ -259,6 +293,20 @@ namespace AutoHitCounter.ViewModels
 
         public int TotalHits => Splits.Where(s => s.Type == SplitType.Child).Sum(s => s.NumOfHits);
         public int TotalPb => Splits.Where(s => s.Type == SplitType.Child).Sum(s => s.PersonalBest);
+
+        public void CommitRename(SplitViewModel split)
+        {
+            split.IsEditing = false;
+            if (ActiveProfile == null) return;
+            var index = Splits.IndexOf(split);
+            if (index >= 0 && index < ActiveProfile.Splits.Count)
+            {
+                ActiveProfile.Splits[index].DisplayName = split.Name;
+                _profileService.SaveProfile(ActiveProfile);
+            }
+
+            _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
+        }
 
         #endregion
 
@@ -318,9 +366,33 @@ namespace AutoHitCounter.ViewModels
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
 
+        private bool _isUnlocked = true;
+
+        public bool IsUnlocked
+        {
+            get => _isUnlocked;
+            set => SetProperty(ref _isUnlocked, value);
+        }
+
         #endregion
 
         #region Private Methods
+
+        private void InitialiseCommands()
+        {
+            RenameSelectedSplitCommand = new DelegateCommand(() =>
+            {
+                if (SelectedSplit == null || SelectedSplit.IsParent) return;
+                SelectedSplit.IsEditing = true;
+            });
+
+            ResetSelectedSplitHitsCommand = new DelegateCommand(() =>
+            {
+                if (SelectedSplit == null || SelectedSplit.IsParent) return;
+                SelectedSplit.NumOfHits = 0;
+                _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
+            });
+        }
 
         private void RegisterHotkeys()
         {
@@ -334,7 +406,10 @@ namespace AutoHitCounter.ViewModels
         private void OnAttached()
         {
             IsAttached = true;
-            AttachedText = $"Attached to {SelectedGame.ProcessName}.exe";
+            var version = (_currentModule as IVersionedGameModule)?.GameVersion;
+            AttachedText = string.IsNullOrEmpty(version)
+                ? $"Attached to {SelectedGame.GameName}"
+                : $"Attached to {SelectedGame.GameName} ({version})";
         }
 
         private void OnNotAttached()

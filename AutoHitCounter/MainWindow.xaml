@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         xmlns:converters="clr-namespace:AutoHitCounter.Converters"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:controls="clr-namespace:AutoHitCounter.Views.Controls"
         xmlns:behaviors="clr-namespace:AutoHitCounter.Behaviors"
         Icon="pack://application:,,,/Assets/icon.ico"
@@ -20,8 +19,61 @@
         <system:Double x:Key="FontSizeBody">13</system:Double>
         <converters:ParentChildMarginConverter x:Key="ParentChildMarginConverter" />
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
-        <converters:ExpanderArrowConverter x:Key="ExpanderArrowConverter" />
-        <xctk:InverseBoolConverter x:Key="InverseBoolConverter" />
+        <converters:LockIconConverter x:Key="LockIconConverter" />
+        <converters:LockTooltipConverter x:Key="LockTooltipConverter" />
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#9D61A8" />
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White" />
+        <!-- Styling the menu items -->
+        <Style x:Key="MenuItemStyle" TargetType="MenuItem">
+            <Setter Property="Foreground" Value="#DDDDDD" />
+            <Setter Property="Background" Value="#1e1e1e" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderThickness="2,0,0,0"
+                                BorderBrush="Transparent"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter ContentSource="Header" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#6683518c" />
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#9D61A8" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#555555" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- styling the context menu -->
+        <Style x:Key="ContextMenuStyle" TargetType="ContextMenu">
+            <Setter Property="Background" Value="#1e1e1e" />
+            <Setter Property="BorderBrush" Value="#5a3d63" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="0,4" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3"
+                                Padding="{TemplateBinding Padding}">
+                            <ItemsPresenter />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
     </Window.Resources>
 
     <Grid>
@@ -94,7 +146,7 @@
                                        FontSize="9" Foreground="#555555" Margin="2,1,0,0" />
                         </StackPanel>
 
-                        <StackPanel Grid.Column="1" Margin="4,0,4,0">
+                        <StackPanel Grid.Column="1" Margin="0,0,4,0">
                             <TextBlock Text="PROFILE"
                                        FontFamily="{StaticResource AppFont}"
                                        FontSize="10"
@@ -105,14 +157,20 @@
                                       DisplayMemberPath="Name" />
                         </StackPanel>
 
-                        <Button Grid.Column="2"
-                                Content="✎"
-                                Command="{Binding OpenProfileEditorCommand}"
-                                VerticalAlignment="Center"
-                                Width="30"
-                                Height="22"
-                                FontSize="14"
-                                ToolTip="Edit Profile" />
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
+                                    Margin="0,2,-2,0">
+                            <Button Content="✎"
+                                    Command="{Binding OpenProfileEditorCommand}"
+                                    Width="30" Height="22"
+                                    FontSize="14"
+                                    ToolTip="Edit Profile" />
+                            <Button Content="{Binding IsUnlocked, Converter={StaticResource LockIconConverter}}"
+                                    Command="{Binding ToggleLockCommand}"
+                                    Width="30" Height="22"
+                                    FontSize="13"
+                                    Margin="4,0,0,0"
+                                    ToolTip="{Binding IsUnlocked, Converter={StaticResource LockTooltipConverter}}" />
+                        </StackPanel>
                     </Grid>
 
                     <Border Grid.Row="1" BorderBrush="#333333" BorderThickness="0,0,0,1">
@@ -122,6 +180,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition x:Name="HeaderScrollSpacer" Width="0" />
                             </Grid.ColumnDefinitions>
 
                             <!-- Splits Header -->
@@ -150,18 +209,39 @@
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Grid>
                     </Border>
-                    <ListBox Grid.Row="2"
+                    <ListBox x:Name="SplitListBox"
+                             Grid.Row="2"
                              ItemsSource="{Binding Splits}"
                              SelectedItem="{Binding SelectedSplit}"
                              AlternationCount="2"
-                             behaviors:SplitListDragDropBehavior.IsEnabled="True"
+                             behaviors:SplitListDragDropBehavior.IsEnabled="{Binding IsUnlocked}"
                              Background="Transparent"
                              BorderThickness="0"
+                             ScrollViewer.ScrollChanged="SplitList_ScrollChanged"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+
+                        <!-- Context Menu -->
+                        <ListBox.ContextMenu>
+                            <ContextMenu Style="{StaticResource ContextMenuStyle}">
+                                <MenuItem Header="Rename"
+                                          Style="{StaticResource MenuItemStyle}"
+                                          Command="{Binding PlacementTarget.DataContext.RenameSelectedSplitCommand,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <MenuItem Header="Reset Split Hits"
+                                          Style="{StaticResource MenuItemStyle}"
+                                          Command="{Binding PlacementTarget.DataContext.ResetSelectedSplitHitsCommand,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <MenuItem Header="Save Notes"
+                                          Style="{StaticResource MenuItemStyle}"
+                                          Command="{Binding PlacementTarget.DataContext.SaveNotesCommand,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
 
                         <!-- Split List -->
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
+                                <EventSetter Event="MouseDoubleClick" Handler="SplitItem_DoubleClick" />
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                 <Setter Property="BorderThickness" Value="4,0,0,0" />
                                 <Setter Property="BorderBrush" Value="Transparent" />
@@ -192,7 +272,7 @@
                                                 </Trigger>
                                                 <DataTrigger Binding="{Binding IsCurrent}" Value="True">
                                                     <Setter TargetName="Border" Property="BorderBrush" Value="#c47fd4" />
-                                                    <Setter TargetName="Border" Property="Background" Value="#1e1028" />
+                                                    <Setter TargetName="Border" Property="Background" Value="#B37c4d85" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding IsParent}" Value="True">
                                                     <Setter TargetName="Border" Property="Background" Value="#1A1A1A" />
@@ -219,13 +299,48 @@
                                         </Grid.ColumnDefinitions>
 
 
-                                        <TextBlock Grid.Column="0"
-                                                   Text="{Binding Name}"
-                                                   FontFamily="{StaticResource AppFont}"
-                                                   FontSize="{StaticResource FontSizeBody}"
-                                                   VerticalAlignment="Center"
-                                                   Margin="{Binding Type,
-                                                       Converter={StaticResource ParentChildMarginConverter}}" />
+                                        <!-- Name column -->
+                                        <Grid Grid.Column="0">
+                                            <TextBlock Text="{Binding Name}"
+                                                       FontFamily="{StaticResource AppFont}"
+                                                       FontSize="{StaticResource FontSizeBody}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="{Binding Type, Converter={StaticResource ParentChildMarginConverter}}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+
+                                            <TextBox x:Name="RenameBox"
+                                                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                                     FontFamily="{StaticResource AppFont}"
+                                                     FontSize="{StaticResource FontSizeBody}"
+                                                     VerticalAlignment="Center"
+                                                     Margin="{Binding Type, Converter={StaticResource ParentChildMarginConverter}}"
+                                                     KeyDown="RenameBox_KeyDown"
+                                                     LostFocus="RenameBox_LostFocus">
+                                                <TextBox.Style>
+                                                    <Style TargetType="TextBox">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Setter Property="Background" Value="#1c1424" />
+                                                        <Setter Property="BorderBrush" Value="#5a3d63" />
+                                                        <Setter Property="BorderThickness" Value="1" />
+                                                        <Setter Property="Foreground" Value="White" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBox.Style>
+                                            </TextBox>
+                                        </Grid>
 
                                         <TextBlock Grid.Column="1"
                                                    Text="{Binding NumOfHits}"
@@ -350,7 +465,7 @@
 
                     <Grid Grid.Row="3">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"
-                                    VerticalAlignment="Center" Margin="5,0,0,0">
+                                    VerticalAlignment="Bottom" Margin="5,0,0,5">
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
                                     <Style.Triggers>
@@ -360,9 +475,9 @@
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
-                            <Button Content="- Hit" Width="50" Height="28"
+                            <Button Content="- Hit" Width="50" Height="24"
                                     Command="{Binding DecrementHitCommand}" />
-                            <Button Content="+ Hit" Width="50" Height="28" Margin="3,0,0,0"
+                            <Button Content="+ Hit" Width="50" Height="24" Margin="3,0,0,0"
                                     Command="{Binding IncrementHitCommand}" />
                             <Rectangle Width="1" Height="16" Fill="#444" Margin="8,0" VerticalAlignment="Center" />
                             <Button Content="← Prev" Height="24" Margin="0,0,3,0"
@@ -386,8 +501,10 @@
                                 <TextBlock Text="{Binding TotalPb}" Foreground="White" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button Content="Mark as PB" Margin="4,0" />
-                                <Button Content="Reset" Margin="4,0" />
+                                <Button Content="Mark as PB" Margin="4,0"
+                                        Command="{Binding SetPbCommand}" />
+                                <Button Content="Reset" Margin="4,0"
+                                        Command="{Binding ResetCommand}" />
                             </StackPanel>
                         </StackPanel>
 

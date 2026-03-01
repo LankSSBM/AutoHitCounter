@@ -9,13 +9,36 @@ using static AutoHitCounter.Games.DS3.DS3Offsets;
 
 namespace AutoHitCounter.Games.DS3;
 
-public class DS3Module : IGameModule, IDisposable
+public class DS3Module : IGameModule, IDisposable, IVersionedGameModule
 {
     private readonly IMemoryService _memoryService;
     private readonly IStateService _stateService;
     private readonly HookManager _hookManager;
     private readonly ITickService _tickService;
     private readonly Dictionary<uint, string> _events;
+    
+    public string GameVersion => DS3Offsets.Version switch
+{
+    DS3Version.Version1_3_2_0 => "1.3.2",
+    DS3Version.Version1_4_1_0 => "1.4.1",
+    DS3Version.Version1_4_2_0 => "1.4.2",
+    DS3Version.Version1_4_3_0 => "1.4.3",
+    DS3Version.Version1_5_0_0 => "1.5.0",
+    DS3Version.Version1_5_1_0 => "1.5.1",
+    DS3Version.Version1_6_0_0 => "1.6.0",
+    DS3Version.Version1_7_0_0 => "1.7.0",
+    DS3Version.Version1_8_0_0 => "1.8.0",
+    DS3Version.Version1_9_0_0 => "1.9.0",
+    DS3Version.Version1_10_0_0 => "1.10.0",
+    DS3Version.Version1_11_0_0 => "1.11.0",
+    DS3Version.Version1_12_0_0 => "1.12.0",
+    DS3Version.Version1_13_0_0 => "1.13.0",
+    DS3Version.Version1_14_0_0 => "1.14.0",
+    DS3Version.Version1_15_0_0 => "1.15.0",
+    DS3Version.Version1_15_1_0 => "1.15.1",
+    DS3Version.Version1_15_2_0 => "1.15.2",
+    _ => "Unknown"
+};
     
     private DateTime? _lastHit;
     private nint _igtPtr;

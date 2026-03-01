@@ -29,7 +29,7 @@
 
         <controls:TitleBar Grid.Row="0" Title="Profile Editor" />
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5.5,0,17.5">
             <TextBlock Text="PROFILE"
                        VerticalAlignment="Center" Margin="0,0,8,0"
                        FontWeight="SemiBold" />
@@ -43,6 +43,8 @@
 
             <Button Content="New" Margin="0,0,4,0"
                     Command="{Binding NewProfileCommand}" />
+             <Button Content="Rename" Margin="0,0,4,0"
+                    Command="{Binding RenameProfileCommand}" />
             <Button Content="Delete" Margin="0,0,4,0"
                     Command="{Binding DeleteCommand}" />
             <Button Content="Save"

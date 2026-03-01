@@ -45,6 +45,7 @@ public class SettingsManager
     public bool ShowPb { get; set; }
     [DefaultValue(true)]
     public bool ShowIgt { get; set; }
+    public bool IsUnlocked { get; set; }
 
     public void Save()
     {
