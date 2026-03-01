@@ -14,9 +14,9 @@ public static class DS2ScholarOffsets
     public static DS2ScholarVersion Version => _version
                                                ?? Version1_0_3;
 
-    public static void Initialize(long fileVersion, nint moduleBase)
+    public static void Initialize(long fileSize, nint moduleBase)
     {
-        _version = fileVersion switch
+        _version = fileSize switch
         {
             31605096 => Version1_0_2,
             28200992 => Version1_0_3,
