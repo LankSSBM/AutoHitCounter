@@ -4,6 +4,9 @@ namespace AutoHitCounter.Enums;
 
 public enum AsmScript
 {
+    DSRHit,
+    DSRApplyHealthDelta,
+    
     ScholarHit,
     ScholarGeneralApplyDamage,
     ScholarKillBox,

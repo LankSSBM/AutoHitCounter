@@ -7,6 +7,7 @@ using AutoHitCounter.Enums;
 using AutoHitCounter.Interfaces;
 using AutoHitCounter.Memory;
 using AutoHitCounter.Utilities;
+using static AutoHitCounter.Games.DSR.DSROffsets;
 
 namespace AutoHitCounter.Games.DSR;
 
@@ -48,18 +49,18 @@ public class DSRModule : IGameModule, IDisposable, IVersionedGameModule
         InitializeOffsets();
         OnVersionDetected?.Invoke();
 
-//         SKCustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
-//         
-// #if DEBUG
-//         Console.WriteLine($@"Code cave: 0x{(long)SKCustomCodeOffsets.Base:X}");
-// #endif
-//
-//         _hitService = new SKHitService(_memoryService, _hookManager);
+        DSRCustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
+        
+#if DEBUG
+        Console.WriteLine($@"Code cave: 0x{(long)DSRCustomCodeOffsets.Base:X}");
+#endif
+
+         _hitService = new DSRHitService(_memoryService, _hookManager);
 //         _eventService = new SKEventService(_memoryService, _hookManager, _events);
 //         // _eventService.InstallHook();
-//         _hitService.InstallHooks();
+         _hitService.InstallHooks();
 //         // _igtPtr = _memoryService.Read<nint>(GameDataMan.Base) + GameDataMan.Igt;
-//         _tickService.RegisterGameTick(Tick);
+         _tickService.RegisterGameTick(Tick);
     }
     
     private void InitializeOffsets()
@@ -70,6 +71,32 @@ public class DSRModule : IGameModule, IDisposable, IVersionedGameModule
         var fileSize = fileInfo.Length;
         var moduleBase = _memoryService.BaseAddress;
         DSROffsets.Initialize(fileSize, moduleBase);
+    }
+    
+    private void Tick()
+    {
+        if (!IsLoaded()) return;
+
+        _hitService.EnsureHooksInstalled();
+
+        if (_hitService.HasHit() && (_lastHit == null || (DateTime.Now - _lastHit.Value).TotalSeconds > 3))
+        {
+            OnHit?.Invoke(1);
+            _lastHit = DateTime.Now;
+        }
+
+        // if (_eventService.ShouldSplit())
+        // {
+        //     OnEventSet?.Invoke();
+        // }
+        //
+        // OnIgtChanged?.Invoke(_memoryService.Read<uint>(_igtPtr));
+    }
+
+    private bool IsLoaded()
+    {
+        var worldChrman = _memoryService.Read<nint>(WorldChrMan.Base);
+        return _memoryService.Read<nint>(worldChrman + WorldChrMan.PlayerIns) != 0;
     }
 
     public void Dispose()

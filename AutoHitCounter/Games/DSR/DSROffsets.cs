@@ -40,6 +40,19 @@ public static class DSROffsets
     public static class WorldChrMan
     {
         public static nint Base;
+
+        public const int PlayerIns = 0x68;
+    }
+
+    public static nint FallDmgRetAddr;
+    public static nint AuxDeathRetAddr;
+    
+    
+    public static class Hooks
+    {
+        public static nint Hit;
+        public static nint ApplyHealthDelta;
+
     }
 
     private static void InitializeBaseAddresses(nint moduleBase)
@@ -54,21 +67,59 @@ public static class DSROffsets
             _ => 0
         };
 
+        FallDmgRetAddr= moduleBase+ Version switch
+        {
+            // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1, Version1_0_1_2
+            Version1_0_3_0 => 0x32610E,
+            Version1_0_3_1 => 0x3282BE,
+            _ => 0
+        };
+        
+        AuxDeathRetAddr = moduleBase + Version switch
+        {
+            // WARNING: No match found for: Version1_0_3_1
+            Version1_0_1_0 => 0x31CF9E,
+            Version1_0_1_1 => 0x31CC9E,
+            Version1_0_1_2 => 0x3201BE,
+            Version1_0_3_0 => 0x32D384,
+            _ => 0
+        };
+
+
+        
+        Hooks.Hit = moduleBase + Version switch
+        {
+            // WARNING: No match found for: Version1_0_1_2, Version1_0_3_1
+            Version1_0_1_0 => 0x28065C5,
+            Version1_0_1_1 => 0x210131E,
+            Version1_0_3_0 => 0x2305994,
+            _ => 0
+        };
+        
+        Hooks.ApplyHealthDelta = moduleBase + Version switch
+        {
+            // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1, Version1_0_1_2
+            Version1_0_3_0 => 0x32071C,
+            Version1_0_3_1 => 0x32296C,
+            _ => 0
+        };
+
 
 #if DEBUG
         _baseAddr = moduleBase;
         Console.WriteLine("--- Globals ---");
         PrintOffset("WorldChrMan.Base", WorldChrMan.Base);
 
-        // PrintOffset("FallDamageKillingFloor", FallDamageKillFloor);
+        PrintOffset("FallDmgRetAddr", FallDmgRetAddr);
+        PrintOffset("AuxDeathRetAddr", AuxDeathRetAddr);
 
         Console.WriteLine("\n--- Hooks ---");
-        // PrintOffset("Hooks.Hit", Hooks.Hit);
+        PrintOffset("Hooks.Hit", Hooks.Hit);
+        PrintOffset("Hooks.ApplyHealthDelta", Hooks.ApplyHealthDelta);
         // PrintOffset("Hooks.LethalFall", Hooks.LethalFall);
         // PrintOffset("Hooks.CheckAuxAttacker", Hooks.CheckAuxAttacker);
         // PrintOffset("Hooks.AuxProc", Hooks.AuxProc);
         // PrintOffset("Hooks.HasJailerDrain", Hooks.HasJailerDrain);
-        // PrintOffset("Hooks.ApplyHealthDelta", Hooks.ApplyHealthDelta);
         // PrintOffset("Hooks.KillBox", Hooks.KillBox);
         // PrintOffset("Hooks.SetEvent", Hooks.SetEvent);
 
