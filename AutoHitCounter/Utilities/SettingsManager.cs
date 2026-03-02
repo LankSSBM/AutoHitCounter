@@ -45,6 +45,8 @@ public class SettingsManager
     public bool ShowPb { get; set; }
     [DefaultValue(true)]
     public bool ShowIgt { get; set; }
+    [DefaultValue(300)]
+    public int OverlayWidth { get; set; }
     public bool IsUnlocked { get; set; }
 
     public void Save()
@@ -110,6 +112,8 @@ public class SettingsManager
                         double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? d : 0.0,
                     { } t when t == typeof(float) =>
                         float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var f) ? f : 0f,
+                    { } t when t == typeof(int) =>
+                        int.TryParse(value, out var i) ? i : (object)null,
                     { } t when t == typeof(bool) =>
                         bool.TryParse(value, out var b) && b,
                     { } t when t == typeof(string) => value,

@@ -159,9 +159,23 @@ public class SettingsViewModel : BaseViewModel
             BroadcastConfigChanged();
         }
     }
-    
-    
-    
+
+    private int _overlayWidth;
+
+    public int OverlayWidth
+    {
+        get => _overlayWidth;
+        set
+        {
+            if (!SetProperty(ref _overlayWidth, value)) return;
+            SettingsManager.Default.OverlayWidth = value;
+            SettingsManager.Default.Save();
+            BroadcastConfigChanged();
+        }
+    }
+
+
+
     #endregion
 
 
@@ -202,13 +216,16 @@ public class SettingsViewModel : BaseViewModel
         
         _showIgt = SettingsManager.Default.ShowIgt;
         OnPropertyChanged(nameof(ShowIgt));
-        
+
+        _overlayWidth = SettingsManager.Default.OverlayWidth;
+        OnPropertyChanged(nameof(OverlayWidth));
+
         BroadcastConfigChanged();
     }
 
     private void BroadcastConfigChanged()
     {
-        var config = new OverlayConfig(MaxSplits, PrevSplits, NextSplits, ShowDiff, ShowPb, ShowIgt);
+        var config = new OverlayConfig(MaxSplits, PrevSplits, NextSplits, ShowDiff, ShowPb, ShowIgt, OverlayWidth);
         _overlayServerService.BroadcastConfig(config);
     }
 

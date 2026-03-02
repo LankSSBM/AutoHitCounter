@@ -152,7 +152,8 @@
             nextSplits: 8,
             showDiff: true,
             showPb: true,
-            showIgt: true
+            showIgt: true,
+            overlayWidth: 300
         }
 
         let config = {...DEFAULTS}
@@ -212,16 +213,25 @@
                 + (config.showPb ? '<span>PB</span>' : '');
 
             igtEl.style.display = config.showIgt ? '' : 'none';
+            overlay.style.width = config.overlayWidth + 'px';
         }
 
         function renderState(state) {
             const cols = getGridColumns();
             let html = '';
 
-            const limit = Math.min(state.splits.length, config.maxSplits);
+            let splits = state.splits;
+            const currentIndex = splits.findIndex(s => s.isCurrent);
+            if (currentIndex >= 0) {
+                const start = Math.max(0, currentIndex - config.prevSplits);
+                const end = Math.min(splits.length, currentIndex + config.nextSplits + 1);
+                splits = splits.slice(start, end);
+            } else {
+                splits = splits.slice(0, config.maxSplits);
+            }
 
-            for (let i = 0; i < limit; i++) {
-                html += buildRow(state.splits[i], cols);
+            for (const split of splits) {
+                html += buildRow(split, cols);
             }
             splitsEl.innerHTML = html;
 
