@@ -56,7 +56,7 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
 
         _hitService = new SKHitService(_memoryService, _hookManager);
         _eventService = new SKEventService(_memoryService, _hookManager, _events);
-        // _eventService.InstallHook();
+        _eventService.InstallHook();
         _hitService.InstallHooks();
         // _igtPtr = _memoryService.Read<nint>(GameDataMan.Base) + GameDataMan.Igt;
         _tickService.RegisterGameTick(Tick);
@@ -82,11 +82,11 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
             _lastHit = DateTime.Now;
         }
 
-        // if (_eventService.ShouldSplit())
-        // {
-        //     OnEventSet?.Invoke();
-        // }
-        //
+        if (_eventService.ShouldSplit())
+        {
+            OnEventSet?.Invoke();
+        }
+        
         // OnIgtChanged?.Invoke(_memoryService.Read<uint>(_igtPtr));
     }
 

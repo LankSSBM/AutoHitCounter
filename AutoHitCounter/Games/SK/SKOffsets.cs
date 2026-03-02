@@ -61,6 +61,7 @@ public static class SKOffsets
         public static nint AuxProc;
         public static nint CheckAuxAttacker;
         public static nint HkbFireEvent;
+        public static nint SetEvent;
     }
 
     public static class Functions
@@ -171,6 +172,14 @@ public static class SKOffsets
             Version1_6_0 => 0x13F9379,
             _ => 0
         };
+        
+        Hooks.SetEvent = moduleBase + Version switch
+        {
+            Version1_2_0 => 0x6C1B90,
+            Version1_3_0 or Version1_4_0 => 0x6C1BF0,
+            Version1_5_0 or Version1_6_0 => 0x6C4520,
+            _ => 0
+        };
 
         Functions.HasSpEffectId = moduleBase + Version switch
         {
@@ -207,6 +216,7 @@ public static class SKOffsets
         PrintOffset("Hooks.AuxProc", Hooks.AuxProc);
         PrintOffset("Hooks.CheckAuxAttacker", Hooks.CheckAuxAttacker);
         PrintOffset("Hooks.HkbFireEvent", Hooks.HkbFireEvent);
+        PrintOffset("Hooks.SetEvent", Hooks.SetEvent);
 
 
         Console.WriteLine("\n--- Functions ---");
