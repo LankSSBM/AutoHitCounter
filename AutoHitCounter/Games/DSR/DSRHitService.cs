@@ -1,5 +1,6 @@
 ﻿// 
 
+using System;
 using System.Linq;
 using AutoHitCounter.Enums;
 using AutoHitCounter.Interfaces;
@@ -18,6 +19,7 @@ public class DSRHitService(IMemoryService memoryService, HookManager hookManager
     {
         InstallHitHook();
         InstallApplyHealthDeltaHook();
+        InstallKillChrHook();
     }
 
     public bool HasHit()
@@ -30,7 +32,7 @@ public class DSRHitService(IMemoryService memoryService, HookManager hookManager
 
     public void EnsureHooksInstalled()
     {
-        nint[] hooks = [Hooks.Hit];
+        nint[] hooks = [Hooks.Hit, Hooks.ApplyHealthDelta];
         if (hooks.Any(h => memoryService.Read<byte>(h) != 0xE9))
             InstallHooks();
     }
@@ -39,13 +41,16 @@ public class DSRHitService(IMemoryService memoryService, HookManager hookManager
     {
         var bytes = AsmLoader.GetAsmBytes(AsmScript.DSRHit);
         var hit = Base + Hit;
+        var envDeathFlag = Base + CheckEnvDeathFlag;
         var code = Base + HitCode;
 
 
         AsmHelper.WriteRelativeOffsets(bytes, [
-            (code + 0x1, WorldChrMan.Base, 7, 0x1 + 3),
-            (code + 0x65, hit, 6, 0x65 + 2),
-            (code + 0x71, Hooks.Hit + 5, 5, 0x71 + 1),
+            (code, envDeathFlag, 7, 2),
+            (code + 0x8, WorldChrMan.Base, 7, 0x8 + 3),
+            (code + 0x8E, hit, 6, 0x8E + 2),
+            (code + 0x96, envDeathFlag, 7, 0x96 + 2),
+            (code + 0xA3, Hooks.Hit + 5, 5, 0xA3 + 1),
         ]);
 
         memoryService.WriteBytes(code, bytes);
@@ -56,21 +61,43 @@ public class DSRHitService(IMemoryService memoryService, HookManager hookManager
     {
         var bytes = AsmLoader.GetAsmBytes(AsmScript.DSRApplyHealthDelta);
         var hit = Base + Hit;
+        var envDeathFlag = Base + CheckEnvDeathFlag;
         var code = Base + ApplyHealthDelta;
 
 
         AsmHelper.WriteRelativeOffsets(bytes, [
-            (code + 0x28, WorldChrMan.Base, 7, 0x28 + 3),
-            (code + 0x3A, hit, 6, 0x3A + 2),
-            (code + 0x41, Hooks.ApplyHealthDelta + 5, 5, 0x41 + 1),
+            (code + 0x17, envDeathFlag, 7, 0x17 + 2),
+            (code + 0x42, WorldChrMan.Base, 7, 0x42 + 3),
+            (code + 0x54, hit, 6, 0x54 + 2),
+            (code + 0x5B, Hooks.ApplyHealthDelta + 5, 5, 0x5B + 1),
         ]);
 
         AsmHelper.WriteAbsoluteAddresses(bytes, [
             (FallDmgRetAddr, 0x6 + 2),
-            (AuxDeathRetAddr, 0x17 + 2)
+            (EnvDeathRetAddr, 0x20 + 2),
+            (AuxDeathRetAddr, 0x31 + 2)
         ]);
 
         memoryService.WriteBytes(code, bytes);
         hookManager.InstallHook(code, Hooks.ApplyHealthDelta, [0x48, 0x89, 0x7C, 0x24, 0x40]);
+    }
+
+    private void InstallKillChrHook()
+    {
+        var bytes = AsmLoader.GetAsmBytes(AsmScript.DSRKillChr);
+        var hit = Base + Hit;
+        var code = Base + KillChr;
+        var originalBytes = DSROriginalBytes.KillChr.GetOriginal();
+        
+        Array.Copy(originalBytes, 0, bytes, 0, originalBytes.Length);
+
+        AsmHelper.WriteRelativeOffsets(bytes, [
+            (code + 0x6, WorldChrMan.Base, 7, 0x6 + 3),
+            (code + 0x18, hit, 6, 0x18 + 2),
+            (code + 0x1F, Hooks.KillChr + 5, 5, 0x1F + 1)
+        ]);
+        
+        memoryService.WriteBytes(code, bytes);
+        hookManager.InstallHook(code, Hooks.KillChr, originalBytes);
     }
 }

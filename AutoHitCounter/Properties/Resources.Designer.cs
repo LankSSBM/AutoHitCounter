@@ -286,15 +286,13 @@ namespace AutoHitCounter.Properties {
         ///48 b8 00 00 00 00 00    movabs rax,0x0
         ///00 00 00 
         ///48 39 44 24 30          cmp    QWORD PTR [rsp+0x30],rax
-        ///74 11                   je     28 &lt;process&gt;
+        ///74 2b                   je     42 &lt;process&gt;
+        ///80 3d 00 00 00 00 00    cmp    BYTE PTR [rip+0x0],0x0        # 1e &lt;_main+0x1e&gt;
+        ///74 11                   je     31 &lt;next&gt;
         ///48 b8 00 00 00 00 00    movabs rax,0x0
         ///00 00 00 
         ///48 39 44 24 30          cmp    QWORD PTR [rsp+0x30],rax
-        ///75 18                   jne    40 &lt;exit&gt;
-        ///
-        ///000000000028 &lt;process&gt;:
-        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 2f &lt;process+0x7&gt;
-        ///48 85 c [rest of string was truncated]&quot;;.
+        ///74 11                   je     42 &lt;p [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DSRApplyHealthDelta {
             get {
@@ -303,21 +301,40 @@ namespace AutoHitCounter.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 50                      push   rax
-        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 8 &lt;_main+0x8&gt;
+        ///   Looks up a localized string similar to c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 7 &lt;_main+0x7&gt;
+        ///50                      push   rax
+        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # f &lt;_main+0xf&gt;
         ///48 85 c0                test   rax,rax
-        ///74 5e                   je     6b &lt;exit&gt;
+        ///0f 84 85 00 00 00       je     9d &lt;exit&gt;
         ///48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
         ///48 85 c0                test   rax,rax
-        ///74 55                   je     6b &lt;exit&gt;
+        ///74 7c                   je     9d &lt;exit&gt;
         ///83 b8 e8 03 00 00 00    cmp    DWORD PTR [rax+0x3e8],0x0
-        ///74 4c                   je     6b &lt;exit&gt;
-        ///48 39 c1                cmp    rcx,rax
-        ///75 47                   jne    6b &lt;e [rest of string was truncated]&quot;;.
+        ///74 73                   je     9d &lt;exit&gt; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DSRHit {
             get {
                 return ResourceManager.GetString("DSRHit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 48 8d 64 24 f8          lea    rsp,[rsp-0x8]
+        ///50                      push   rax
+        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # d &lt;_main+0xd&gt;
+        ///48 85 c0                test   rax,rax
+        ///74 0c                   je     1e &lt;exit&gt;
+        ///48 3b 48 68             cmp    rcx,QWORD PTR [rax+0x68]
+        ///75 06                   jne    1e &lt;exit&gt;
+        ///ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 1e &lt;exit&gt;
+        ///
+        ///00000000001e &lt;exit&gt;:
+        ///58                      pop    rax
+        ///e9 00 00 00 00          jmp    24 &lt;exit [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string DSRKillChr {
+            get {
+                return ResourceManager.GetString("DSRKillChr", resourceCulture);
             }
         }
         

@@ -6,6 +6,7 @@ public enum AsmScript
 {
     DSRHit,
     DSRApplyHealthDelta,
+    DSRKillChr,
     
     ScholarHit,
     ScholarGeneralApplyDamage,

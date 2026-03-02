@@ -46,13 +46,15 @@ public static class DSROffsets
 
     public static nint FallDmgRetAddr;
     public static nint AuxDeathRetAddr;
+    public static nint EnvDeathRetAddr;
+    
     
     
     public static class Hooks
     {
         public static nint Hit;
         public static nint ApplyHealthDelta;
-
+        public static nint KillChr;
     }
 
     private static void InitializeBaseAddresses(nint moduleBase)
@@ -84,6 +86,17 @@ public static class DSROffsets
             Version1_0_3_0 => 0x32D384,
             _ => 0
         };
+        
+        EnvDeathRetAddr = moduleBase + Version switch
+        {
+            Version1_0_1_0 => 0x1151975,
+            Version1_0_1_1 => 0x11517F5,
+            Version1_0_1_2 => 0x31A89D,
+            Version1_0_3_0 => 0x32084D,
+            Version1_0_3_1 => 0x1144085,            //TODO test on 11x patches
+            _ => 0
+        };
+
 
 
         
@@ -103,6 +116,17 @@ public static class DSROffsets
             Version1_0_3_1 => 0x32296C,
             _ => 0
         };
+        
+        Hooks.KillChr = moduleBase + Version switch
+        {
+            Version1_0_1_0 => 0xF2E482,
+            Version1_0_1_1 => 0x3080D02,
+            Version1_0_1_2 => 0x3565DD4,
+            Version1_0_3_0 => 0x298DA68,
+            Version1_0_3_1 => 0x2653E32,
+            _ => 0
+        };
+
 
 
 #if DEBUG
@@ -112,16 +136,13 @@ public static class DSROffsets
 
         PrintOffset("FallDmgRetAddr", FallDmgRetAddr);
         PrintOffset("AuxDeathRetAddr", AuxDeathRetAddr);
+        PrintOffset("EnvDeathRetAddr", EnvDeathRetAddr);
 
         Console.WriteLine("\n--- Hooks ---");
         PrintOffset("Hooks.Hit", Hooks.Hit);
         PrintOffset("Hooks.ApplyHealthDelta", Hooks.ApplyHealthDelta);
-        // PrintOffset("Hooks.LethalFall", Hooks.LethalFall);
-        // PrintOffset("Hooks.CheckAuxAttacker", Hooks.CheckAuxAttacker);
-        // PrintOffset("Hooks.AuxProc", Hooks.AuxProc);
-        // PrintOffset("Hooks.HasJailerDrain", Hooks.HasJailerDrain);
-        // PrintOffset("Hooks.KillBox", Hooks.KillBox);
-        // PrintOffset("Hooks.SetEvent", Hooks.SetEvent);
+        PrintOffset("Hooks.KillChr", Hooks.KillChr);
+      
 
 
         Console.WriteLine("\n--- Functions ---");
