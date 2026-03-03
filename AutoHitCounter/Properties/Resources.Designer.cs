@@ -1008,18 +1008,18 @@ namespace AutoHitCounter.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to 80 3d 00 00 00 00 00    cmp    BYTE PTR [rip+0x0],0x0        # 7 &lt;_main+0x7&gt;
-        ///74 11                   je     1a &lt;original&gt;
+        ///74 1a                   je     23 &lt;original&gt;
         ///85 c0                   test   eax,eax
-        ///74 06                   je     13 &lt;exit&gt;
-        ///ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 13 &lt;exit&gt;
+        ///74 0f                   je     1c &lt;exit&gt;
+        ///80 bf c7 01 00 00 00    cmp    BYTE PTR [rdi+0x1c7],0x0
+        ///75 06                   jne    1c &lt;exit&gt;
+        ///ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 1c &lt;exit&gt;
         ///
-        ///000000000013 &lt;exit&gt;:
-        ///c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 1a &lt;original&gt;
+        ///00000000001c &lt;exit&gt;:
+        ///c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 23 &lt;original&gt;
         ///
-        ///00000000001a &lt;original&gt;:
-        ///45 0f 57 c0             xorps  xmm8,xmm8
-        ///85 c0                   test   eax,eax
-        ///e9 00 00 00 00          [rest of string was truncated]&quot;;.
+        ///000000000023 &lt;original&gt;:
+        ///45 0f  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SKStaggerIgnoreCheck {
             get {

@@ -158,9 +158,9 @@ public class SKHitService(IMemoryService memoryService, HookManager hookManager)
 
         AsmHelper.WriteRelativeOffsets(bytes, [
             (code, staggerCheckFlag, 7, 2),
-            (code + 0xD, hit, 6, 0xD + 2),
-            (code + 0x13, staggerCheckFlag, 7, 0x13 + 2),
-            (code + 0x20, Hooks.StaggerIgnoreCheck + 6, 5, 0x20 + 1),
+            (code + 0x16, hit, 6, 0x16 + 2),
+            (code + 0x1C, staggerCheckFlag, 7, 0x1C + 2),
+            (code + 0x29, Hooks.StaggerIgnoreCheck + 6, 5, 0x29 + 1),
         ]);
 
         memoryService.WriteBytes(code, bytes);
