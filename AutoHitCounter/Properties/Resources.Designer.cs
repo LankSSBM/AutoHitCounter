@@ -372,11 +372,11 @@ namespace AutoHitCounter.Properties {
         /// <summary>
         ///   Looks up a localized string similar to BossName,DeathFlag
         ///4 Kings,13
-        ///Artorias,11210001
+        ///Artorias,11215015
         ///Asylum Demon,16
         ///Bed of Chaos,10
         ///Bell Gargoyles,3
-        ///Capra Demon,11010902
+        ///Capra Demon,11015375
         ///Ceaseless Discharge,11410900
         ///Centipede Demon,11410901
         ///Chaos Witch Quelaag,9
@@ -385,18 +385,18 @@ namespace AutoHitCounter.Properties {
         ///Gwyndolin,11510900
         ///Gwyn,15
         ///Iron Golem,11
-        ///Kalameet,11210004
-        ///Manus,11210002
+        ///Kalameet,11215065
+        ///Manus,11215025
         ///Moonlight Butterfly,11200900
         ///Nito,7
         ///Ornstein &amp; Smough,12
         ///Pinwheel,6
         ///Priscilla,4
-        ///Sanctuary Guardian,11210000
+        ///Sanctuary Guardian,11215005
         ///Seath,14
         ///Sif,5
         ///Stray Demon,11810900
-        ///Taurus Demon,11010901.
+        ///Taurus Demon,11015385.
         /// </summary>
         internal static string DSREvents {
             get {

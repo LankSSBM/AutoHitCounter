@@ -2074,21 +2074,297 @@
   ],
   "Dark Souls Remastered": [
     {
-      "Name": "Test",
+      "Name": "All Bosses",
       "GameName": "Dark Souls Remastered",
       "Splits": [
         {
-          "EventId": null,
-          "Name": "Test",
+          "EventId": 16,
+          "Name": "Asylum Demon",
           "DisplayName": null,
           "PersonalBest": 0,
           "Type": 1,
           "GroupId": null,
           "Notes": null,
-          "Label": "Test",
-          "IsAuto": false
+          "Label": "Asylum Demon",
+          "IsAuto": true
+        },
+        {
+          "EventId": 3,
+          "Name": "Bell Gargoyles",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Bell Gargoyles",
+          "IsAuto": true
+        },
+        {
+          "EventId": 9,
+          "Name": "Chaos Witch Quelaag",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Chaos Witch Quelaag",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11410900,
+          "Name": "Ceaseless Discharge",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Ceaseless Discharge",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11,
+          "Name": "Iron Golem",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Iron Golem",
+          "IsAuto": true
+        },
+        {
+          "EventId": 12,
+          "Name": "Ornstein \u0026 Smough",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Ornstein \u0026 Smough",
+          "IsAuto": true
+        },
+        {
+          "EventId": 6,
+          "Name": "Pinwheel",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Pinwheel",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11810900,
+          "Name": "Stray Demon",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Stray Demon",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11015385,
+          "Name": "Taurus Demon",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Taurus Demon",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11015375,
+          "Name": "Capra Demon",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Capra Demon",
+          "IsAuto": true
+        },
+        {
+          "EventId": 2,
+          "Name": "Gaping Dragon",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Gaping Dragon",
+          "IsAuto": true
+        },
+        {
+          "EventId": 5,
+          "Name": "Sif",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Sif",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11200900,
+          "Name": "Moonlight Butterfly",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Moonlight Butterfly",
+          "IsAuto": true
+        },
+        {
+          "EventId": 14,
+          "Name": "Seath",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Seath",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11215005,
+          "Name": "Sanctuary Guardian",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Sanctuary Guardian",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11215015,
+          "Name": "Artorias",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Artorias",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11215065,
+          "Name": "Kalameet",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Kalameet",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11215025,
+          "Name": "Manus",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Manus",
+          "IsAuto": true
+        },
+        {
+          "EventId": 13,
+          "Name": "4 Kings",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "4 Kings",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11410410,
+          "Name": "Demon Firesage",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Demon Firesage",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11410901,
+          "Name": "Centipede Demon",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Centipede Demon",
+          "IsAuto": true
+        },
+        {
+          "EventId": 10,
+          "Name": "Bed of Chaos",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Bed of Chaos",
+          "IsAuto": true
+        },
+        {
+          "EventId": 11510900,
+          "Name": "Gwyndolin",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Gwyndolin",
+          "IsAuto": true
+        },
+        {
+          "EventId": 4,
+          "Name": "Priscilla",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Priscilla",
+          "IsAuto": true
+        },
+        {
+          "EventId": 7,
+          "Name": "Nito",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Nito",
+          "IsAuto": true
+        },
+        {
+          "EventId": 15,
+          "Name": "Gwyn",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Gwyn",
+          "IsAuto": true
         }
-      ]
+      ],
+      "GameSettings": {}
     }
   ],
   "Dark Souls 2": [

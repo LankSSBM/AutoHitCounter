@@ -1868,11 +1868,11 @@ e9 fc ff ff ff          jmp    11 &lt;_main+0x11&gt;</value>
   <data name="DSREvents" xml:space="preserve">
     <value>BossName,DeathFlag
 4 Kings,13
-Artorias,11210001
+Artorias,11215015
 Asylum Demon,16
 Bed of Chaos,10
 Bell Gargoyles,3
-Capra Demon,11010902
+Capra Demon,11015375
 Ceaseless Discharge,11410900
 Centipede Demon,11410901
 Chaos Witch Quelaag,9
@@ -1881,18 +1881,18 @@ Gaping Dragon,2
 Gwyndolin,11510900
 Gwyn,15
 Iron Golem,11
-Kalameet,11210004
-Manus,11210002
+Kalameet,11215065
+Manus,11215025
 Moonlight Butterfly,11200900
 Nito,7
 Ornstein &amp; Smough,12
 Pinwheel,6
 Priscilla,4
-Sanctuary Guardian,11210000
+Sanctuary Guardian,11215005
 Seath,14
 Sif,5
 Stray Demon,11810900
-Taurus Demon,11010901</value>
+Taurus Demon,11015385</value>
   </data>
   <data name="SKEvents" xml:space="preserve">
     <value>BossName,DeathFlag
