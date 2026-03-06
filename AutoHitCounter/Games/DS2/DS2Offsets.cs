@@ -49,7 +49,12 @@ public static class DS2Offsets
             _ => 0x0
         };
 
-        public const int SaveDataManager = 0xD8;
+        public static int SaveDataManager => Version switch
+        {
+            Vanilla1_0_11 or Vanilla1_0_12 => 0x6C,
+            Scholar1_0_2 or Scholar1_0_3 => 0xD8,
+            _ => 0x0
+        };
 
         public static class SaveDataManagerOffsets
         {

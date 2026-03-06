@@ -10,18 +10,25 @@ using static AutoHitCounter.Games.DS2.DS2Offsets;
 
 namespace AutoHitCounter.Games.DS2;
 
-public class DS2IgtService(IMemoryService memoryService, HookManager hookManager)
+public class DS2IgtService
 {
     private long _baseMs;
     private readonly Stopwatch _stopwatch = new();
     private readonly nint _igtState = Base + IgtState;
 
-    private readonly nint _saveDataManager = memoryService.FollowPointers(GameManagerImp.Base,
-    [
-        GameManagerImp.GameDataManager, GameManagerImp.SaveDataManager
-    ], true);
+    private readonly nint _saveDataManager;
+
+    private readonly IMemoryService _memoryService;
+    private readonly HookManager _hookManager;
 
     private const int SaveSlotSize = 0x1F0;
+
+    public DS2IgtService(IMemoryService memoryService, HookManager hookManager)
+    {
+        _memoryService = memoryService;
+        _hookManager = hookManager;
+        _saveDataManager = ResolveSaveDataManager();
+    }
 
     public long ElapsedMilliseconds => _baseMs + _stopwatch.ElapsedMilliseconds;
 
@@ -33,10 +40,10 @@ public class DS2IgtService(IMemoryService memoryService, HookManager hookManager
 
     public void Update()
     {
-        var status = memoryService.Read<int>(_igtState);
+        var status = _memoryService.Read<int>(_igtState);
         if (status == (int)DS2TimerStatus.NoChange) return;
 
-        memoryService.Write(_igtState, (int)DS2TimerStatus.NoChange);
+        _memoryService.Write(_igtState, (int)DS2TimerStatus.NoChange);
 
         switch (status)
         {
@@ -49,12 +56,12 @@ public class DS2IgtService(IMemoryService memoryService, HookManager hookManager
                 return;
             case (int)DS2TimerStatus.LoadGame:
                 var slotIndex =
-                    memoryService.Read<int>(_saveDataManager +
-                                            GameManagerImp.SaveDataManagerOffsets.CurrentSaveSlotIdx);
+                    _memoryService.Read<int>(_saveDataManager +
+                                             GameManagerImp.SaveDataManagerOffsets.CurrentSaveSlotIdx);
                 if (slotIndex >= 0 && slotIndex < 10)
                 {
                     var slotBase = _saveDataManager + slotIndex * SaveSlotSize;
-                    _baseMs = memoryService.Read<uint>(slotBase + GameManagerImp.SaveSlotOffsets.PlayTime) * 1000L;
+                    _baseMs = _memoryService.Read<uint>(slotBase + GameManagerImp.SaveSlotOffsets.PlayTime) * 1000L;
                     _stopwatch.Restart();
                 }
 
@@ -63,6 +70,22 @@ public class DS2IgtService(IMemoryService memoryService, HookManager hookManager
     }
 
     public void Stop() => _stopwatch.Stop();
+
+    private nint ResolveSaveDataManager()
+    {
+        if (IsScholar)
+        {
+            var gameMan = _memoryService.Read<nint>(GameManagerImp.Base);
+            var gameDataMan = _memoryService.Read<nint>(gameMan + GameManagerImp.GameDataManager);
+            return _memoryService.Read<nint>(gameDataMan + GameManagerImp.SaveDataManager);
+        }
+        else
+        {
+            var gameMan = _memoryService.Read<int>(GameManagerImp.Base);
+            var gameDataMan = _memoryService.Read<int>(gameMan + GameManagerImp.GameDataManager);
+            return _memoryService.Read<int>(gameDataMan + GameManagerImp.SaveDataManager);
+        }
+    }
 
     #region Scholar
 
@@ -84,8 +107,8 @@ public class DS2IgtService(IMemoryService memoryService, HookManager hookManager
             (code + 0x11, hook + 7, 5, 0x11 + 1)
         ]);
 
-        memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, hook, [0x48, 0x89, 0x83, 0x60, 0x13, 0x00, 0x00]);
+        _memoryService.WriteBytes(code, bytes);
+        _hookManager.InstallHook(code, hook, [0x48, 0x89, 0x83, 0x60, 0x13, 0x00, 0x00]);
     }
 
     private void InstallScholarIgtStopHook()
@@ -93,7 +116,7 @@ public class DS2IgtService(IMemoryService memoryService, HookManager hookManager
         var code = Base + IgtStopCode;
         var bytes = AsmLoader.GetAsmBytes(AsmScript.ScholarIgtStop);
         var hook = Hooks.IgtStop;
-        var originalBytes = memoryService.ReadBytes(hook, 5);
+        var originalBytes = _memoryService.ReadBytes(hook, 5);
 
         AsmHelper.WriteRelativeOffsets(bytes, [
             (code, Functions.RequestSave, 5, 1),
@@ -101,8 +124,8 @@ public class DS2IgtService(IMemoryService memoryService, HookManager hookManager
             (code + 0xF, hook + 5, 5, 0xF + 1)
         ]);
 
-        memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, hook, originalBytes);
+        _memoryService.WriteBytes(code, bytes);
+        _hookManager.InstallHook(code, hook, originalBytes);
     }
 
     private void InstallScholarIgtLoadGameHook()
@@ -116,8 +139,8 @@ public class DS2IgtService(IMemoryService memoryService, HookManager hookManager
             (code + 0x11, hook + 7, 5, 0x11 + 1)
         ]);
 
-        memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, hook, [0x48, 0x89, 0x87, 0x60, 0x13, 0x00, 0x00]);
+        _memoryService.WriteBytes(code, bytes);
+        _hookManager.InstallHook(code, hook, [0x48, 0x89, 0x87, 0x60, 0x13, 0x00, 0x00]);
     }
 
     #endregion
@@ -139,9 +162,9 @@ public class DS2IgtService(IMemoryService memoryService, HookManager hookManager
 
         AsmHelper.WriteImmediateDword(bytes, (int)_igtState, 0x6 + 2);
         AsmHelper.WriteRelativeOffset(bytes, code + 0x10, Hooks.IgtNewGame + 6, 5, 0x10 + 1);
-        
-        memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, hook, [0x89, 0x8B, 0x60, 0x13, 0x00, 0x00]);
+
+        _memoryService.WriteBytes(code, bytes);
+        _hookManager.InstallHook(code, hook, [0x89, 0x8B, 0x60, 0x13, 0x00, 0x00]);
     }
 
     private void InstallVanillaIgtStopHook()
@@ -149,17 +172,17 @@ public class DS2IgtService(IMemoryService memoryService, HookManager hookManager
         var code = Base + IgtStopCode;
         var bytes = AsmLoader.GetAsmBytes(AsmScript.VanillaIgtStop);
         var hook = Hooks.IgtStop;
-        var originalBytes = memoryService.ReadBytes(hook, 5);
+        var originalBytes = _memoryService.ReadBytes(hook, 5);
 
         AsmHelper.WriteImmediateDword(bytes, (int)_igtState, 0x5 + 2);
-        
+
         AsmHelper.WriteRelativeOffsets(bytes, [
             (code, Functions.RequestSave, 5, 1),
             (code + 0xF, hook + 5, 5, 0xF + 1)
         ]);
 
-        memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, hook, originalBytes);
+        _memoryService.WriteBytes(code, bytes);
+        _hookManager.InstallHook(code, hook, originalBytes);
     }
 
     private void InstallVanillaIgtLoadGameHook()
@@ -170,9 +193,9 @@ public class DS2IgtService(IMemoryService memoryService, HookManager hookManager
 
         AsmHelper.WriteImmediateDword(bytes, (int)_igtState, 0x6 + 2);
         AsmHelper.WriteRelativeOffset(bytes, code + 0x10, Hooks.IgtLoadGame + 6, 5, 0x10 + 1);
-        
-        memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, hook, [0x89, 0x8F, 0x60, 0x13, 0x00, 0x00]);
+
+        _memoryService.WriteBytes(code, bytes);
+        _hookManager.InstallHook(code, hook, [0x89, 0x8F, 0x60, 0x13, 0x00, 0x00]);
     }
 
     #endregion

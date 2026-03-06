@@ -2369,21 +2369,462 @@
   ],
   "Dark Souls 2": [
     {
-      "Name": "Test",
+      "Name": "All Bosses",
       "GameName": "Dark Souls 2",
       "Splits": [
         {
-          "EventId": null,
-          "Name": "Test",
+          "EventId": 100971,
+          "Name": "The Last Giant",
           "DisplayName": null,
           "PersonalBest": 0,
           "Type": 1,
           "GroupId": null,
           "Notes": null,
-          "Label": "Test",
-          "IsAuto": false
+          "Label": "The Last Giant",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100968,
+          "Name": "The Pursuer",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "The Pursuer",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100960,
+          "Name": "Old Dragonslayer",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Old Dragonslayer",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100959,
+          "Name": "Dragonrider",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Dragonrider",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100961,
+          "Name": "Flexile Sentry",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Flexile Sentry",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100966,
+          "Name": "The Rotten",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "The Rotten",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100954,
+          "Name": "Skeleton Lords",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Skeleton Lords",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100955,
+          "Name": "Covetous Demon",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Covetous Demon",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100965,
+          "Name": "Royal Rat Vanguard",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Royal Rat Vanguard",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100957,
+          "Name": "Scorpioness Najka",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Scorpioness Najka",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100967,
+          "Name": "Royal Rat Authority",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Royal Rat Authority",
+          "IsAuto": true
+        },
+        {
+          "EventId": 101000,
+          "Name": "Prowling Magus \u0026 Congregation",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Prowling Magus \u0026 Congregation",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100951,
+          "Name": "The Duke\u0027s Dear Freja",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "The Duke\u0027s Dear Freja",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100962,
+          "Name": "Ruin Sentinels",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Ruin Sentinels",
+          "IsAuto": true
+        },
+        {
+          "EventId": 101001,
+          "Name": "Belfry Gargoyles",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Belfry Gargoyles",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100963,
+          "Name": "The Lost Sinner",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "The Lost Sinner",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100956,
+          "Name": "Mytha, the Baneful Queen",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Mytha, the Baneful Queen",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100964,
+          "Name": "Red Smelter Demon",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Red Smelter Demon",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100952,
+          "Name": "Old Iron King",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Old Iron King",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100980,
+          "Name": "Dragonriders",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Dragonriders",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100958,
+          "Name": "Looking Glass Knight",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Looking Glass Knight",
+          "IsAuto": true
+        },
+        {
+          "EventId": 101053,
+          "Name": "Gank Squad",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Gank Squad",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100950,
+          "Name": "Demon of Song",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Demon of Song",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100975,
+          "Name": "Velstadt, the Royal Aegis",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Velstadt, the Royal Aegis",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100970,
+          "Name": "Guardian Dragon",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Guardian Dragon",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100977,
+          "Name": "Ancient Dragon",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Ancient Dragon",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100972,
+          "Name": "Giant Lord",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Giant Lord",
+          "IsAuto": true
+        },
+        {
+          "EventId": 101061,
+          "Name": "Fume Knight",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Fume Knight",
+          "IsAuto": true
+        },
+        {
+          "EventId": 101063,
+          "Name": "Blue Smelter Demon",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Blue Smelter Demon",
+          "IsAuto": true
+        },
+        {
+          "EventId": 101062,
+          "Name": "Sir Alonne",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Sir Alonne",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100978,
+          "Name": "Vendrick",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Vendrick",
+          "IsAuto": true
+        },
+        {
+          "EventId": 101050,
+          "Name": "Elana, the Squalid Queen",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Elana, the Squalid Queen",
+          "IsAuto": true
+        },
+        {
+          "EventId": 101051,
+          "Name": "Sinh, the Slumbering Dragon",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Sinh, the Slumbering Dragon",
+          "IsAuto": true
+        },
+        {
+          "EventId": 101071,
+          "Name": "Aava, the King\u0027s Pet",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Aava, the King\u0027s Pet",
+          "IsAuto": true
+        },
+        {
+          "EventId": 101072,
+          "Name": "Lud \u0026 Zallen",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Lud \u0026 Zallen",
+          "IsAuto": true
+        },
+        {
+          "EventId": 101070,
+          "Name": "Burnt Ivory King",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Burnt Ivory King",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100953,
+          "Name": "Executioner\u0027s Chariot",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Executioner\u0027s Chariot",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100979,
+          "Name": "Darklurker",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Darklurker",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100974,
+          "Name": "Throne Defender \u0026 Throne Watcher",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Throne Defender \u0026 Throne Watcher",
+          "IsAuto": true
+        },
+        {
+          "EventId": 100973,
+          "Name": "Nashandra",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Nashandra",
+          "IsAuto": true
+        },
+        {
+          "EventId": 101080,
+          "Name": "Aldia, Scholar of the First Sin",
+          "DisplayName": null,
+          "PersonalBest": 0,
+          "Type": 1,
+          "GroupId": null,
+          "Notes": null,
+          "Label": "Aldia, Scholar of the First Sin",
+          "IsAuto": true
         }
-      ]
+      ],
+      "GameSettings": {}
     }
   ]
 }
