@@ -203,24 +203,24 @@ namespace AutoHitCounter.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to BossName,DeathFlag
-        ///&quot;Aldrich, Devourer of Gods&quot;,13700800
+        ///&quot;Aldrich, Devourer of Gods&quot;,50002130
         ///Abyss Watchers,13300800
-        ///Ancient Wyvern,13200800
+        ///Ancient Wyvern,50002070
         ///Champion Gundyr,14000830
         ///Crystal Sage,13300850
         ///Curse-Rotted Greatwood,13100800
         ///Dancer of the Boreal Valley,13000890
-        ///Darkeater Midir,15100850
+        ///Darkeater Midir,50002350
         ///Deacons of the Deep,13500800
-        ///Demon Prince,15000800
+        ///Demon Prince,50002330
         ///Dragonslayer Armour,13010800
-        ///Gravetender,14500860
+        ///Gravetender,6323
         ///Halflight,15100800
-        ///High Lord Wolnir,13800800
+        ///High Lord Wolnir,63800561
         ///Iudex Gundyr,14000800
         ///Nameless King,13200850
         ///&quot;Oceiros, the Consumed King&quot;,13000830
-        ///Old Demon King,13800 [rest of string was truncated]&quot;;.
+        ///Old Demon King,50002150        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DS3Events {
             get {

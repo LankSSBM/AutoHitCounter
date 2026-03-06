@@ -18,10 +18,10 @@ public abstract class EventServiceBase(
     private int _readIndex;
 
     public abstract void InstallHook();
-    
+
     protected IMemoryService MemoryService => memoryService;
     protected HookManager HookManager => hookManager;
-    
+
     public bool ShouldSplit()
     {
         var writeIndex = memoryService.Read<int>(writeIdx);
@@ -39,6 +39,9 @@ public abstract class EventServiceBase(
             if (events.ContainsKey(eventId))
             {
                 _readIndex = writeIndex;
+#if DEBUG
+                Console.WriteLine($@"Event {eventId} set to true, splitting {events[eventId]}");
+#endif
                 return true;
             }
         }

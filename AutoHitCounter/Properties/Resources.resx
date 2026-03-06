@@ -1140,28 +1140,28 @@ e9 00 00 00 00          jmp    38 &lt;_main+0x38&gt;</value>
   </data>
   <data name="DS3Events" xml:space="preserve">
     <value>BossName,DeathFlag
-"Aldrich, Devourer of Gods",13700800
+"Aldrich, Devourer of Gods",50002130
 Abyss Watchers,13300800
-Ancient Wyvern,13200800
+Ancient Wyvern,50002070
 Champion Gundyr,14000830
 Crystal Sage,13300850
 Curse-Rotted Greatwood,13100800
 Dancer of the Boreal Valley,13000890
-Darkeater Midir,15100850
+Darkeater Midir,50002350
 Deacons of the Deep,13500800
-Demon Prince,15000800
+Demon Prince,50002330
 Dragonslayer Armour,13010800
-Gravetender,14500860
+Gravetender,6323
 Halflight,15100800
-High Lord Wolnir,13800800
+High Lord Wolnir,63800561
 Iudex Gundyr,14000800
 Nameless King,13200850
 "Oceiros, the Consumed King",13000830
-Old Demon King,13800830
+Old Demon King,50002150
 Pontiff Sulyvahn,13700850
-Sister Friede,14500800
+Sister Friede,6322
 Slave Knight Gael,15110800
-Soul of Cinder,14100800
+Soul of Cinder,50002200
 Twin Princes,13410830
 Vordt of the Boreal Valley,13000800
 Yhorm the Giant,13900800</value>
