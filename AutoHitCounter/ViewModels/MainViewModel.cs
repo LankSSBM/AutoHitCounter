@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Media;
 using AutoHitCounter.Core;
 using AutoHitCounter.Enums;
 using AutoHitCounter.Interfaces;
@@ -82,6 +83,9 @@ namespace AutoHitCounter.ViewModels
                 SettingsManager.Default.Save();
             });
 
+
+            EditAttemptsCommand = new DelegateCommand(() => IsEditingAttempts = true);
+
             InitialiseCommands();
 
 
@@ -120,6 +124,12 @@ namespace AutoHitCounter.ViewModels
         public DelegateCommand ResetSelectedSplitHitsCommand { get; set; }
 
         public DelegateCommand RenameSelectedSplitCommand { get; set; }
+
+        public DelegateCommand EditAttemptsCommand { get; set; }
+
+        public DelegateCommand ClearTotalPbCommand { get; set; }
+
+        public DelegateCommand EditSplitPbCommand { get; set; }
 
         #endregion
 
@@ -183,6 +193,8 @@ namespace AutoHitCounter.ViewModels
                     IsRunComplete = false;
                     OnPropertyChanged(nameof(ActiveProfile));
                     OnPropertyChanged(nameof(TotalHits));
+                    OnPropertyChanged(nameof(TotalDiff));
+                    OnPropertyChanged(nameof(TotalHitsBrush));
                     OnPropertyChanged(nameof(TotalPb));
                     _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
                 }
@@ -204,7 +216,9 @@ namespace AutoHitCounter.ViewModels
             }
         }
 
-        public string TrackingText => _activeGame != null ? $"Tracking: {_activeGame.GameName}" : "Not tracking";
+        public string TrackingText => _activeGame != null
+            ? $"Track hits for the currently selected game.\nCurrently Tracking: {_activeGame.GameName}"
+            : "Not tracking";
 
         public ObservableCollection<SplitViewModel> Splits { get; } = new();
 
@@ -227,7 +241,11 @@ namespace AutoHitCounter.ViewModels
         public SplitViewModel CurrentSplit
         {
             get => _currentSplit;
-            set => SetProperty(ref _currentSplit, value);
+            set
+            {
+                SetProperty(ref _currentSplit, value);
+                OnPropertyChanged(nameof(CurrentSplitNumber));
+            }
         }
 
         private Profile _activeProfile;
@@ -254,7 +272,7 @@ namespace AutoHitCounter.ViewModels
                 }
 
                 LoadProfile(value);
-                
+
                 if (_activeGame == _selectedGame && _currentModule != null)
                     _currentModule.UpdateEvents(GetActiveEvents());
                 
@@ -297,8 +315,35 @@ namespace AutoHitCounter.ViewModels
         }
 
         public int TotalHits => Splits.Where(s => s.Type == SplitType.Child).Sum(s => s.NumOfHits);
+
+        public Brush TotalHitsBrush
+        {
+            get
+            {
+                if (TotalPb == 0) return new SolidColorBrush(Color.FromRgb(0x70, 0x70, 0x70));
+                if (TotalHits < TotalPb) return new SolidColorBrush(Color.FromRgb(0x5a, 0x90, 0x68));
+                if (TotalHits > TotalPb) return new SolidColorBrush(Color.FromRgb(0xb8, 0x55, 0x55));
+                return new SolidColorBrush(Color.FromRgb(0x70, 0x70, 0x70));
+            }
+        }
+
+        public int TotalDiff => Splits.Where(s => s.Type == SplitType.Child).Sum(s => s.Diff);
+
+
         public int TotalPb => Splits.Where(s => s.Type == SplitType.Child).Sum(s => s.PersonalBest);
 
+        public Brush TotalPbBrush
+        {
+            get
+            {
+                var diff = TotalDiff;
+                if (diff > 0) return new SolidColorBrush(Color.FromRgb(0xb8, 0x55, 0x55));
+                if (diff < 0) return new SolidColorBrush(Color.FromRgb(0x5a, 0x90, 0x68));
+                return new SolidColorBrush(Color.FromRgb(0x90, 0x90, 0x90));
+            }
+        }
+
+        public event Action OnSettingsChanged;
         public event Action OnHitRulesChanged;
 
         public bool GetRule(string key) => _activeProfile != null
@@ -385,6 +430,20 @@ namespace AutoHitCounter.ViewModels
             set => SetProperty(ref _isUnlocked, value);
         }
 
+        public int AttemptCount => _activeProfile?.AttemptCount ?? 0;
+
+        public int CurrentSplitNumber
+        {
+            get
+            {
+                if (CurrentSplit == null) return 0;
+                var children = Splits.Where(s => s.Type == SplitType.Child).ToList();
+                return children.IndexOf(CurrentSplit) + 1;
+            }
+        }
+
+        public int TotalSplitCount => Splits.Count(s => s.Type == SplitType.Child);
+
         #endregion
 
         #region Private Methods
@@ -403,7 +462,28 @@ namespace AutoHitCounter.ViewModels
                 SelectedSplit.NumOfHits = 0;
                 _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
             });
+
+            ClearTotalPbCommand = new DelegateCommand(() =>
+            {
+                foreach (var split in Splits.Where(s => s.Type == SplitType.Child))
+                {
+                    split.PersonalBest = 0;
+                    var index = Splits.IndexOf(split);
+                    if (index >= 0 && index < _activeProfile.Splits.Count)
+                        _activeProfile.Splits[index].PersonalBest = 0;
+                }
+
+                _profileService.SaveProfile(_activeProfile);
+                RefreshSplitValues();
+            });
+
+            EditSplitPbCommand = new DelegateCommand(() =>
+            {
+                if (SelectedSplit != null)
+                    SelectedSplit.IsEditingPb = true;
+            });
         }
+
 
         private void RegisterHotkeys()
         {
@@ -530,7 +610,7 @@ namespace AutoHitCounter.ViewModels
 
             var window = new ProfileEditorWindow { DataContext = vm };
             window.ShowDialog();
-            
+
             if (_activeProfile != null)
             {
                 var key = $"{_selectedGame.GameName}|{_activeProfile.Name}";
@@ -561,7 +641,7 @@ namespace AutoHitCounter.ViewModels
 
             foreach (var split in ActiveProfile.Splits)
             {
-                Splits.Add(new SplitViewModel
+                var vm = new SplitViewModel
                 {
                     Name = split.Label,
                     IsAuto = split.IsAuto,
@@ -569,7 +649,34 @@ namespace AutoHitCounter.ViewModels
                     NumOfHits = 0,
                     PersonalBest = split.PersonalBest,
                     Notes = split.Notes
-                });
+                };
+                vm.PropertyChanged += (_, _) =>
+                {
+                    OnPropertyChanged(nameof(TotalSplitCount));
+                    OnPropertyChanged(nameof(AttemptCount));
+                    OnPropertyChanged(nameof(TotalHits));
+                    OnPropertyChanged(nameof(TotalDiff));
+                    OnPropertyChanged(nameof(TotalHitsBrush));
+                    OnPropertyChanged(nameof(TotalPb));
+                };
+                Splits.Add(vm);
+            }
+        }
+
+        private void RefreshSplitValues()
+        {
+            var hits = Splits.Select(s => s.NumOfHits).ToArray();
+            var currentIndex = CurrentSplit != null ? Splits.IndexOf(CurrentSplit) : -1;
+
+            UpdateSplits();
+
+            for (int i = 0; i < Splits.Count && i < hits.Length; i++)
+                Splits[i].NumOfHits = hits[i];
+
+            if (currentIndex >= 0 && currentIndex < Splits.Count)
+            {
+                CurrentSplit = Splits[currentIndex];
+                CurrentSplit.IsCurrent = true;
             }
         }
 
@@ -656,6 +763,13 @@ namespace AutoHitCounter.ViewModels
 
         private void ResetSplits()
         {
+            if (_activeProfile != null)
+            {
+                _activeProfile.AttemptCount++;
+                _profileService.SaveProfile(_activeProfile);
+                OnPropertyChanged(nameof(AttemptCount));
+            }
+
             var key = $"{_selectedGame?.GameName}|{_activeProfile?.Name}";
             _runSnapshots.Remove(key);
             IsRunComplete = false;
@@ -675,6 +789,23 @@ namespace AutoHitCounter.ViewModels
 
             _profileService.SaveProfile(ActiveProfile);
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
+        }
+
+        public void CommitPbEdit(SplitViewModel split, string value)
+        {
+            if (int.TryParse(value, out int val) && val >= 0)
+            {
+                split.PersonalBest = val;
+                var index = Splits.IndexOf(split);
+                if (index >= 0 && index < _activeProfile.Splits.Count)
+                {
+                    _activeProfile.Splits[index].PersonalBest = val;
+                    _profileService.SaveProfile(_activeProfile);
+                }
+            }
+
+            split.IsEditingPb = false;
+            RefreshSplitValues();
         }
 
         private void PreviousSplit()
@@ -702,6 +833,40 @@ namespace AutoHitCounter.ViewModels
             CurrentSplit.NumOfHits--;
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
+
+        private bool _isEditingAttempts;
+
+        public bool IsEditingAttempts
+        {
+            get => _isEditingAttempts;
+            set => SetProperty(ref _isEditingAttempts, value);
+        }
+
+        public void CommitAttemptsEdit(string value)
+        {
+            if (int.TryParse(value, out var count) && count >= 0)
+            {
+                _activeProfile.AttemptCount = count;
+                _profileService.SaveProfile(_activeProfile);
+                OnPropertyChanged(nameof(AttemptCount));
+            }
+
+            IsEditingAttempts = false;
+        }
+
+        public bool HasSplits => TotalSplitCount > 0;
+
+        public bool IsSplitListScrollbarVisible
+        {
+            get => _isSplitListScrollbarVisible;
+            set
+            {
+                _isSplitListScrollbarVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isSplitListScrollbarVisible;
 
         #endregion
     }

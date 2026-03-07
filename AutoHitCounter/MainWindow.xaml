@@ -23,13 +23,14 @@
         <converters:LockTooltipConverter x:Key="LockTooltipConverter" />
         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#9D61A8" />
         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White" />
+        <converters:AttemptCountColorConverter x:Key="AttemptCountColorConverter" />
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="*"  />
         </Grid.RowDefinitions>
         <controls:TitleBar Grid.Row="0" Title="Auto Hit Counter" />
         <!-- Tool Attachment Info -->
@@ -67,6 +68,7 @@
                         <RowDefinition Height="0.5*" />
                         <RowDefinition Height="0.3*" />
                         <RowDefinition Height="4*" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="0.6*" />
                     </Grid.RowDefinitions>
 
@@ -108,11 +110,13 @@
 
                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
                                     Margin="0,2,-2,0">
+                            <!-- Edit Profile Button -->
                             <Button Content="✎"
                                     Command="{Binding OpenProfileEditorCommand}"
                                     Width="30" Height="22"
                                     FontSize="14"
                                     ToolTip="Edit Profile" />
+                            <!-- Lock Splits Button -->
                             <Button Content="{Binding IsUnlocked, Converter={StaticResource LockIconConverter}}"
                                     Command="{Binding ToggleLockCommand}"
                                     Width="30" Height="22"
@@ -123,21 +127,124 @@
                     </Grid>
 
                     <Border Grid.Row="1" BorderBrush="#333333" BorderThickness="0,0,0,1">
-                        <Grid Margin="5">
+                        <Grid Margin="{Binding IsSplitListScrollbarVisible, Converter={StaticResource ScrollbarVisibleToMarginConverter}}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="4*" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition x:Name="HeaderScrollSpacer" Width="0" />
                             </Grid.ColumnDefinitions>
 
-                            <!-- Splits Header -->
-                            <TextBlock FontFamily="{StaticResource AppFont}"
-                                       FontSize="{StaticResource FontSizeHeader}"
-                                       Text="Split"
-                                       VerticalAlignment="Center"
-                                       Margin="10, 0, 0,0" />
+                            <!-- Split header + current/total -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock FontFamily="{StaticResource AppFont}"
+                                           FontSize="{StaticResource FontSizeHeader}"
+                                           Text="Split"
+                                           VerticalAlignment="Center"
+                                           Margin="10,0,0,0" />
+
+                                <!-- Splitter -->
+                                <Rectangle Width="1" Height="12" Fill="#444" Margin="7,0,7,0"
+                                           VerticalAlignment="Center">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsRunComplete}" Value="False">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+
+                                <!-- (Split/Total) -->
+                                <TextBlock FontSize="12"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,0,0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsRunComplete}" Value="False">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                    <Run Text="(" /><Run Text="{Binding CurrentSplitNumber, Mode=OneWay}" ToolTip="Current Split" />
+                                    <Run Text="/" />
+                                    <Run Text="{Binding TotalSplitCount, Mode=OneWay}" ToolTip="Total Splits" /><Run Text=")" />
+                                </TextBlock>
+
+                                <!-- Splitter -->
+                                <Rectangle Width="1" Height="12" Fill="#444" Margin="7,0,7,0"
+                                           VerticalAlignment="Center">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsRunComplete}" Value="False">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+
+                                <!-- Attempts count -->
+                                <TextBlock FontSize="12"
+                                           VerticalAlignment="Center"
+                                           Cursor="Hand"
+                                           Text="{Binding AttemptCount, StringFormat='#{0}'}"
+                                           ToolTip="Double Click to edit attempts count"
+                                           Foreground="{Binding AttemptCount, Converter={StaticResource AttemptCountColorConverter}}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEditingAttempts}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                    <TextBlock.InputBindings>
+                                        <MouseBinding MouseAction="LeftDoubleClick"
+                                                      Command="{Binding EditAttemptsCommand}" />
+                                    </TextBlock.InputBindings>
+                                </TextBlock>
+                                <TextBox x:Name="AttemptsBox"
+                                         FocusVisualStyle="{x:Null}"
+                                         CaretBrush="White"
+                                         SelectionBrush="#9D61A8"
+                                         TextAlignment="Center"
+                                         FontSize="11"
+                                         VerticalContentAlignment="Center"
+                                         Text="{Binding AttemptCount, Mode=OneWay}"
+                                         KeyDown="AttemptsBox_KeyDown">
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Setter Property="Foreground" Value="#DDDDDD" />
+                                            <Setter Property="Padding" Value="3,1" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEditingAttempts}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+
+                                <!-- Reset Attempt count button -->
+                                <Button FontFamily="Segoe MDL2 Assets" Content="&#xE72C;" FontSize="12" Height="21" Width="24"
+                                        Margin="7,0,0,0"
+                                        VerticalAlignment="Center"
+                                        ToolTip="Reset attempts count"
+                                        Click="ResetAttempts_Click" />
+                            </StackPanel>
 
                             <TextBlock Grid.Column="1"
                                        Text="Hits"
@@ -147,19 +254,21 @@
 
                             <TextBlock Grid.Column="2"
                                        Text="Diff"
+                                       Margin="0,0,7,0"
                                        FontFamily="{StaticResource AppFont}"
                                        FontSize="{StaticResource FontSizeHeader}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
 
                             <TextBlock Grid.Column="3"
                                        Text="PB"
+                                       Margin="0,0,8,0"
                                        FontFamily="{StaticResource AppFont}"
                                        FontSize="{StaticResource FontSizeHeader}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Grid>
                     </Border>
-                    <ListBox x:Name="SplitListBox"
-                             Grid.Row="2"
+                    <ListBox x:Name="SplitListBox" 
+                             Grid.Row="2" 
                              ItemsSource="{Binding Splits}"
                              SelectedItem="{Binding SelectedSplit}"
                              AlternationCount="2"
@@ -172,15 +281,27 @@
                         <!-- Context Menu -->
                         <ListBox.ContextMenu>
                             <ContextMenu>
+                                <MenuItem Header="Add Splits"
+                                          Command="{Binding PlacementTarget.DataContext.OpenProfileEditorCommand,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                 <MenuItem Header="Rename"
                                           Command="{Binding PlacementTarget.DataContext.RenameSelectedSplitCommand,
-                            RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                                <MenuItem Header="Reset Split Hits"
-                                          Command="{Binding PlacementTarget.DataContext.ResetSelectedSplitHitsCommand,
                             RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                 <MenuItem Header="Save Notes"
                                           Command="{Binding PlacementTarget.DataContext.SaveNotesCommand,
                             RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <MenuItem Header="Reset Split Hits"
+                                          Command="{Binding PlacementTarget.DataContext.ResetSelectedSplitHitsCommand,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <MenuItem Header="Edit PB"
+                                          Command="{Binding PlacementTarget.DataContext.EditSplitPbCommand,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <MenuItem Header="Clear All PBs"
+                                          Command="{Binding PlacementTarget.DataContext.ClearTotalPbCommand,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                
+                                
+                                
                             </ContextMenu>
                         </ListBox.ContextMenu>
 
@@ -244,9 +365,41 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-
-                                        <!-- Name column -->
+                                        <!-- Drag handle -->
                                         <Grid Grid.Column="0">
+                                            <TextBlock Text="⋮⋮"
+                                                       Cursor="Hand"
+                                                       FontSize="11"
+                                                       Foreground="#888"
+                                                       VerticalAlignment="Center"
+                                                       Margin="4,0,0,0"
+                                                       HorizontalAlignment="Left">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <MultiDataTrigger>
+                                                                <MultiDataTrigger.Conditions>
+                                                                    <Condition
+                                                                        Binding="{Binding DataContext.IsUnlocked,
+                            RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                                        Value="True" />
+                                                                    <Condition
+                                                                        Binding="{Binding IsMouseOver,
+                            RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                                                        Value="True" />
+                                                                </MultiDataTrigger.Conditions>
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </MultiDataTrigger>
+                                                            <DataTrigger Binding="{Binding IsParent}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+
+                                            <!-- Name column -->
                                             <TextBlock Text="{Binding Name}"
                                                        FontFamily="{StaticResource AppFont}"
                                                        FontSize="{StaticResource FontSizeBody}"
@@ -262,21 +415,21 @@
                                                     </Style>
                                                 </TextBlock.Style>
                                             </TextBlock>
-
+                                            
+                                            <!-- In-line Rename box -->
                                             <TextBox x:Name="RenameBox"
                                                      Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
                                                      FontFamily="{StaticResource AppFont}"
                                                      FontSize="{StaticResource FontSizeBody}"
                                                      VerticalAlignment="Center"
                                                      Margin="{Binding Type, Converter={StaticResource ParentChildMarginConverter}}"
-                                                     KeyDown="RenameBox_KeyDown"
-                                                     LostFocus="RenameBox_LostFocus">
+                                                     KeyDown="RenameBox_KeyDown">
                                                 <TextBox.Style>
-                                                    <Style TargetType="TextBox">
+                                                    <Style TargetType="TextBox"
+                                                           BasedOn="{StaticResource {x:Type TextBox}}">
                                                         <Setter Property="Visibility" Value="Collapsed" />
-                                                        <Setter Property="Background" Value="#1c1424" />
-                                                        <Setter Property="BorderBrush" Value="#5a3d63" />
-                                                        <Setter Property="BorderThickness" Value="1" />
+                                                        <Setter Property="Background"
+                                                                Value="{StaticResource BackgroundBrush}" />
                                                         <Setter Property="Foreground" Value="White" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsEditing}" Value="True">
@@ -287,7 +440,8 @@
                                                 </TextBox.Style>
                                             </TextBox>
                                         </Grid>
-
+                                        
+                                        <!-- Hit Count -->
                                         <TextBlock Grid.Column="1"
                                                    Text="{Binding NumOfHits}"
                                                    Foreground="{Binding HitsBrush}"
@@ -304,8 +458,9 @@
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>
-
+                                        <!-- Diff -->
                                         <TextBlock Grid.Column="2"
+                                                   
                                                    Text="{Binding Diff}"
                                                    Foreground="{Binding DiffBrush}"
                                                    FontFamily="{StaticResource AppFont}"
@@ -321,9 +476,9 @@
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>
-
+                                        <!-- PB -->
                                         <TextBlock Grid.Column="3"
-                                                   Text="{Binding PersonalBest}"
+                                                   Text="{Binding PersonalBest, Mode=OneWay}"
                                                    FontFamily="{StaticResource AppFont}"
                                                    FontSize="{StaticResource FontSizeBody}"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -333,6 +488,58 @@
                                                         <DataTrigger Binding="{Binding IsParent}" Value="True">
                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                         </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsEditingPb}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBox Grid.Column="3" x:Name="PbBox"
+                                                 Text="{Binding PersonalBest, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 TextAlignment="Center"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 Width="50"
+                                                 KeyDown="PbBox_KeyDown">
+                                            <TextBox.Style>
+                                                <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Setter Property="Padding" Value="3,1" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsEditingPb}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBox.Style>
+                                        </TextBox>
+                                        
+                                        <!-- Context Menu Indicator -->
+                                        <TextBlock Grid.Column="3"
+                                                   Text="⋯"
+                                                   MouseDown="SplitContextDots_MouseDown"
+                                                   Cursor="Hand"
+                                                   FontSize="13"
+                                                   Foreground="#888"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,4,0"
+                                                   ToolTip="Right click for options">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition
+                                                                    Binding="{Binding IsMouseOver,
+                                RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                                                    Value="True" />
+                                                                <Condition Binding="{Binding IsParent}" Value="False" />
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </MultiDataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </TextBlock.Style>
@@ -365,8 +572,7 @@
                                                          AcceptsReturn="True"
                                                          FontSize="11"
                                                          Foreground="#999"
-                                                         Padding="2"
-                                                         LostFocus="Notes_LostFocus">
+                                                         Padding="2">
                                                     <TextBox.Style>
                                                         <Style TargetType="TextBox">
                                                             <Setter Property="Background" Value="Transparent" />
@@ -408,8 +614,61 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
+                    <!-- Total Hits Row -->
+                    <Border Grid.Row="3" BorderBrush="#333333" BorderThickness="0,1,0,0"
+                            Visibility="{Binding HasSplits, Converter={StaticResource BoolToVisConverter}}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Splits.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding TotalSplitCount}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Grid Margin="{Binding IsSplitListScrollbarVisible, Converter={StaticResource ScrollbarVisibleToMarginConverter}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Total"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="{StaticResource FontSizeBody}"
+                                       Foreground="#FFFFFF"
+                                       VerticalAlignment="Center"
+                                       Margin="30,0,0,0" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding TotalHits}"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="{StaticResource FontSizeBody}"
+                                       Foreground="{Binding TotalHitsBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2"
+                                       Margin="0,0,4,0"
+                                       Text="{Binding TotalDiff}"
+                                       Foreground="#888"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="{StaticResource FontSizeBody}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="3"
+                                       Margin="0,0,8,0"
+                                       Text="{Binding TotalPb}"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="{StaticResource FontSizeBody}"
+                                       Foreground="#909090"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                        
 
-                    <Grid Grid.Row="3">
+                    <Grid Grid.Row="4">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"
                                     VerticalAlignment="Bottom" Margin="5,0,0,5">
                             <StackPanel.Style>
@@ -430,8 +689,13 @@
                                     Command="{Binding PrevSplitCommand}" />
                             <Button Content="Next →" Height="24" Margin="0,0,3,0"
                                     Command="{Binding AdvanceSplitCommand}" />
+                            <Rectangle Width="1" Height="16" Fill="#444" Margin="8,0" VerticalAlignment="Center" />
                             <Button Content="Reset" Height="24"
-                                    Command="{Binding ResetCommand}" />
+                                    Command="{Binding ResetCommand}" Margin="0,0,3,0" />
+                            <Rectangle Width="1" Height="16" Fill="#444" Margin="8,0" VerticalAlignment="Center" />
+                            <Button Content="Clear PBs" Height="24"
+                                    Command="{Binding ClearTotalPbCommand}" />
+                            
                         </StackPanel>
                         <!-- Potentially turn this into a popup window -->
                         <StackPanel Visibility="{Binding IsRunComplete, Converter={StaticResource BoolToVisConverter}}"
@@ -473,14 +737,22 @@
 
                 </Grid>
             </TabItem>
-            
+
             <TabItem Header="Hotkeys">
                 <controls:HotkeysTab DataContext="{Binding Hotkeys}" />
             </TabItem>
-            
+
             <TabItem Header="Settings">
                 <controls:SettingsTab DataContext="{Binding Settings}" />
             </TabItem>
         </TabControl>
+        <Button Content="Help"
+        Grid.Row="2"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Top"
+        Margin="0,2,3,0"
+        Height="25" Width="60" FontSize="12"
+        Panel.ZIndex="1"
+        Click="HelpButton_Click" />
     </Grid>
 </Window>

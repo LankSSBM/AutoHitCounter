@@ -109,12 +109,14 @@
         <Compile Include="Behaviors\InsertionAdorner.cs" />
         <Compile Include="Behaviors\SplitListDragDropBehavior.cs" />
         <Compile Include="Behaviors\TemplatesDragDropBehavior.cs" />
+        <Compile Include="Converters\AttemptCountColorConverter.cs" />
         <Compile Include="Converters\EnumDescriptionConverter.cs" />
         <Compile Include="Converters\ExpanderArrowConverter.cs" />
         <Compile Include="Converters\InverseBoolConverter.cs" />
         <Compile Include="Converters\LockIconConverter.cs" />
         <Compile Include="Converters\ParentChildMarginConverter.cs" />
         <Compile Include="Converters\ParentChildMarginMultiConverter.cs" />
+        <Compile Include="Converters\ScrollbarVisibleToMarginConverter.cs" />
         <Compile Include="Core\DelegateCommand.cs" />
         <Compile Include="Enums\AsmScript.cs" />
         <Compile Include="Enums\GameTitle.cs" />
@@ -216,6 +218,9 @@
           <DependentUpon>TitleBar.xaml</DependentUpon>
         </Compile>
         <Compile Include="Views\Windows\CustomMessageBox.xaml.cs" />
+        <Compile Include="Views\Windows\HelpWindow.xaml.cs">
+          <DependentUpon>HelpWindow.xaml</DependentUpon>
+        </Compile>
         <Compile Include="Views\Windows\InputBox.xaml.cs" />
         <Compile Include="Views\Windows\ProfileEditorWindow.xaml.cs">
           <DependentUpon>ProfileEditorWindow.xaml</DependentUpon>
@@ -238,6 +243,7 @@
         <Page Include="Views\Controls\SplitEventEditorWindow.xaml" />
         <Page Include="Views\Controls\TitleBar.xaml" />
         <Page Include="Views\Windows\CustomMessageBox.xaml" />
+        <Page Include="Views\Windows\HelpWindow.xaml" />
         <Page Include="Views\Windows\InputBox.xaml" />
         <Page Include="Views\Windows\ProfileEditorWindow.xaml" />
     </ItemGroup>
