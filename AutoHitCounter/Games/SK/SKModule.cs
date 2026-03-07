@@ -17,61 +17,71 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
     private readonly HookManager _hookManager;
     private readonly ITickService _tickService;
     private readonly Dictionary<uint, string> _events;
-    private readonly IGameSettingsProvider _settings;
+    private readonly IHitRulesProvider _rules;
 
     public string GameVersion => SKOffsets.Version.GetDescription();
-    
+
     private DateTime? _lastHit;
     private nint _igtPtr;
     private SKHitService _hitService;
     private SKEventService _eventService;
-    
+    private SKSettingsService _settingsService;
+
     public event Action<int> OnHit;
     public event Action OnEventSet;
     public event Action<long> OnIgtChanged;
     public event Action OnVersionDetected;
 
     public SKModule(IMemoryService memoryService, IStateService stateService, HookManager hookManager,
-        ITickService tickService, Dictionary<uint, string> events, IGameSettingsProvider settings)
+        ITickService tickService, Dictionary<uint, string> events, IHitRulesProvider rules)
     {
         _memoryService = memoryService;
         _stateService = stateService;
         _hookManager = hookManager;
         _tickService = tickService;
         _events = events;
-        _settings = settings;
-        settings.OnSettingsChanged += ApplySettings;
+        _rules = rules;
+
+        rules.OnHitRulesChanged += ApplyRules;
 
         stateService.Subscribe(State.Attached, Initialize);
         _lastHit = DateTime.Now;
     }
-    
-    private void ApplySettings()                                                                                            {
-        _hitService?.SetRobertoStaggerCounts(_settings.GetFlag("should_count_roberto"));
+
+    private void ApplyRules()
+    {
+        _hitService?.SetRobertoStaggerCounts(_rules.GetRule("should_count_roberto"));
     }
-    
+
     private void Initialize()
     {
         InitializeOffsets();
-        OnVersionDetected?.Invoke();
+
 
         SKCustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
-        
+
 #if DEBUG
         Console.WriteLine($@"Code cave: 0x{(long)SKCustomCodeOffsets.Base:X}");
 #endif
 
         _hitService = new SKHitService(_memoryService, _hookManager);
         _eventService = new SKEventService(_memoryService, _hookManager, _events);
+        _settingsService = new SKSettingsService(_memoryService);
+
+        ApplySettings(onlyEnabled: true);
+
         _eventService.InstallHook();
         _hitService.InstallHooks();
+
         _igtPtr = _memoryService.Read<nint>(GameDataMan.Base) + GameDataMan.Igt;
-        
-        ApplySettings();
-        
+
+        ApplyRules();
+
         _tickService.RegisterGameTick(Tick);
+
+        OnVersionDetected?.Invoke();
     }
-    
+
     private void InitializeOffsets()
     {
         if (_memoryService.TargetProcess == null) return;
@@ -80,8 +90,7 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
         var moduleBase = _memoryService.BaseAddress;
         SKOffsets.Initialize(fileVersion, moduleBase);
     }
-    
-    
+
     private void Tick()
     {
         if (!IsLoaded()) return;
@@ -96,16 +105,16 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
         {
             OnEventSet?.Invoke();
         }
-        
+
         OnIgtChanged?.Invoke(_memoryService.Read<uint>(_igtPtr));
     }
 
     private bool IsLoaded()
     {
-        var worldChrman = _memoryService.Read<nint>(WorldChrMan.Base);
-        return _memoryService.Read<nint>(worldChrman + WorldChrMan.PlayerIns) != 0;
+        var worldChrMan = _memoryService.Read<nint>(WorldChrMan.Base);
+        return _memoryService.Read<nint>(worldChrMan + WorldChrMan.PlayerIns) != 0;
     }
-    
+
     public void Dispose()
     {
         _stateService.Unsubscribe(State.Attached, Initialize);
@@ -114,9 +123,18 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
         OnEventSet = null;
         OnIgtChanged = null;
     }
-    
+
     public void UpdateEvents(Dictionary<uint, string> events)
     {
         _eventService?.UpdateEvents(events);
+    }
+
+    public void ApplySettings(bool onlyEnabled = false)
+    {
+        var noLogo = SettingsManager.Default.SKNoLogo;
+        if (noLogo || !onlyEnabled) _settingsService.ToggleNoLogo(noLogo);
+
+        var noTutorials = SettingsManager.Default.SKNoTutorials;
+        if (noTutorials || !onlyEnabled) _settingsService.ToggleNoTutorials(noTutorials);
     }
 }

@@ -11,4 +11,5 @@ public interface IGameModule
     event Action OnEventSet;
     event Action<long> OnIgtChanged;
     void UpdateEvents(Dictionary<uint, string> events);
+    void ApplySettings(bool onlyEnabled = false);
 }

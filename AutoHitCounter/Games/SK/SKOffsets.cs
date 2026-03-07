@@ -77,6 +77,14 @@ public static class SKOffsets
         public static nint GetEvent;
     }
 
+    public static class Patches
+    {
+        public static nint NoLogo;
+        public static nint MenuTutorialSkip;
+        public static nint ShowSmallHintBox;
+        public static nint ShowTutorialText;
+    }
+
     private static void InitializeBaseAddresses(nint moduleBase)
     {
         WorldChrMan.Base = moduleBase + Version switch
@@ -213,33 +221,73 @@ public static class SKOffsets
             Version1_5_0 or Version1_6_0 => 0x6C3E60,
             _ => 0
         };
+        
+        Patches.NoLogo = moduleBase + Version switch
+        {
+            Version1_2_0 => 0xDEBF2B,
+            Version1_3_0 or Version1_4_0 => 0xDEC85B,
+            Version1_5_0 => 0xE1B1AB,
+            Version1_6_0 => 0xE1B51B,
+            _ => 0
+        };
+        
+        Patches.MenuTutorialSkip = moduleBase + Version switch
+        {
+            Version1_2_0 => 0xD73E22,
+            Version1_3_0 or Version1_4_0 => 0xD74752,
+            Version1_5_0 => 0xD9A2D2,
+            Version1_6_0 => 0xD9A642,
+            _ => 0
+        };
+
+        Patches.ShowSmallHintBox = moduleBase + Version switch
+        {
+            Version1_2_0 => 0x8FE263,
+            Version1_3_0 or Version1_4_0 => 0x8FE763,
+            Version1_5_0 or Version1_6_0 => 0x909FA3,
+            _ => 0
+        };
+
+        Patches.ShowTutorialText = moduleBase + Version switch
+        {
+            Version1_2_0 => 0x8FE213,
+            Version1_3_0 or Version1_4_0 => 0x8FE713,
+            Version1_5_0 or Version1_6_0 => 0x909F53,
+            _ => 0
+        };
 
 
 #if DEBUG
         _baseAddr = moduleBase;
         Console.WriteLine("--- Globals ---");
-        PrintOffset("WorldChrMan.Base", WorldChrMan.Base);
-        PrintOffset("GameDataMan.Base", GameDataMan.Base);
-        PrintOffset("EventFlagMan.Base", EventFlagMan.Base);
+        PrintOffset("WorldChrMan", WorldChrMan.Base);
+        PrintOffset("GameDataMan", GameDataMan.Base);
+        PrintOffset("EventFlagMan", EventFlagMan.Base);
         PrintOffset("FallDmgRetAddr", FallDmgRetAddr);
 
 
         Console.WriteLine("\n--- Hooks ---");
-        PrintOffset("Hooks.Hit", Hooks.Hit);
-        PrintOffset("Hooks.LethalFall", Hooks.LethalFall);
-        PrintOffset("Hooks.FadeFall", Hooks.FadeFall);
-        PrintOffset("Hooks.ApplyHealthDelta", Hooks.ApplyHealthDelta);
-        PrintOffset("Hooks.PostHit", Hooks.PostHit);
-        PrintOffset("Hooks.StaggerIgnoreCheck", Hooks.StaggerIgnoreCheck);
-        PrintOffset("Hooks.AuxProc", Hooks.AuxProc);
-        PrintOffset("Hooks.CheckAuxAttacker", Hooks.CheckAuxAttacker);
-        PrintOffset("Hooks.HkbFireEvent", Hooks.HkbFireEvent);
-        PrintOffset("Hooks.SetEvent", Hooks.SetEvent);
+        PrintOffset("Hit", Hooks.Hit);
+        PrintOffset("LethalFall", Hooks.LethalFall);
+        PrintOffset("FadeFall", Hooks.FadeFall);
+        PrintOffset("ApplyHealthDelta", Hooks.ApplyHealthDelta);
+        PrintOffset("PostHit", Hooks.PostHit);
+        PrintOffset("StaggerIgnoreCheck", Hooks.StaggerIgnoreCheck);
+        PrintOffset("AuxProc", Hooks.AuxProc);
+        PrintOffset("CheckAuxAttacker", Hooks.CheckAuxAttacker);
+        PrintOffset("HkbFireEvent", Hooks.HkbFireEvent);
+        PrintOffset("SetEvent", Hooks.SetEvent);
 
 
         Console.WriteLine("\n--- Functions ---");
-        PrintOffset("Functions.HasSpEffectId", Functions.HasSpEffectId);
-        PrintOffset("Functions.GetEvent", Functions.GetEvent);
+        PrintOffset("HasSpEffectId", Functions.HasSpEffectId);
+        PrintOffset("GetEvent", Functions.GetEvent);
+        
+        Console.WriteLine("\n--- Patches ---");
+        PrintOffset("NoLogo", Patches.NoLogo);
+        PrintOffset("MenuTutorialSkip", Patches.MenuTutorialSkip);
+        PrintOffset("ShowSmallHintBox", Patches.ShowSmallHintBox);
+        PrintOffset("ShowTutorialText", Patches.ShowTutorialText);
 
 
         Console.WriteLine("\n====================================\n");

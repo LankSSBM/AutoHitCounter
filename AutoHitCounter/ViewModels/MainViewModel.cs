@@ -16,7 +16,7 @@ using AutoHitCounter.Views.Windows;
 
 namespace AutoHitCounter.ViewModels
 {
-    public class MainViewModel : BaseViewModel, IReorderHandler, IGameSettingsProvider
+    public class MainViewModel : BaseViewModel, IReorderHandler, IHitRulesProvider
     {
         private readonly IMemoryService _memoryService;
         private readonly HotkeyManager _hotkeyManager;
@@ -55,6 +55,8 @@ namespace AutoHitCounter.ViewModels
 
             stateService.Subscribe(State.Attached, OnAttached);
             stateService.Subscribe(State.NotAttached, OnNotAttached);
+
+            Settings.OnGameSettingChanged += () => _currentModule?.ApplySettings();
 
             RegisterHotkeys();
 
@@ -273,8 +275,8 @@ namespace AutoHitCounter.ViewModels
 
                 if (_activeGame == _selectedGame && _currentModule != null)
                     _currentModule.UpdateEvents(GetActiveEvents());
-
-                OnSettingsChanged?.Invoke();
+                
+                OnHitRulesChanged?.Invoke();
             }
         }
 
@@ -342,8 +344,9 @@ namespace AutoHitCounter.ViewModels
         }
 
         public event Action OnSettingsChanged;
+        public event Action OnHitRulesChanged;
 
-        public bool GetFlag(string key) => _activeProfile != null
+        public bool GetRule(string key) => _activeProfile != null
                                            && _activeProfile.GameSettings.TryGetValue(key, out var val)
                                            && val;
 

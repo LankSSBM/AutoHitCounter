@@ -63,6 +63,13 @@ public static class DS3Offsets
 
         public const int Igt = 0xA4;
     }
+    
+    public static class UserInputManager
+    {
+        public static nint Base;
+
+        public const int SteamInputEnum = 0x24B;
+    }
 
     public static nint FallDamageKillFloor;
 
@@ -82,6 +89,12 @@ public static class DS3Offsets
     public static class Functions
     {
         public static nint HasSpEffectId;
+        public static nint OriginalLogoFunc;
+    }
+
+    public static class Patches
+    {
+        public static nint NoLogo;
     }
 
     private static void InitializeBaseAddresses(nint moduleBase)
@@ -116,6 +129,26 @@ public static class DS3Offsets
             Version1_15_1_0 or Version1_15_2_0 => 0x47572B8,
             _ => 0
         };
+        
+        UserInputManager.Base = moduleBase + Version switch
+        {
+            Version1_3_2_0 => 0x48A9968,
+            Version1_4_1_0 or Version1_4_2_0 or Version1_4_3_0 => 0x48AAC70,
+            Version1_5_0_0 => 0x48AED80,
+            Version1_5_1_0 => 0x48ADD80,
+            Version1_6_0_0 => 0x48AEDF0,
+            Version1_7_0_0 => 0x48B3670,
+            Version1_8_0_0 => 0x49127F0,
+            Version1_9_0_0 or Version1_10_0_0 => 0x4912930,
+            Version1_11_0_0 => 0x4945EC8,
+            Version1_12_0_0 => 0x4949058,
+            Version1_13_0_0 => 0x494C878,
+            Version1_14_0_0 or Version1_15_0_0 => 0x494E9D8,
+            Version1_15_1_0 => 0x49644C8,
+            Version1_15_2_0 => 0x49644B8,
+            _ => 0
+        };
+
 
 
         FallDamageKillFloor = moduleBase + Version switch
@@ -138,8 +171,29 @@ public static class DS3Offsets
             Version1_15_2_0 => 0x3D7EE10,
             _ => 0
         };
+        
+        Functions.OriginalLogoFunc = moduleBase + Version switch
+        {
+            Version1_3_2_0 => 0xB7B790,
+            Version1_4_1_0 or Version1_4_2_0 or Version1_4_3_0 => 0xB7B860,
+            Version1_5_0_0 => 0xB7C6B0,
+            Version1_5_1_0 => 0xB7C4E0,
+            Version1_6_0_0 => 0xB7CAB0,
+            Version1_7_0_0 => 0xB7E140,
+            Version1_8_0_0 => 0xB93180,
+            Version1_9_0_0 => 0xB93740,
+            Version1_10_0_0 => 0xB937B0,
+            Version1_11_0_0 => 0xBA2D30,
+            Version1_12_0_0 => 0xBA37B0,
+            Version1_13_0_0 => 0xBA5360,
+            Version1_14_0_0 => 0xBA5630,
+            Version1_15_0_0 => 0xBA5730,
+            Version1_15_1_0 => 0xBAFCE0,
+            Version1_15_2_0 => 0xBAFE10,
+            _ => 0
+        };
 
-
+        
         Hooks.Hit = moduleBase + Version switch
         {
             Version1_3_2_0 => 0x99F498,
@@ -345,28 +399,56 @@ public static class DS3Offsets
             Version1_15_2_0 => 0x88BC00,
             _ => 0
         };
+        
+        Patches.NoLogo = moduleBase + Version switch
+        {
+            Version1_3_2_0 => 0xBBAFDF,
+            Version1_4_1_0 or Version1_4_2_0 or Version1_4_3_0 => 0xBBB0CF,
+            Version1_5_0_0 => 0xBBBF2F,
+            Version1_5_1_0 => 0xBBBD5F,
+            Version1_6_0_0 => 0xBBC32F,
+            Version1_7_0_0 => 0xBBEA5F,
+            Version1_8_0_0 => 0xBD6ACF,
+            Version1_9_0_0 => 0xBD708F,
+            Version1_10_0_0 => 0xBD70FF,
+            Version1_11_0_0 => 0xBE6F8F,
+            Version1_12_0_0 => 0xBE7D9F,
+            Version1_13_0_0 => 0xBE993F,
+            Version1_14_0_0 => 0xBE9C0F,
+            Version1_15_0_0 => 0xBE9D0F,
+            Version1_15_1_0 => 0xBF42BF,
+            Version1_15_2_0 => 0xBF43EF,
+            _ => 0
+        };
 
+        
 
 #if DEBUG
         _baseAddr = moduleBase;
         Console.WriteLine("--- Globals ---");
         PrintOffset("WorldChrMan.Base", WorldChrMan.Base);
+        PrintOffset("GameDataMan", GameDataMan.Base);
+        PrintOffset("UserInputManager", UserInputManager.Base);
 
         PrintOffset("FallDamageKillingFloor", FallDamageKillFloor);
 
         Console.WriteLine("\n--- Hooks ---");
-        PrintOffset("Hooks.Hit", Hooks.Hit);
-        PrintOffset("Hooks.LethalFall", Hooks.LethalFall);
-        PrintOffset("Hooks.CheckAuxAttacker", Hooks.CheckAuxAttacker);
-        PrintOffset("Hooks.AuxProc", Hooks.AuxProc);
-        PrintOffset("Hooks.HasJailerDrain", Hooks.HasJailerDrain);
-        PrintOffset("Hooks.ApplyHealthDelta", Hooks.ApplyHealthDelta);
-        PrintOffset("Hooks.KillBox", Hooks.KillBox);
-        PrintOffset("Hooks.SetEvent", Hooks.SetEvent);
+        PrintOffset("Hit", Hooks.Hit);
+        PrintOffset("LethalFall", Hooks.LethalFall);
+        PrintOffset("CheckAuxAttacker", Hooks.CheckAuxAttacker);
+        PrintOffset("AuxProc", Hooks.AuxProc);
+        PrintOffset("HasJailerDrain", Hooks.HasJailerDrain);
+        PrintOffset("ApplyHealthDelta", Hooks.ApplyHealthDelta);
+        PrintOffset("KillBox", Hooks.KillBox);
+        PrintOffset("SetEvent", Hooks.SetEvent);
 
 
         Console.WriteLine("\n--- Functions ---");
-        PrintOffset("Functions.HasSpEffectId", Functions.HasSpEffectId);
+        PrintOffset("HasSpEffectId", Functions.HasSpEffectId);
+        PrintOffset("OriginalLogoFunc", Functions.OriginalLogoFunc);
+        
+        Console.WriteLine("\n--- Patches ---");
+        PrintOffset("NoLogo", Patches.NoLogo);
 
 
         Console.WriteLine("\n====================================\n");

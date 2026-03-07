@@ -16,11 +16,12 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
     private readonly IStateService _stateService;
     private readonly HookManager _hookManager;
     private readonly ITickService _tickService;
+    private readonly Dictionary<uint, string> _events;
     private DS2HitService _hitService;
     private DS2EventService _eventService;
+    private DS2SettingsService _settingsService;
     private DS2IgtService _igtService;
-    private readonly Dictionary<uint, string> _events;
-    private readonly IGameSettingsProvider _settings;
+    private readonly IHitRulesProvider _rules;
 
     public string GameVersion => DS2Offsets.Version.GetDescription();
 
@@ -32,28 +33,28 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
     public event Action OnVersionDetected;
 
     public DS2Module(IMemoryService memoryService, IStateService stateService, HookManager hookManager,
-        ITickService tickService, Dictionary<uint, string> events, IGameSettingsProvider settings)
+        ITickService tickService, Dictionary<uint, string> events, IHitRulesProvider rules)
     {
         _memoryService = memoryService;
         _stateService = stateService;
         _hookManager = hookManager;
         _tickService = tickService;
         _events = events;
-        _settings = settings;
-        settings.OnSettingsChanged += ApplySettings;
+        _rules = rules;
+        rules.OnHitRulesChanged += ApplyRules;
 
         stateService.Subscribe(State.Attached, Initialize);
         _lastHit = DateTime.Now;
     }
 
-    private void ApplySettings()                                                                                            {
-        _hitService?.SetIsShulvaSpikesIgnored(_settings.GetFlag("ignore_shulva_spikes"));
+    private void ApplyRules()
+    {
+        _hitService?.SetIsShulvaSpikesIgnored(_rules.GetRule("ignore_shulva_spikes"));
     }
 
     private void Initialize()
     {
         InitializeOffsets();
-        OnVersionDetected?.Invoke();
 
         DS2CustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
 
@@ -62,15 +63,21 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
 #endif
 
         _hitService = new DS2HitService(_memoryService, _hookManager);
-        _hitService.InstallHooks();
         _eventService = new DS2EventService(_memoryService, _hookManager, _events);
-        _eventService.InstallHook();
+        _settingsService = new DS2SettingsService(_memoryService, _hookManager);
         _igtService = new DS2IgtService(_memoryService, _hookManager);
+
+        ApplySettings(onlyEnabled: true);
+
+        _hitService.InstallHooks();
+        _eventService.InstallHook();
         _igtService.InstallHooks();
-        
-        ApplySettings();
+
+        ApplyRules();
 
         _tickService.RegisterGameTick(Tick);
+        
+        OnVersionDetected?.Invoke();
     }
 
     private void InitializeOffsets()
@@ -95,23 +102,35 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
         {
             OnEventSet?.Invoke();
         }
-        
+
         _igtService.Update();
         OnIgtChanged?.Invoke(_igtService.ElapsedMilliseconds);
     }
 
     public void Dispose()
     {
-        _settings.OnSettingsChanged -= ApplySettings;
+        _rules.OnHitRulesChanged -= ApplyRules;
         _stateService.Unsubscribe(State.Attached, Initialize);
         _tickService.UnregisterGameTick();
         OnHit = null;
         OnEventSet = null;
         OnIgtChanged = null;
     }
-    
+
     public void UpdateEvents(Dictionary<uint, string> events)
     {
         _eventService?.UpdateEvents(events);
+    }
+
+    public void ApplySettings(bool onlyEnabled = false)
+    {
+        var noBabyJump = SettingsManager.Default.DS2NoBabyJump;
+        if (noBabyJump || !onlyEnabled) _settingsService.ToggleBabyJumpFix(noBabyJump);
+
+        var skipCredits = SettingsManager.Default.DS2SkipCredits;
+        if (skipCredits || !onlyEnabled) _settingsService.ToggleCreditSkip(skipCredits);
+
+        var disableDoubleClick = SettingsManager.Default.DS2DisableDoubleClick;
+        if (disableDoubleClick || !onlyEnabled) _settingsService.ToggleDoubleClick(disableDoubleClick);
     }
 }

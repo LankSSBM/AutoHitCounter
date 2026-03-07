@@ -110,6 +110,7 @@
         <Compile Include="Behaviors\SplitListDragDropBehavior.cs" />
         <Compile Include="Behaviors\TemplatesDragDropBehavior.cs" />
         <Compile Include="Converters\AttemptCountColorConverter.cs" />
+        <Compile Include="Converters\EnumDescriptionConverter.cs" />
         <Compile Include="Converters\ExpanderArrowConverter.cs" />
         <Compile Include="Converters\InverseBoolConverter.cs" />
         <Compile Include="Converters\LockIconConverter.cs" />
@@ -127,6 +128,7 @@
         <Compile Include="Games\DS2\DS2IgtService.cs" />
         <Compile Include="Games\DS2\DS2Module.cs" />
         <Compile Include="Games\DS2\DS2Offsets.cs" />
+        <Compile Include="Games\DS2\DS2SettingsService.cs" />
         <Compile Include="Games\DS2\DS2Version.cs" />
         <Compile Include="Games\DS2\DS2TimerStatus.cs" />
         <Compile Include="Games\DS2\DS2CustomCodeOffsets.cs" />
@@ -135,6 +137,7 @@
         <Compile Include="Games\DS3\DS3HitService.cs" />
         <Compile Include="Games\DS3\DS3Module.cs" />
         <Compile Include="Games\DS3\DS3Offsets.cs" />
+        <Compile Include="Games\DS3\DS3SettingsService.cs" />
         <Compile Include="Games\DS3\DS3Version.cs" />
         <Compile Include="Games\DSR\DSRCustomCodeOffsets.cs" />
         <Compile Include="Games\DSR\DSREventService.cs" />
@@ -148,20 +151,22 @@
         <Compile Include="Games\ER\EldenRingHitService.cs" />
         <Compile Include="Games\ER\EldenRingModule.cs" />
         <Compile Include="Games\ER\EldenRingOffsets.cs" />
+        <Compile Include="Games\ER\EldenRingSettingsService.cs" />
         <Compile Include="Games\ER\EldenRingVersion.cs" />
         <Compile Include="Games\SK\SKCustomCodeOffsets.cs" />
         <Compile Include="Games\SK\SKEventService.cs" />
         <Compile Include="Games\SK\SKHitService.cs" />
         <Compile Include="Games\SK\SKModule.cs" />
         <Compile Include="Games\SK\SKOffsets.cs" />
+        <Compile Include="Games\SK\SKOriginalBytes.cs" />
+        <Compile Include="Games\SK\SKSettingsService.cs" />
         <Compile Include="Games\SK\SKVersion.cs" />
         <Compile Include="Interfaces\IEventService.cs" />
         <Compile Include="Interfaces\IGameModule.cs" />
-        <Compile Include="Interfaces\IGameSettingsProvider.cs" />
+        <Compile Include="Interfaces\IHitRulesProvider.cs" />
         <Compile Include="Interfaces\IHitService.cs" />
         <Compile Include="Interfaces\IProfileService.cs" />
         <Compile Include="Interfaces\IReorderHandler.cs" />
-        <Compile Include="Interfaces\ISettingsService.cs" />
         <Compile Include="Interfaces\IStateService.cs" />
         <Compile Include="Interfaces\ITickService.cs" />
         <Compile Include="Interfaces\IVersionedGameModule.cs" />
@@ -179,7 +184,6 @@
         <Compile Include="Services\MemoryService.cs" />
         <Compile Include="Services\OverlayServerService.cs" />
         <Compile Include="Services\ProfileService.cs" />
-        <Compile Include="Services\SettingsService.cs" />
         <Compile Include="Services\StateService.cs" />
         <Compile Include="Services\TickService.cs" />
         <Compile Include="Utilities\EnumExtensions.cs" />

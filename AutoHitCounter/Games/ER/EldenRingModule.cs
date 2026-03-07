@@ -19,6 +19,7 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
     private readonly Dictionary<uint, string> _events;
     private EldenRingHitService _hitService;
     private EldenRingEventService _eventService;
+    private EldenRingSettingsService _settingsService;
     public string GameVersion => EldenRingOffsets.Version.GetDescription();
 
     private DateTime? _lastHit;
@@ -39,7 +40,7 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
         _hookManager = hookManager;
         _tickService = tickService;
         _events = events;
-
+        
         stateService.Subscribe(State.Attached, Initialize);
         _lastHit = DateTime.Now;
     }
@@ -47,19 +48,27 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
     private void Initialize()
     {
         InitializeOffsets();
-        OnVersionDetected?.Invoke();
-
+        
         EldenRingCustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
+        
 #if DEBUG
         Console.WriteLine($@"Code cave: 0x{(long)EldenRingCustomCodeOffsets.Base:X}");
 #endif
-
+        
         _hitService = new EldenRingHitService(_memoryService, _hookManager);
         _eventService = new EldenRingEventService(_memoryService, _hookManager, _events);
+        _settingsService = new EldenRingSettingsService(_memoryService);
+        
+        ApplySettings(onlyEnabled: true);
+        
         _eventService.InstallHook();
         _hitService.InstallHooks();
+        
         _igtPtr = _memoryService.Read<nint>(GameDataMan.Base) + GameDataMan.Igt;
+        
         _tickService.RegisterGameTick(Tick);
+        
+        OnVersionDetected?.Invoke();
     }
 
     private void InitializeOffsets()
@@ -91,8 +100,8 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
 
     private bool IsLoaded()
     {
-        var worldChrman = _memoryService.Read<nint>(WorldChrMan.Base);
-        return _memoryService.Read<nint>(worldChrman + WorldChrMan.PlayerIns) != 0;
+        var worldChrMan = _memoryService.Read<nint>(WorldChrMan.Base);
+        return _memoryService.Read<nint>(worldChrMan + WorldChrMan.PlayerIns) != 0;
     }
 
     public void Dispose()
@@ -107,5 +116,17 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
     public void UpdateEvents(Dictionary<uint, string> events)
     {
         _eventService?.UpdateEvents(events);
+    }
+
+    public void ApplySettings(bool onlyEnabled = false)
+    {
+        var noLogo = SettingsManager.Default.ERNoLogo;
+        if (noLogo || !onlyEnabled) _settingsService.ToggleNoLogo(noLogo);
+
+        var stutterFix = SettingsManager.Default.ERStutterFix;
+        if (stutterFix || !onlyEnabled) _settingsService.ToggleStutterFix(stutterFix);
+
+        var disableAchievements = SettingsManager.Default.ERDisableAchievements;
+        if (disableAchievements || !onlyEnabled) _settingsService.ToggleDisableAchievements(disableAchievements);
     }
 }
