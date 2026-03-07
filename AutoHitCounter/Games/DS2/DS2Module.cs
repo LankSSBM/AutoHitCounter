@@ -20,7 +20,7 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
     private DS2EventService _eventService;
     private DS2IgtService _igtService;
     private readonly Dictionary<uint, string> _events;
-    private readonly IGameSettingsProvider _settings;
+    private readonly IHitRulesProvider _rules;
 
     public string GameVersion => DS2Offsets.Version.GetDescription();
 
@@ -32,22 +32,22 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
     public event Action OnVersionDetected;
 
     public DS2Module(IMemoryService memoryService, IStateService stateService, HookManager hookManager,
-        ITickService tickService, Dictionary<uint, string> events, IGameSettingsProvider settings)
+        ITickService tickService, Dictionary<uint, string> events, IHitRulesProvider rules)
     {
         _memoryService = memoryService;
         _stateService = stateService;
         _hookManager = hookManager;
         _tickService = tickService;
         _events = events;
-        _settings = settings;
-        settings.OnSettingsChanged += ApplySettings;
+        _rules = rules;
+        rules.OnHitRulesChanged += ApplyRules;
 
         stateService.Subscribe(State.Attached, Initialize);
         _lastHit = DateTime.Now;
     }
 
-    private void ApplySettings()                                                                                            {
-        _hitService?.SetIsShulvaSpikesIgnored(_settings.GetFlag("ignore_shulva_spikes"));
+    private void ApplyRules()                                                                                            {
+        _hitService?.SetIsShulvaSpikesIgnored(_rules.GetRule("ignore_shulva_spikes"));
     }
 
     private void Initialize()
@@ -68,7 +68,7 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
         _igtService = new DS2IgtService(_memoryService, _hookManager);
         _igtService.InstallHooks();
         
-        ApplySettings();
+        ApplyRules();
 
         _tickService.RegisterGameTick(Tick);
     }
@@ -102,7 +102,7 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
 
     public void Dispose()
     {
-        _settings.OnSettingsChanged -= ApplySettings;
+        _rules.OnHitRulesChanged -= ApplyRules;
         _stateService.Unsubscribe(State.Attached, Initialize);
         _tickService.UnregisterGameTick();
         OnHit = null;
@@ -113,5 +113,10 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
     public void UpdateEvents(Dictionary<uint, string> events)
     {
         _eventService?.UpdateEvents(events);
+    }
+
+    public void ApplySettings()
+    {
+       
     }
 }

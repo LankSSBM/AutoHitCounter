@@ -112,4 +112,9 @@ public class DSRModule : IGameModule, IDisposable, IVersionedGameModule
     {
         _eventService?.UpdateEvents(events);
     }
+
+    public void ApplySettings()
+    {
+       
+    }
 }

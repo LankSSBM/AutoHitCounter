@@ -47,7 +47,7 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
     private void Initialize()
     {
         InitializeOffsets();
-        OnVersionDetected?.Invoke();
+        ApplySettings();
 
         EldenRingCustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
 #if DEBUG
@@ -60,6 +60,7 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
         _hitService.InstallHooks();
         _igtPtr = _memoryService.Read<nint>(GameDataMan.Base) + GameDataMan.Igt;
         _tickService.RegisterGameTick(Tick);
+        OnVersionDetected?.Invoke();
     }
 
     private void InitializeOffsets()
@@ -91,8 +92,8 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
 
     private bool IsLoaded()
     {
-        var worldChrman = _memoryService.Read<nint>(WorldChrMan.Base);
-        return _memoryService.Read<nint>(worldChrman + WorldChrMan.PlayerIns) != 0;
+        var worldChrMan = _memoryService.Read<nint>(WorldChrMan.Base);
+        return _memoryService.Read<nint>(worldChrMan + WorldChrMan.PlayerIns) != 0;
     }
 
     public void Dispose()
@@ -107,5 +108,10 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
     public void UpdateEvents(Dictionary<uint, string> events)
     {
         _eventService?.UpdateEvents(events);
+    }
+
+    public void ApplySettings()
+    {
+        
     }
 }

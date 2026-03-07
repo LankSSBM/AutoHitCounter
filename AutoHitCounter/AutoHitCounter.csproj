@@ -155,7 +155,7 @@
         <Compile Include="Games\SK\SKVersion.cs" />
         <Compile Include="Interfaces\IEventService.cs" />
         <Compile Include="Interfaces\IGameModule.cs" />
-        <Compile Include="Interfaces\IGameSettingsProvider.cs" />
+        <Compile Include="Interfaces\IHitRulesProvider.cs" />
         <Compile Include="Interfaces\IHitService.cs" />
         <Compile Include="Interfaces\IProfileService.cs" />
         <Compile Include="Interfaces\IReorderHandler.cs" />

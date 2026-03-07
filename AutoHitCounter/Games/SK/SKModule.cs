@@ -17,7 +17,7 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
     private readonly HookManager _hookManager;
     private readonly ITickService _tickService;
     private readonly Dictionary<uint, string> _events;
-    private readonly IGameSettingsProvider _settings;
+    private readonly IHitRulesProvider _rules;
 
     public string GameVersion => SKOffsets.Version.GetDescription();
     
@@ -32,22 +32,22 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
     public event Action OnVersionDetected;
 
     public SKModule(IMemoryService memoryService, IStateService stateService, HookManager hookManager,
-        ITickService tickService, Dictionary<uint, string> events, IGameSettingsProvider settings)
+        ITickService tickService, Dictionary<uint, string> events, IHitRulesProvider rules)
     {
         _memoryService = memoryService;
         _stateService = stateService;
         _hookManager = hookManager;
         _tickService = tickService;
         _events = events;
-        _settings = settings;
-        settings.OnSettingsChanged += ApplySettings;
+        _rules = rules;
+        rules.OnHitRulesChanged += ApplyRules;
 
         stateService.Subscribe(State.Attached, Initialize);
         _lastHit = DateTime.Now;
     }
     
-    private void ApplySettings()                                                                                            {
-        _hitService?.SetRobertoStaggerCounts(_settings.GetFlag("should_count_roberto"));
+    private void ApplyRules()                                                                                            {
+        _hitService?.SetRobertoStaggerCounts(_rules.GetRule("should_count_roberto"));
     }
     
     private void Initialize()
@@ -67,7 +67,7 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
         _hitService.InstallHooks();
         _igtPtr = _memoryService.Read<nint>(GameDataMan.Base) + GameDataMan.Igt;
         
-        ApplySettings();
+        ApplyRules();
         
         _tickService.RegisterGameTick(Tick);
     }
@@ -102,8 +102,8 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
 
     private bool IsLoaded()
     {
-        var worldChrman = _memoryService.Read<nint>(WorldChrMan.Base);
-        return _memoryService.Read<nint>(worldChrman + WorldChrMan.PlayerIns) != 0;
+        var worldChrMan = _memoryService.Read<nint>(WorldChrMan.Base);
+        return _memoryService.Read<nint>(worldChrMan + WorldChrMan.PlayerIns) != 0;
     }
     
     public void Dispose()
@@ -118,5 +118,10 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
     public void UpdateEvents(Dictionary<uint, string> events)
     {
         _eventService?.UpdateEvents(events);
+    }
+
+    public void ApplySettings()
+    {
+        
     }
 }

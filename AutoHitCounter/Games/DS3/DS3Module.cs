@@ -112,5 +112,9 @@ public class DS3Module : IGameModule, IDisposable, IVersionedGameModule
     {
         _eventService?.UpdateEvents(events);
     }
-    
+
+    public void ApplySettings()
+    {
+       
+    }
 }
