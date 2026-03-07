@@ -155,6 +155,8 @@
         <Compile Include="Games\SK\SKHitService.cs" />
         <Compile Include="Games\SK\SKModule.cs" />
         <Compile Include="Games\SK\SKOffsets.cs" />
+        <Compile Include="Games\SK\SKOriginalBytes.cs" />
+        <Compile Include="Games\SK\SKSettingsService.cs" />
         <Compile Include="Games\SK\SKVersion.cs" />
         <Compile Include="Interfaces\IEventService.cs" />
         <Compile Include="Interfaces\IGameModule.cs" />

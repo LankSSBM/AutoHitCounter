@@ -52,8 +52,8 @@ public class DS3Module : IGameModule, IDisposable, IVersionedGameModule
     private void Initialize()
     {
         InitializeOffsets();
-        OnVersionDetected?.Invoke();
-
+        ApplySettings();
+        
         DS3CustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
         
 #if DEBUG
@@ -64,6 +64,7 @@ public class DS3Module : IGameModule, IDisposable, IVersionedGameModule
         _hitService.InstallHooks();
         _igtPtr = _memoryService.Read<nint>(GameDataMan.Base) + GameDataMan.Igt;
         _tickService.RegisterGameTick(Tick);
+        OnVersionDetected?.Invoke();
     }
     
     private void InitializeOffsets()

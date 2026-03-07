@@ -267,6 +267,38 @@ public class SettingsViewModel : BaseViewModel
     }
 
     #endregion
+
+    #region Sekiro
+
+    private bool _skNoLogo;
+
+    public bool SKNoLogo
+    {
+        get => _skNoLogo;
+        set
+        {
+            if (!SetProperty(ref _skNoLogo, value)) return;
+            SettingsManager.Default.SKNoLogo = value;
+            SettingsManager.Default.Save();
+            OnGameSettingChanged?.Invoke();
+        }
+    }
+    
+    private bool _skNoTutorials;
+
+    public bool SKNoTutorials
+    {
+        get => _skNoTutorials;
+        set
+        {
+            if (!SetProperty(ref _skNoTutorials, value)) return;
+            SettingsManager.Default.SKNoTutorials = value;
+            SettingsManager.Default.Save();
+            OnGameSettingChanged?.Invoke();
+        }
+    }
+
+    #endregion
     
 
     #endregion
@@ -275,21 +307,10 @@ public class SettingsViewModel : BaseViewModel
 
     private void OnAppStart()
     {
-        _erNoLogo = SettingsManager.Default.ERNoLogo;
-        OnPropertyChanged(nameof(ErNoLogo));
-
-        _erStutterFix = SettingsManager.Default.ERStutterFix;
-        OnPropertyChanged(nameof(ERStutterFix));
-
-        _erDisableAchievements = SettingsManager.Default.ERDisableAchievements;
-        OnPropertyChanged(nameof(ERDisableAchievements));
+        ApplyERSettings();
+        ApplyDS3Settings();
+        ApplySKSettings();
         
-        _ds3NoLogo = SettingsManager.Default.DS3NoLogo;
-        OnPropertyChanged(nameof(DS3NoLogo));
-        
-        _ds3StutterFix = SettingsManager.Default.DS3StutterFix;
-        OnPropertyChanged(nameof(DS3StutterFix));
-
         IsAlwaysOnTopEnabled = SettingsManager.Default.AlwaysOnTop;
 
         _isShowNotesEnabled = SettingsManager.Default.ShowNotesSection;
@@ -302,6 +323,39 @@ public class SettingsViewModel : BaseViewModel
         OnPropertyChanged(nameof(IsPracticeMode));
 
         LoadSplitConfig();
+    }
+
+    private void ApplyERSettings()
+    {
+        _erNoLogo = SettingsManager.Default.ERNoLogo;
+        OnPropertyChanged(nameof(ErNoLogo));
+
+        _erStutterFix = SettingsManager.Default.ERStutterFix;
+        OnPropertyChanged(nameof(ERStutterFix));
+
+        _erDisableAchievements = SettingsManager.Default.ERDisableAchievements;
+        OnPropertyChanged(nameof(ERDisableAchievements));
+    }
+
+    private void ApplyDS3Settings()
+    {
+        _ds3NoLogo = SettingsManager.Default.DS3NoLogo;
+        OnPropertyChanged(nameof(DS3NoLogo));
+        
+        _ds3StutterFix = SettingsManager.Default.DS3StutterFix;
+        OnPropertyChanged(nameof(DS3StutterFix));
+        
+        _ds3NoLogo = SettingsManager.Default.DS3NoLogo;
+        OnPropertyChanged(nameof(DS3NoLogo));
+    }
+
+    private void ApplySKSettings()
+    {
+        _skNoLogo = SettingsManager.Default.SKNoLogo;
+        OnPropertyChanged(nameof(SKNoLogo));
+        
+        _skNoTutorials = SettingsManager.Default.SKNoTutorials;
+        OnPropertyChanged(nameof(SKNoTutorials));
     }
 
     private void LoadSplitConfig()
