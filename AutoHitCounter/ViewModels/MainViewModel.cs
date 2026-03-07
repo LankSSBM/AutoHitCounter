@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Media;
 using AutoHitCounter.Core;
 using AutoHitCounter.Enums;
 using AutoHitCounter.Interfaces;
@@ -80,6 +81,7 @@ namespace AutoHitCounter.ViewModels
                 SettingsManager.Default.Save();
             });
 
+
             EditAttemptsCommand = new DelegateCommand(() => IsEditingAttempts = true);
 
             InitialiseCommands();
@@ -122,6 +124,10 @@ namespace AutoHitCounter.ViewModels
         public DelegateCommand RenameSelectedSplitCommand { get; set; }
 
         public DelegateCommand EditAttemptsCommand { get; set; }
+
+        public DelegateCommand ClearTotalPbCommand { get; set; }
+
+        public DelegateCommand EditSplitPbCommand { get; set; }
 
         #endregion
 
@@ -185,6 +191,8 @@ namespace AutoHitCounter.ViewModels
                     IsRunComplete = false;
                     OnPropertyChanged(nameof(ActiveProfile));
                     OnPropertyChanged(nameof(TotalHits));
+                    OnPropertyChanged(nameof(TotalDiff));
+                    OnPropertyChanged(nameof(TotalHitsBrush));
                     OnPropertyChanged(nameof(TotalPb));
                     _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
                 }
@@ -206,7 +214,9 @@ namespace AutoHitCounter.ViewModels
             }
         }
 
-        public string TrackingText => _activeGame != null ? $"Tracking: {_activeGame.GameName}" : "Not tracking";
+        public string TrackingText => _activeGame != null
+            ? $"Track hits for the currently selected game.\nCurrently Tracking: {_activeGame.GameName}"
+            : "Not tracking";
 
         public ObservableCollection<SplitViewModel> Splits { get; } = new();
 
@@ -260,10 +270,10 @@ namespace AutoHitCounter.ViewModels
                 }
 
                 LoadProfile(value);
-                
+
                 if (_activeGame == _selectedGame && _currentModule != null)
                     _currentModule.UpdateEvents(GetActiveEvents());
-                
+
                 OnSettingsChanged?.Invoke();
             }
         }
@@ -303,7 +313,33 @@ namespace AutoHitCounter.ViewModels
         }
 
         public int TotalHits => Splits.Where(s => s.Type == SplitType.Child).Sum(s => s.NumOfHits);
+
+        public Brush TotalHitsBrush
+        {
+            get
+            {
+                if (TotalPb == 0) return new SolidColorBrush(Color.FromRgb(0x70, 0x70, 0x70));
+                if (TotalHits < TotalPb) return new SolidColorBrush(Color.FromRgb(0x5a, 0x90, 0x68));
+                if (TotalHits > TotalPb) return new SolidColorBrush(Color.FromRgb(0xb8, 0x55, 0x55));
+                return new SolidColorBrush(Color.FromRgb(0x70, 0x70, 0x70));
+            }
+        }
+
+        public int TotalDiff => Splits.Where(s => s.Type == SplitType.Child).Sum(s => s.Diff);
+
+
         public int TotalPb => Splits.Where(s => s.Type == SplitType.Child).Sum(s => s.PersonalBest);
+
+        public Brush TotalPbBrush
+        {
+            get
+            {
+                var diff = TotalDiff;
+                if (diff > 0) return new SolidColorBrush(Color.FromRgb(0xb8, 0x55, 0x55));
+                if (diff < 0) return new SolidColorBrush(Color.FromRgb(0x5a, 0x90, 0x68));
+                return new SolidColorBrush(Color.FromRgb(0x90, 0x90, 0x90));
+            }
+        }
 
         public event Action OnSettingsChanged;
 
@@ -423,7 +459,28 @@ namespace AutoHitCounter.ViewModels
                 SelectedSplit.NumOfHits = 0;
                 _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
             });
+
+            ClearTotalPbCommand = new DelegateCommand(() =>
+            {
+                foreach (var split in Splits.Where(s => s.Type == SplitType.Child))
+                {
+                    split.PersonalBest = 0;
+                    var index = Splits.IndexOf(split);
+                    if (index >= 0 && index < _activeProfile.Splits.Count)
+                        _activeProfile.Splits[index].PersonalBest = 0;
+                }
+
+                _profileService.SaveProfile(_activeProfile);
+                RefreshSplitValues();
+            });
+
+            EditSplitPbCommand = new DelegateCommand(() =>
+            {
+                if (SelectedSplit != null)
+                    SelectedSplit.IsEditingPb = true;
+            });
         }
+
 
         private void RegisterHotkeys()
         {
@@ -550,7 +607,7 @@ namespace AutoHitCounter.ViewModels
 
             var window = new ProfileEditorWindow { DataContext = vm };
             window.ShowDialog();
-            
+
             if (_activeProfile != null)
             {
                 var key = $"{_selectedGame.GameName}|{_activeProfile.Name}";
@@ -581,7 +638,7 @@ namespace AutoHitCounter.ViewModels
 
             foreach (var split in ActiveProfile.Splits)
             {
-                Splits.Add(new SplitViewModel
+                var vm = new SplitViewModel
                 {
                     Name = split.Label,
                     IsAuto = split.IsAuto,
@@ -589,11 +646,35 @@ namespace AutoHitCounter.ViewModels
                     NumOfHits = 0,
                     PersonalBest = split.PersonalBest,
                     Notes = split.Notes
-                });
+                };
+                vm.PropertyChanged += (_, _) =>
+                {
+                    OnPropertyChanged(nameof(TotalSplitCount));
+                    OnPropertyChanged(nameof(AttemptCount));
+                    OnPropertyChanged(nameof(TotalHits));
+                    OnPropertyChanged(nameof(TotalDiff));
+                    OnPropertyChanged(nameof(TotalHitsBrush));
+                    OnPropertyChanged(nameof(TotalPb));
+                };
+                Splits.Add(vm);
             }
+        }
 
-            OnPropertyChanged(nameof(TotalSplitCount));
-            OnPropertyChanged(nameof(AttemptCount));
+        private void RefreshSplitValues()
+        {
+            var hits = Splits.Select(s => s.NumOfHits).ToArray();
+            var currentIndex = CurrentSplit != null ? Splits.IndexOf(CurrentSplit) : -1;
+
+            UpdateSplits();
+
+            for (int i = 0; i < Splits.Count && i < hits.Length; i++)
+                Splits[i].NumOfHits = hits[i];
+
+            if (currentIndex >= 0 && currentIndex < Splits.Count)
+            {
+                CurrentSplit = Splits[currentIndex];
+                CurrentSplit.IsCurrent = true;
+            }
         }
 
         private Dictionary<uint, string> GetActiveEvents()
@@ -707,6 +788,23 @@ namespace AutoHitCounter.ViewModels
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
 
+        public void CommitPbEdit(SplitViewModel split, string value)
+        {
+            if (int.TryParse(value, out int val) && val >= 0)
+            {
+                split.PersonalBest = val;
+                var index = Splits.IndexOf(split);
+                if (index >= 0 && index < _activeProfile.Splits.Count)
+                {
+                    _activeProfile.Splits[index].PersonalBest = val;
+                    _profileService.SaveProfile(_activeProfile);
+                }
+            }
+
+            split.IsEditingPb = false;
+            RefreshSplitValues();
+        }
+
         private void PreviousSplit()
         {
             var currentIndex = Splits.IndexOf(CurrentSplit);
@@ -752,6 +850,20 @@ namespace AutoHitCounter.ViewModels
 
             IsEditingAttempts = false;
         }
+
+        public bool HasSplits => TotalSplitCount > 0;
+
+        public bool IsSplitListScrollbarVisible
+        {
+            get => _isSplitListScrollbarVisible;
+            set
+            {
+                _isSplitListScrollbarVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isSplitListScrollbarVisible;
 
         #endregion
     }

@@ -39,7 +39,8 @@ public class SplitViewModel : BaseViewModel
         set
         {
             if (SetProperty(ref _personalBest, value))
-                OnPropertyChanged(nameof(DiffBrush));
+                OnPropertyChanged(nameof(Diff));
+            OnPropertyChanged(nameof(DiffBrush));
         }
     }
 
@@ -58,7 +59,7 @@ public class SplitViewModel : BaseViewModel
         get => _isAuto;
         set => SetProperty(ref _isAuto, value);
     }
-    
+
     private SplitType _type = SplitType.Child;
 
     public SplitType Type
@@ -86,7 +87,7 @@ public class SplitViewModel : BaseViewModel
         get => _isExpanded;
         set => SetProperty(ref _isExpanded, value);
     }
-    
+
     private string _notes;
 
     public string Notes
@@ -118,5 +119,23 @@ public class SplitViewModel : BaseViewModel
     {
         get => _isEditing;
         set => SetProperty(ref _isEditing, value);
+    }
+
+    public bool IsEditingPb
+    {
+        get => _isEditingPb;
+        set
+        {
+            _isEditingPb = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private bool _isEditingPb;
+
+    public void RefreshLayout()
+    {
+        OnPropertyChanged(nameof(IsEditingPb));
+        OnPropertyChanged(nameof(PersonalBest));
     }
 }

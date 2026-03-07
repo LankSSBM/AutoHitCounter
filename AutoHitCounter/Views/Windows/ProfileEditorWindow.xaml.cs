@@ -23,11 +23,19 @@ public partial class ProfileEditorWindow : Window
 
     protected override void OnClosing(CancelEventArgs e)
     {
-        if (DataContext is ProfileEditorViewModel { IsDirty: true })
+        if (DataContext is ProfileEditorViewModel { IsDirty: true } vm)
         {
-            var close = MsgBox.ShowOkCancel("You have unsaved changes. Close without saving?", "Unsaved Changes");
-            if (!close)
+            var result = MsgBox.ShowYesNoCancel("You have unsaved changes. Would you like to save before closing?",
+                "Unsaved Changes");
+
+            if (result == null)
+            {
                 e.Cancel = true;
+            }
+            else if (result == true)
+            {
+                vm.SaveCommand.Execute(null);
+            }
         }
 
         base.OnClosing(e);
