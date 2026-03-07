@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using AutoHitCounter.Utilities;
 using AutoHitCounter.ViewModels;
 
@@ -137,5 +139,72 @@ namespace AutoHitCounter
                 textBox?.SelectAll();
             });
         }
+
+        private void ResetAttempts_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+                vm.CommitAttemptsEdit("0");
+        }
+
+        private void AttemptsBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (DataContext is not MainViewModel vm) return;
+            if (e.Key == Key.Enter)
+                vm.CommitAttemptsEdit(((TextBox)sender).Text);
+            else if (e.Key == Key.Escape)
+                vm.CommitAttemptsEdit(vm.AttemptCount.ToString());
+        }
+
+        private void AttemptsBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+                vm.CommitAttemptsEdit(((TextBox)sender).Text);
+        }
+
+        protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnPreviewMouseDown(e);
+            var hit = e.OriginalSource as DependencyObject;
+            if (DataContext is not MainViewModel vm) return;
+
+            if (vm.IsEditingAttempts && hit != null && !IsDescendantOf(AttemptsBox, hit))
+                vm.CommitAttemptsEdit(AttemptsBox.Text);
+
+            var editingSplit = vm.Splits.FirstOrDefault(s => s.IsEditing);
+            if (editingSplit != null)
+            {
+                var renameBox = FindRenameBox(SplitListBox, editingSplit);
+                if (renameBox == null || (hit != null && !IsDescendantOf(renameBox, hit)))
+                    vm.CommitRename(editingSplit);
+            }
+        }
+
+        private static bool IsDescendantOf(DependencyObject parent, DependencyObject child)
+        {
+            var current = child;
+            while (current != null)
+            {
+                if (current == parent) return true;
+                current = VisualTreeHelper.GetParent(current);
+            }
+
+            return false;
+        }
+
+        private static TextBox FindRenameBox(DependencyObject parent, object dataContext)
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is TextBox tb && tb.Name == "RenameBox" && tb.DataContext == dataContext)
+                    return tb;
+                var result = FindRenameBox(child, dataContext);
+                if (result != null) return result;
+            }
+
+            return null;
+        }
+        
+        
     }
 }

@@ -81,6 +81,8 @@ namespace AutoHitCounter.ViewModels
                 SettingsManager.Default.Save();
             });
 
+            EditAttemptsCommand = new DelegateCommand(() => IsEditingAttempts = true);
+
             InitialiseCommands();
 
 
@@ -120,6 +122,8 @@ namespace AutoHitCounter.ViewModels
         public DelegateCommand ResetSelectedSplitHitsCommand { get; set; }
 
         public DelegateCommand RenameSelectedSplitCommand { get; set; }
+
+        public DelegateCommand EditAttemptsCommand { get; set; }
 
         #endregion
 
@@ -227,7 +231,11 @@ namespace AutoHitCounter.ViewModels
         public SplitViewModel CurrentSplit
         {
             get => _currentSplit;
-            set => SetProperty(ref _currentSplit, value);
+            set
+            {
+                SetProperty(ref _currentSplit, value);
+                OnPropertyChanged(nameof(CurrentSplitNumber));
+            }
         }
 
         private Profile _activeProfile;
@@ -298,8 +306,8 @@ namespace AutoHitCounter.ViewModels
         public event Action OnSettingsChanged;
 
         public bool GetFlag(string key) => _activeProfile != null
-            && _activeProfile.GameSettings.TryGetValue(key, out var val)
-            && val;
+                                           && _activeProfile.GameSettings.TryGetValue(key, out var val)
+                                           && val;
 
         public void CommitRename(SplitViewModel split)
         {
@@ -380,6 +388,20 @@ namespace AutoHitCounter.ViewModels
             get => _isUnlocked;
             set => SetProperty(ref _isUnlocked, value);
         }
+
+        public int AttemptCount => _activeProfile?.AttemptCount ?? 0;
+
+        public int CurrentSplitNumber
+        {
+            get
+            {
+                if (CurrentSplit == null) return 0;
+                var children = Splits.Where(s => s.Type == SplitType.Child).ToList();
+                return children.IndexOf(CurrentSplit) + 1;
+            }
+        }
+
+        public int TotalSplitCount => Splits.Count(s => s.Type == SplitType.Child);
 
         #endregion
 
@@ -551,6 +573,9 @@ namespace AutoHitCounter.ViewModels
                     Notes = split.Notes
                 });
             }
+
+            OnPropertyChanged(nameof(TotalSplitCount));
+            OnPropertyChanged(nameof(AttemptCount));
         }
 
         private Dictionary<uint, string> GetActiveEvents()
@@ -634,6 +659,13 @@ namespace AutoHitCounter.ViewModels
 
         private void ResetSplits()
         {
+            if (_activeProfile != null)
+            {
+                _activeProfile.AttemptCount++;
+                _profileService.SaveProfile(_activeProfile);
+                OnPropertyChanged(nameof(AttemptCount));
+            }
+
             var key = $"{_selectedGame?.GameName}|{_activeProfile?.Name}";
             _runSnapshots.Remove(key);
             IsRunComplete = false;
@@ -679,6 +711,26 @@ namespace AutoHitCounter.ViewModels
             if (IsRunComplete || CurrentSplit == null || CurrentSplit.NumOfHits <= 0) return;
             CurrentSplit.NumOfHits--;
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
+        }
+
+        private bool _isEditingAttempts;
+
+        public bool IsEditingAttempts
+        {
+            get => _isEditingAttempts;
+            set => SetProperty(ref _isEditingAttempts, value);
+        }
+
+        public void CommitAttemptsEdit(string value)
+        {
+            if (int.TryParse(value, out var count) && count >= 0)
+            {
+                _activeProfile.AttemptCount = count;
+                _profileService.SaveProfile(_activeProfile);
+                OnPropertyChanged(nameof(AttemptCount));
+            }
+
+            IsEditingAttempts = false;
         }
 
         #endregion

@@ -57,12 +57,14 @@ public static class SplitListDragDropBehavior
 
     private static void OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
+        if (e.OriginalSource is TextBox) return;
         _dragStartPoint = e.GetPosition(null);
         _isDragging = false;
     }
 
     private static void OnPreviewMouseMove(object sender, MouseEventArgs e)
     {
+        if (e.OriginalSource is TextBox) return;
         if (e.LeftButton != MouseButtonState.Pressed) return;
 
         var diff = _dragStartPoint - e.GetPosition(null);

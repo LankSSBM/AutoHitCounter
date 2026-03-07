@@ -23,6 +23,7 @@
         <converters:LockTooltipConverter x:Key="LockTooltipConverter" />
         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#9D61A8" />
         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White" />
+        <converters:AttemptCountColorConverter x:Key="AttemptCountColorConverter" />
     </Window.Resources>
 
     <Grid>
@@ -108,11 +109,13 @@
 
                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
                                     Margin="0,2,-2,0">
+                            <!-- Edit Profile Button -->
                             <Button Content="✎"
                                     Command="{Binding OpenProfileEditorCommand}"
                                     Width="30" Height="22"
                                     FontSize="14"
                                     ToolTip="Edit Profile" />
+                            <!-- Lock Splits Button -->
                             <Button Content="{Binding IsUnlocked, Converter={StaticResource LockIconConverter}}"
                                     Command="{Binding ToggleLockCommand}"
                                     Width="30" Height="22"
@@ -132,12 +135,118 @@
                                 <ColumnDefinition x:Name="HeaderScrollSpacer" Width="0" />
                             </Grid.ColumnDefinitions>
 
-                            <!-- Splits Header -->
-                            <TextBlock FontFamily="{StaticResource AppFont}"
-                                       FontSize="{StaticResource FontSizeHeader}"
-                                       Text="Split"
-                                       VerticalAlignment="Center"
-                                       Margin="10, 0, 0,0" />
+                            <!-- Split header + current/total -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock FontFamily="{StaticResource AppFont}"
+                                           FontSize="{StaticResource FontSizeHeader}"
+                                           Text="Split"
+                                           VerticalAlignment="Center"
+                                           Margin="10,0,0,0" />
+
+                                <!-- Splitter -->
+                                <Rectangle Width="1" Height="12" Fill="#444" Margin="7,0,7,0"
+                                           VerticalAlignment="Center">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsRunComplete}" Value="False">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+
+                                <!-- (Split/Total) -->
+                                <TextBlock FontSize="12"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,0,0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsRunComplete}" Value="False">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                    <Run Text="(" />
+                                    <Run Text="{Binding CurrentSplitNumber, Mode=OneWay}" ToolTip="Current Split" />
+                                    <Run Text="/" />
+                                    <Run Text="{Binding TotalSplitCount, Mode=OneWay}" ToolTip="Total Splits" />
+                                    <Run Text=")" />
+                                </TextBlock>
+
+                                <!-- Splitter -->
+                                <Rectangle Width="1" Height="12" Fill="#444" Margin="7,0,7,0"
+                                           VerticalAlignment="Center">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsRunComplete}" Value="False">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+
+                                <!-- Attempts count -->
+                                <TextBlock FontSize="12"
+                                           VerticalAlignment="Center"
+                                           Cursor="Hand"
+                                           Text="{Binding AttemptCount, StringFormat='#{0}'}"
+                                           ToolTip="Double Click to edit attempts count"
+                                           Foreground="{Binding AttemptCount, Converter={StaticResource AttemptCountColorConverter}}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEditingAttempts}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                    <TextBlock.InputBindings>
+                                        <MouseBinding MouseAction="LeftDoubleClick"
+                                                      Command="{Binding EditAttemptsCommand}" />
+                                    </TextBlock.InputBindings>
+                                </TextBlock>
+                                <TextBox x:Name="AttemptsBox"
+                                         FocusVisualStyle="{x:Null}"
+                                         CaretBrush="White"
+                                         SelectionBrush="#9D61A8"
+                                        
+                                         FontSize="11"
+                                         VerticalContentAlignment="Center"
+                                         Text="{Binding AttemptCount, Mode=OneWay}"
+                                         KeyDown="AttemptsBox_KeyDown">
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Setter Property="Foreground" Value="#DDDDDD" />
+                                            <Setter Property="Padding" Value="3,1" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEditingAttempts}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+
+                                <!-- Reset Attempt count button -->
+                                <Button Content="↺" FontSize="12" Height="21" Width="21"
+                                        Margin="7,0,0,0"
+                                        VerticalAlignment="Center"
+                                        ToolTip="Reset attempts count"
+                                        Click="ResetAttempts_Click" />
+                            </StackPanel>
 
                             <TextBlock Grid.Column="1"
                                        Text="Hits"
@@ -172,6 +281,9 @@
                         <!-- Context Menu -->
                         <ListBox.ContextMenu>
                             <ContextMenu>
+                                <MenuItem Header="Add Splits"
+                                          Command="{Binding PlacementTarget.DataContext.OpenProfileEditorCommand,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                 <MenuItem Header="Rename"
                                           Command="{Binding PlacementTarget.DataContext.RenameSelectedSplitCommand,
                             RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
@@ -244,9 +356,34 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-
-                                        <!-- Name column -->
+                                        <!-- Drag handle -->
                                         <Grid Grid.Column="0">
+                                            <TextBlock Text="☰"
+                                                       FontSize="11"
+                                                       Foreground="#444"
+                                                       VerticalAlignment="Center"
+                                                       Margin="4,0,0,0"
+                                                       HorizontalAlignment="Left">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger
+                                                                Binding="{Binding DataContext.IsUnlocked,
+                        RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                                Value="True">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsParent}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+
+                                            <!-- Name column -->
+
                                             <TextBlock Text="{Binding Name}"
                                                        FontFamily="{StaticResource AppFont}"
                                                        FontSize="{StaticResource FontSizeBody}"
@@ -269,14 +406,12 @@
                                                      FontSize="{StaticResource FontSizeBody}"
                                                      VerticalAlignment="Center"
                                                      Margin="{Binding Type, Converter={StaticResource ParentChildMarginConverter}}"
-                                                     KeyDown="RenameBox_KeyDown"
-                                                     LostFocus="RenameBox_LostFocus">
+                                                     KeyDown="RenameBox_KeyDown">
                                                 <TextBox.Style>
-                                                    <Style TargetType="TextBox">
+                                                    <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
                                                         <Setter Property="Visibility" Value="Collapsed" />
-                                                        <Setter Property="Background" Value="#1c1424" />
-                                                        <Setter Property="BorderBrush" Value="#5a3d63" />
-                                                        <Setter Property="BorderThickness" Value="1" />
+                                                        <Setter Property="Background"
+                                                                Value="{StaticResource BackgroundBrush}" />
                                                         <Setter Property="Foreground" Value="White" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsEditing}" Value="True">
@@ -365,8 +500,7 @@
                                                          AcceptsReturn="True"
                                                          FontSize="11"
                                                          Foreground="#999"
-                                                         Padding="2"
-                                                         LostFocus="Notes_LostFocus">
+                                                         Padding="2">
                                                     <TextBox.Style>
                                                         <Style TargetType="TextBox">
                                                             <Setter Property="Background" Value="Transparent" />
@@ -430,6 +564,7 @@
                                     Command="{Binding PrevSplitCommand}" />
                             <Button Content="Next →" Height="24" Margin="0,0,3,0"
                                     Command="{Binding AdvanceSplitCommand}" />
+                            <Rectangle Width="1" Height="16" Fill="#444" Margin="8,0" VerticalAlignment="Center" />
                             <Button Content="Reset" Height="24"
                                     Command="{Binding ResetCommand}" />
                         </StackPanel>

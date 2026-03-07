@@ -109,6 +109,7 @@
         <Compile Include="Behaviors\InsertionAdorner.cs" />
         <Compile Include="Behaviors\SplitListDragDropBehavior.cs" />
         <Compile Include="Behaviors\TemplatesDragDropBehavior.cs" />
+        <Compile Include="Converters\AttemptCountColorConverter.cs" />
         <Compile Include="Converters\ExpanderArrowConverter.cs" />
         <Compile Include="Converters\InverseBoolConverter.cs" />
         <Compile Include="Converters\LockIconConverter.cs" />
