@@ -55,7 +55,7 @@ namespace AutoHitCounter
 
         private void CheckUpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            
         }
 
         private void SplitItem_DoubleClick(object sender, MouseButtonEventArgs e)

@@ -9,6 +9,17 @@ public enum AsmScript
     DSRKillChr,
     DSREventLog,
     
+    VanillaCheckPlayerDead,
+    VanillaHit,
+    VanillaCountAuxHit,
+    VanillaGeneralApplyDamage,
+    VanillaKillBox,
+    VanillaLightPoiseStagger,
+    VanillaEventLog,
+    VanillaIgtNewGame,
+    VanillaIgtStop,
+    VanillaIgtLoadGame,
+    
     ScholarHit,
     ScholarGeneralApplyDamage,
     ScholarKillBox,

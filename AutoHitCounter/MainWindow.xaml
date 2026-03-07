@@ -83,9 +83,9 @@
                                        Foreground="#666666" Margin="2,0,0,2" />
                             <DockPanel>
                                 <Button DockPanel.Dock="Right"
-                                        Content="▶"
+                                        Content="Track"
                                         Command="{Binding TrackGameCommand}"
-                                        Width="22" Height="22"
+                                        Height="22"
                                         Margin="4,0,0,0"
                                         ToolTip="{Binding TrackingText}" />
                                 <ComboBox ItemsSource="{Binding Games}"
@@ -589,21 +589,30 @@
                             </StackPanel>
                         </StackPanel>
 
-                        <TextBlock HorizontalAlignment="Right"
-                                   VerticalAlignment="Bottom"
-                                   Margin="0,0,5,5"
-                                   Text="{Binding InGameTimeFormatted}" />
+                        <StackPanel HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Orientation="Horizontal"
+                                    Margin="0,0,5,5">
+                            <TextBlock Text="IGT"
+                                       FontSize="12"
+                                       Foreground="#888"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,6,0" />
+                            <TextBlock Text="{Binding InGameTimeFormatted}"
+                                       FontFamily="JetBrains Mono"
+                                       FontSize="16"
+                                       Foreground="#c47fd4"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
                     </Grid>
 
                 </Grid>
             </TabItem>
-
-            <!-- Hotkeys Tab -->
+            
             <TabItem Header="Hotkeys">
                 <controls:HotkeysTab DataContext="{Binding Hotkeys}" />
             </TabItem>
-
-            <!-- Settings Tab -->
+            
             <TabItem Header="Settings">
                 <controls:SettingsTab DataContext="{Binding Settings}" />
             </TabItem>

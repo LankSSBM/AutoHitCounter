@@ -1,10 +1,14 @@
-﻿// 
+﻿//
+
+using AutoHitCounter.Enums;
+using AutoHitCounter.Utilities;
 
 namespace AutoHitCounter.Models
 {
     public class Game
     {
-        public string GameName { get; set; }
+        public GameTitle Title { get; set; }
+        public string GameName => Title.GetDescription();
         public string ProcessName { get; set; }
     }
 }

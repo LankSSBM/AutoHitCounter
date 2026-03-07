@@ -513,45 +513,49 @@ e9 00 00 00 00          jmp    39 &lt;_main+0x39&gt;</value>
     <value>c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 7 &lt;_main+0x7&gt;
 50                      push   rax
 e8 00 00 00 00          call   d &lt;_main+0xd&gt;
-58                      pop    rax
-74 65                   je     75 &lt;exit&gt;
-81 7c 24 4c e6 50 f5    cmp    DWORD PTR [rsp+0x4c],0x5f550e6
+74 73                   je     82 &lt;exit&gt;
+81 7c 24 54 e6 50 f5    cmp    DWORD PTR [rsp+0x54],0x5f550e6
 05 
-74 5b                   je     75 &lt;exit&gt;
+74 69                   je     82 &lt;exit&gt;
 53                      push   rbx
-48 8b 1d 00 00 00 00    mov    rbx,QWORD PTR [rip+0x0]        # 22 &lt;_main+0x22&gt;
+48 8b 1d 00 00 00 00    mov    rbx,QWORD PTR [rip+0x0]        # 21 &lt;_main+0x21&gt;
 48 8b 9b d0 00 00 00    mov    rbx,QWORD PTR [rbx+0xd0]
 48 3b 59 08             cmp    rbx,QWORD PTR [rcx+0x8]
-75 45                   jne    74 &lt;normal&gt;
-81 7c 24 54 42 59 f4    cmp    DWORD PTR [rsp+0x54],0xbf45942
+75 53                   jne    81 &lt;normal&gt;
+81 7c 24 5c 42 59 f4    cmp    DWORD PTR [rsp+0x5c],0xbf45942
 0b 
-75 17                   jne    50 &lt;check_wall&gt;
-81 3d 00 00 00 00 00    cmp    DWORD PTR [rip+0x0],0x32230000        # 43 &lt;_main+0x43&gt;
+75 17                   jne    4f &lt;check_wall&gt;
+81 3d 00 00 00 00 00    cmp    DWORD PTR [rip+0x0],0x32230000        # 42 &lt;_main+0x42&gt;
 00 23 32 
-75 2f                   jne    74 &lt;normal&gt;
-80 3d 00 00 00 00 00    cmp    BYTE PTR [rip+0x0],0x0        # 4c &lt;_main+0x4c&gt;
-74 20                   je     6e &lt;count_hit&gt;
-eb 24                   jmp    74 &lt;normal&gt;
+75 3d                   jne    81 &lt;normal&gt;
+80 3d 00 00 00 00 00    cmp    BYTE PTR [rip+0x0],0x0        # 4b &lt;_main+0x4b&gt;
+74 2e                   je     7b &lt;count_hit&gt;
+eb 32                   jmp    81 &lt;normal&gt;
 
-000000000050 &lt;check_wall&gt;:
-81 7c 24 54 5a 55 f4    cmp    DWORD PTR [rsp+0x54],0xbf4555a
+00000000004f &lt;check_wall&gt;:
+81 7c 24 5c 5a 55 f4    cmp    DWORD PTR [rsp+0x5c],0xbf4555a
 0b 
-74 14                   je     6e &lt;count_hit&gt;
+74 22                   je     7b &lt;count_hit&gt;
+8b 44 24 5c             mov    eax,DWORD PTR [rsp+0x5c]
+2d 30 8a f3 0b          sub    eax,0xbf38a30
+83 f8 14                cmp    eax,0x14
+76 1a                   jbe    81 &lt;normal&gt;
 49 3b 59 70             cmp    rbx,QWORD PTR [r9+0x70]
-74 14                   je     74 &lt;normal&gt;
-c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 67 &lt;check_wall+0x17&gt;
+74 14                   je     81 &lt;normal&gt;
+c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 74 &lt;check_wall+0x25&gt;
 41 83 78 34 00          cmp    DWORD PTR [r8+0x34],0x0
-7e 06                   jle    74 &lt;normal&gt;
+7e 06                   jle    81 &lt;normal&gt;
 
-00000000006e &lt;count_hit&gt;:
-ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 74 &lt;normal&gt;
+00000000007b &lt;count_hit&gt;:
+ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 81 &lt;normal&gt;
 
-000000000074 &lt;normal&gt;:
+000000000081 &lt;normal&gt;:
 5b                      pop    rbx
 
-000000000075 &lt;exit&gt;:
+000000000082 &lt;exit&gt;:
+58                      pop    rax
 48 89 5c 24 10          mov    QWORD PTR [rsp+0x10],rbx
-e9 00 00 00 00          jmp    7f &lt;exit+0xa&gt;</value>
+e9 00 00 00 00          jmp    8d &lt;exit+0xb&gt;</value>
   </data>
   <data name="ScholarGeneralApplyDamage" xml:space="preserve">
     <value>51                      push   rcx
@@ -580,7 +584,7 @@ ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 1e &lt;exit&gt;
 89 54 24 10             mov    DWORD PTR [rsp+0x10],edx
 e9 00 00 00 00          jmp    28 &lt;exit+0xa&gt;</value>
   </data>
-  <data name="ScholarEvents" xml:space="preserve">
+  <data name="DS2Events" xml:space="preserve">
     <value>BossName,DeathFlag
 The Last Giant,100971
 The Pursuer,100968
@@ -947,72 +951,72 @@ c3                      ret</value>
     <value>50                      push   rax
 e8 00 00 00 00          call   6 &lt;_main+0x6&gt;
 58                      pop    rax
-0f 84 ae 00 00 00       je     bb &lt;skip_all&gt;
-48 85 d2                test   rdx,rdx
-75 29                   jne    3b &lt;continue&gt;
-41 81 78 40 c6 16 00    cmp    DWORD PTR [r8+0x40],0x16c6
-00 
-74 14                   je     30 &lt;real_hit_no_pop&gt;
-41 81 78 40 b4 14 00    cmp    DWORD PTR [r8+0x40],0x14b4
-00 
-74 0a                   je     30 &lt;real_hit_no_pop&gt;
-41 81 78 40 58 1b 00    cmp    DWORD PTR [r8+0x40],0x1b58
-00 
-75 0b                   jne    3b &lt;continue&gt;
-
-000000000030 &lt;real_hit_no_pop&gt;:
-ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 36 &lt;real_hit_no_pop+0x6&gt;
-e9 80 00 00 00          jmp    bb &lt;skip_all&gt;
-
-00000000003b &lt;continue&gt;:
+0f 84 b7 00 00 00       je     c4 &lt;skip_all&gt;
 50                      push   rax
 57                      push   rdi
 52                      push   rdx
 53                      push   rbx
 48 89 d7                mov    rdi,rdx
-48 8b 15 00 00 00 00    mov    rdx,QWORD PTR [rip+0x0]        # 49 &lt;continue+0xe&gt;
+48 8b 15 00 00 00 00    mov    rdx,QWORD PTR [rip+0x0]        # 1b &lt;_main+0x1b&gt;
 48 8b 82 80 00 00 00    mov    rax,QWORD PTR [rdx+0x80]
 48 39 c7                cmp    rdi,rax
-74 62                   je     b7 &lt;skip_count&gt;
+0f 84 95 00 00 00       je     c0 &lt;skip_count&gt;
 48 8b 80 90 1f 00 00    mov    rax,QWORD PTR [rax+0x1f90]
 48 3b 88 98 00 00 00    cmp    rcx,QWORD PTR [rax+0x98]
-75 52                   jne    b7 &lt;skip_count&gt;
+0f 85 81 00 00 00       jne    c0 &lt;skip_count&gt;
+48 85 ff                test   rdi,rdi
+75 20                   jne    64 &lt;continue&gt;
+41 81 78 40 c6 16 00    cmp    DWORD PTR [r8+0x40],0x16c6
+00 
+74 6c                   je     ba &lt;real_hit&gt;
+41 81 78 40 b4 14 00    cmp    DWORD PTR [r8+0x40],0x14b4
+00 
+74 62                   je     ba &lt;real_hit&gt;
+41 81 78 40 58 1b 00    cmp    DWORD PTR [r8+0x40],0x1b58
+00 
+74 58                   je     ba &lt;real_hit&gt;
+eb 5c                   jmp    c0 &lt;skip_count&gt;
+
+000000000064 &lt;continue&gt;:
 45 0f 57 ff             xorps  xmm15,xmm15
 45 0f 2f 38             comiss xmm15,DWORD PTR [r8]
-72 42                   jb     b1 &lt;real_hit&gt;
+72 4c                   jb     ba &lt;real_hit&gt;
+41 81 78 40 fc 9d 44    cmp    DWORD PTR [r8+0x40],0xd449dfc
+0d 
+74 48                   je     c0 &lt;skip_count&gt;
 45 0f 2f 78 04          comiss xmm15,DWORD PTR [r8+0x4]
-72 3b                   jb     b1 &lt;real_hit&gt;
+72 3b                   jb     ba &lt;real_hit&gt;
 45 0f 2f 78 08          comiss xmm15,DWORD PTR [r8+0x8]
-72 34                   jb     b1 &lt;real_hit&gt;
+72 34                   jb     ba &lt;real_hit&gt;
 45 0f 2f 78 0c          comiss xmm15,DWORD PTR [r8+0xc]
-72 2d                   jb     b1 &lt;real_hit&gt;
+72 2d                   jb     ba &lt;real_hit&gt;
 45 0f 2f 78 10          comiss xmm15,DWORD PTR [r8+0x10]
-72 26                   jb     b1 &lt;real_hit&gt;
+72 26                   jb     ba &lt;real_hit&gt;
 41 80 b8 cd 00 00 00    cmp    BYTE PTR [r8+0xcd],0x0
 00 
-75 1c                   jne    b1 &lt;real_hit&gt;
+75 1c                   jne    ba &lt;real_hit&gt;
 41 83 78 7c 00          cmp    DWORD PTR [r8+0x7c],0x0
-7d 15                   jge    b1 &lt;real_hit&gt;
+7d 15                   jge    ba &lt;real_hit&gt;
 41 0f b6 58 24          movzx  ebx,BYTE PTR [r8+0x24]
 ff cb                   dec    ebx
 83 fb 0a                cmp    ebx,0xa
-77 0f                   ja     b7 &lt;skip_count&gt;
-c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # af &lt;continue+0x74&gt;
-eb 06                   jmp    b7 &lt;skip_count&gt;
+77 0f                   ja     c0 &lt;skip_count&gt;
+c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # b8 &lt;continue+0x54&gt;
+eb 06                   jmp    c0 &lt;skip_count&gt;
 
-0000000000b1 &lt;real_hit&gt;:
-ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # b7 &lt;skip_count&gt;
+0000000000ba &lt;real_hit&gt;:
+ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # c0 &lt;skip_count&gt;
 
-0000000000b7 &lt;skip_count&gt;:
+0000000000c0 &lt;skip_count&gt;:
 5b                      pop    rbx
 5a                      pop    rdx
 5f                      pop    rdi
 58                      pop    rax
 
-0000000000bb &lt;skip_all&gt;:
+0000000000c4 &lt;skip_all&gt;:
 48 83 ec 50             sub    rsp,0x50
 48 8b 41 08             mov    rax,QWORD PTR [rcx+0x8]
-e9 00 00 00 00          jmp    c8 &lt;skip_all+0xd&gt;</value>
+e9 00 00 00 00          jmp    d1 &lt;skip_all+0xd&gt;</value>
   </data>
   <data name="DS3LethalFall" xml:space="preserve">
     <value>50                      push   rax
@@ -1136,28 +1140,28 @@ e9 00 00 00 00          jmp    38 &lt;_main+0x38&gt;</value>
   </data>
   <data name="DS3Events" xml:space="preserve">
     <value>BossName,DeathFlag
-"Aldrich, Devourer of Gods",13700800
+"Aldrich, Devourer of Gods",50002130
 Abyss Watchers,13300800
-Ancient Wyvern,13200800
+Ancient Wyvern,50002070
 Champion Gundyr,14000830
 Crystal Sage,13300850
 Curse-Rotted Greatwood,13100800
 Dancer of the Boreal Valley,13000890
-Darkeater Midir,15100850
+Darkeater Midir,50002350
 Deacons of the Deep,13500800
-Demon Prince,15000800
+Demon Prince,50002330
 Dragonslayer Armour,13010800
-Gravetender,14500860
+Gravetender,6323
 Halflight,15100800
-High Lord Wolnir,13800800
+High Lord Wolnir,63800561
 Iudex Gundyr,14000800
 Nameless King,13200850
 "Oceiros, the Consumed King",13000830
-Old Demon King,13800830
+Old Demon King,50002150
 Pontiff Sulyvahn,13700850
-Sister Friede,14500800
+Sister Friede,6322
 Slave Knight Gael,15110800
-Soul of Cinder,14100800
+Soul of Cinder,50002200
 Twin Princes,13410830
 Vordt of the Boreal Valley,13000800
 Yhorm the Giant,13900800</value>
@@ -1238,102 +1242,109 @@ c3</value>
 48 89 44 24 50          mov    QWORD PTR [rsp+0x50],rax
 50                      push   rax
 e8 00 00 00 00          call   12 &lt;_main+0x12&gt;
-0f 84 4b 01 00 00       je     163 &lt;skip_count&gt;
+0f 84 62 01 00 00       je     17a &lt;skip_count&gt;
 48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 1f &lt;_main+0x1f&gt;
 48 8b 80 88 00 00 00    mov    rax,QWORD PTR [rax+0x88]
 48 39 d0                cmp    rax,rdx
-0f 84 34 01 00 00       je     163 &lt;skip_count&gt;
+0f 84 4b 01 00 00       je     17a &lt;skip_count&gt;
 48 8b 80 f8 1f 00 00    mov    rax,QWORD PTR [rax+0x1ff8]
 48 3b 88 98 00 00 00    cmp    rcx,QWORD PTR [rax+0x98]
-0f 85 20 01 00 00       jne    163 &lt;skip_count&gt;
+0f 85 37 01 00 00       jne    17a &lt;skip_count&gt;
+41 81 78 4c 56 32 98    cmp    DWORD PTR [r8+0x4c],0xc983256
+0c 
+75 0d                   jne    5a &lt;check_dragon&gt;
+80 3d 00 00 00 00 01    cmp    BYTE PTR [rip+0x0],0x1        # 54 &lt;_main+0x54&gt;
+0f 84 ea 00 00 00       je     144 &lt;hit&gt;
+
+00000000005a &lt;check_dragon&gt;:
 41 81 78 4c 3e 3a 05    cmp    DWORD PTR [r8+0x4c],0xf053a3e
 0f 
-0f 84 bf 00 00 00       je     110 &lt;handle_dragon&gt;
+0f 84 bf 00 00 00       je     127 &lt;handle_dragon&gt;
 41 81 78 4c 63 39 05    cmp    DWORD PTR [r8+0x4c],0xf053963
 0f 
-75 2b                   jne    86 &lt;proceed&gt;
+75 2b                   jne    9d &lt;proceed&gt;
 51                      push   rcx
 52                      push   rdx
 ba 7f 9e 01 00          mov    edx,0x19e7f
-48 8b 0d 00 00 00 00    mov    rcx,QWORD PTR [rip+0x0]        # 69 &lt;_main+0x69&gt;
+48 8b 0d 00 00 00 00    mov    rcx,QWORD PTR [rip+0x0]        # 80 &lt;check_dragon+0x26&gt;
 48 8b 89 88 00 00 00    mov    rcx,QWORD PTR [rcx+0x88]
 48 8b 89 d0 11 00 00    mov    rcx,QWORD PTR [rcx+0x11d0]
-e8 00 00 00 00          call   7c &lt;_main+0x7c&gt;
+e8 00 00 00 00          call   93 &lt;check_dragon+0x39&gt;
 5a                      pop    rdx
 59                      pop    rcx
 84 c0                   test   al,al
-0f 85 dd 00 00 00       jne    163 &lt;skip_count&gt;
+0f 85 dd 00 00 00       jne    17a &lt;skip_count&gt;
 
-000000000086 &lt;proceed&gt;:
+00000000009d &lt;proceed&gt;:
 45 0f 57 ff             xorps  xmm15,xmm15
 45 0f 2f 38             comiss xmm15,DWORD PTR [r8]
-0f 82 a1 00 00 00       jb     135 &lt;set_pending&gt;
+0f 82 a1 00 00 00       jb     14c &lt;set_pending&gt;
 45 0f 2f 78 04          comiss xmm15,DWORD PTR [r8+0x4]
-0f 82 96 00 00 00       jb     135 &lt;set_pending&gt;
+0f 82 96 00 00 00       jb     14c &lt;set_pending&gt;
 45 0f 2f 78 08          comiss xmm15,DWORD PTR [r8+0x8]
-0f 82 8b 00 00 00       jb     135 &lt;set_pending&gt;
+0f 82 8b 00 00 00       jb     14c &lt;set_pending&gt;
 45 0f 2f 78 0c          comiss xmm15,DWORD PTR [r8+0xc]
-0f 82 80 00 00 00       jb     135 &lt;set_pending&gt;
+0f 82 80 00 00 00       jb     14c &lt;set_pending&gt;
 45 0f 2f 78 10          comiss xmm15,DWORD PTR [r8+0x10]
-72 79                   jb     135 &lt;set_pending&gt;
+72 79                   jb     14c &lt;set_pending&gt;
 41 80 b8 d9 00 00 00    cmp    BYTE PTR [r8+0xd9],0x0
 00 
-75 67                   jne    12d &lt;hit&gt;
+75 67                   jne    144 &lt;hit&gt;
 41 83 b8 88 00 00 00    cmp    DWORD PTR [r8+0x88],0x0
 00 
-7d 5d                   jge    12d &lt;hit&gt;
+7d 5d                   jge    144 &lt;hit&gt;
 41 0f b6 40 24          movzx  eax,BYTE PTR [r8+0x24]
 ff c8                   dec    eax
 83 f8 0a                cmp    eax,0xa
-0f 87 83 00 00 00       ja     163 &lt;skip_count&gt;
+0f 87 83 00 00 00       ja     17a &lt;skip_count&gt;
 51                      push   rcx
 52                      push   rdx
-48 8b 0d 00 00 00 00    mov    rcx,QWORD PTR [rip+0x0]        # e9 &lt;proceed+0x63&gt;
+48 8b 0d 00 00 00 00    mov    rcx,QWORD PTR [rip+0x0]        # 100 &lt;proceed+0x63&gt;
 48 8b 89 88 00 00 00    mov    rcx,QWORD PTR [rcx+0x88]
 48 8b 89 d0 11 00 00    mov    rcx,QWORD PTR [rcx+0x11d0]
 ba 31 88 01 00          mov    edx,0x18831
-e8 00 00 00 00          call   101 &lt;proceed+0x7b&gt;
+e8 00 00 00 00          call   118 &lt;proceed+0x7b&gt;
 5a                      pop    rdx
 59                      pop    rcx
 84 c0                   test   al,al
-75 5c                   jne    163 &lt;skip_count&gt;
-c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 10e &lt;proceed+0x88&gt;
-eb 53                   jmp    163 &lt;skip_count&gt;
+75 5c                   jne    17a &lt;skip_count&gt;
+c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 125 &lt;proceed+0x88&gt;
+eb 53                   jmp    17a &lt;skip_count&gt;
 
-00000110 &lt;handle_dragon&gt;:
+00000127 &lt;handle_dragon&gt;:
 51                      push   rcx
 52                      push   rdx
 41 50                   push   r8
-48 8b 0d 00 00 00 00    mov    rcx,QWORD PTR [rip+0x0]        # 11b &lt;handle_dragon+0xb&gt;
+48 8b 0d 00 00 00 00    mov    rcx,QWORD PTR [rip+0x0]        # 132 &lt;handle_dragon+0xb&gt;
 ba 20 d3 be 00          mov    edx,0xbed320
-e8 00 00 00 00          call   125 &lt;handle_dragon+0x15&gt;
+e8 00 00 00 00          call   13c &lt;handle_dragon+0x15&gt;
 41 58                   pop    r8
 5a                      pop    rdx
 59                      pop    rcx
 84 c0                   test   al,al
-74 36                   je     163 &lt;skip_count&gt;
+74 36                   je     17a &lt;skip_count&gt;
 
-0000012d &lt;hit&gt;:
-ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 133 &lt;hit+0x6&gt;
-eb 2e                   jmp    163 &lt;skip_count&gt;
+00000144 &lt;hit&gt;:
+ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 14a &lt;hit+0x6&gt;
+eb 2e                   jmp    17a &lt;skip_count&gt;
 
-00000135 &lt;set_pending&gt;:
+0000014c &lt;set_pending&gt;:
 51                      push   rcx
 52                      push   rdx
-48 8b 0d 00 00 00 00    mov    rcx,QWORD PTR [rip+0x0]        # 13e &lt;set_pending+0x9&gt;
+48 8b 0d 00 00 00 00    mov    rcx,QWORD PTR [rip+0x0]        # 155 &lt;set_pending+0x9&gt;
 48 8b 89 88 00 00 00    mov    rcx,QWORD PTR [rcx+0x88]
 48 8b 89 d0 11 00 00    mov    rcx,QWORD PTR [rcx+0x11d0]
 ba 88 a3 01 00          mov    edx,0x1a388
-e8 00 00 00 00          call   156 &lt;set_pending+0x21&gt;
+e8 00 00 00 00          call   16d &lt;set_pending+0x21&gt;
 5a                      pop    rdx
 59                      pop    rcx
 84 c0                   test   al,al
-75 07                   jne    163 &lt;skip_count&gt;
-c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 163 &lt;skip_count&gt;
+75 07                   jne    17a &lt;skip_count&gt;
+c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 17a &lt;skip_count&gt;
 
-00000163 &lt;skip_count&gt;:
+0000017a &lt;skip_count&gt;:
 58                      pop    rax
-e9 00 00 00 00          jmp    169 &lt;skip_count+0x6&gt;</value>
+e9 00 00 00 00          jmp    180 &lt;skip_count+0x6&gt;</value>
   </data>
   <data name="SKDeflectCheck" xml:space="preserve">
     <value>c7 45 c0 ff ff ff ff    mov    DWORD PTR [rbp-0x40],0xffffffff
@@ -1691,5 +1702,251 @@ c3                      ret
 000000000020 &lt;dead&gt;:
 31 c0                   xor    eax,eax
 c3                      ret</value>
+  </data>
+  <data name="VanillaHit" xml:space="preserve">
+    <value>c6 05 00 00 00 00 00    mov    BYTE PTR ds:0x0,0x0
+50                      push   eax
+e8 fc ff ff ff          call   9 &lt;_main+0x9&gt;
+74 7b                   je     8a &lt;exit&gt;
+81 bd f4 fd ff ff e6    cmp    DWORD PTR [ebp-0x20c],0x5f550e6
+50 f5 05 
+74 6f                   je     8a &lt;exit&gt;
+53                      push   ebx
+8b 1d 00 00 00 00       mov    ebx,DWORD PTR ds:0x0
+8b 5b 74                mov    ebx,DWORD PTR [ebx+0x74]
+3b 59 10                cmp    ebx,DWORD PTR [ecx+0x10]
+75 5f                   jne    89 &lt;normal&gt;
+81 bd f4 fd ff ff 42    cmp    DWORD PTR [ebp-0x20c],0xbf45942
+59 f4 0b 
+75 17                   jne    4d &lt;check_wall&gt;
+81 3d 00 00 00 00 00    cmp    DWORD PTR ds:0x0,0x32230000
+00 23 32 
+75 47                   jne    89 &lt;normal&gt;
+80 3d 00 00 00 00 00    cmp    BYTE PTR ds:0x0,0x0
+74 38                   je     83 &lt;count_hit&gt;
+eb 3c                   jmp    89 &lt;normal&gt;
+
+004d &lt;check_wall&gt;:
+81 bd f4 fd ff ff 5a    cmp    DWORD PTR [ebp-0x20c],0xbf4555a
+55 f4 0b 
+74 2a                   je     83 &lt;count_hit&gt;
+8b 85 f4 fd ff ff       mov    eax,DWORD PTR [ebp-0x20c]
+2d 30 8a f3 0b          sub    eax,0xbf38a30
+83 f8 14                cmp    eax,0x14
+76 20                   jbe    89 &lt;normal&gt;
+8b 44 24 14             mov    eax,DWORD PTR [esp+0x14]
+3b 58 60                cmp    ebx,DWORD PTR [eax+0x60]
+74 17                   je     89 &lt;normal&gt;
+c6 05 00 00 00 00 01    mov    BYTE PTR ds:0x0,0x1
+8b 44 24 10             mov    eax,DWORD PTR [esp+0x10]
+83 78 34 00             cmp    DWORD PTR [eax+0x34],0x0
+7e 06                   jle    89 &lt;normal&gt;
+
+0083 &lt;count_hit&gt;:
+ff 05 00 00 00 00       inc    DWORD PTR ds:0x0
+
+0089 &lt;normal&gt;:
+5b                      pop    ebx
+
+008a &lt;exit&gt;:
+58                      pop    eax
+55                      push   ebp
+89 e5                   mov    ebp,esp
+83 ec 08                sub    esp,0x8
+e9 fc ff ff ff          jmp    92 &lt;exit+0x8&gt;</value>
+  </data>
+  <data name="VanillaCheckPlayerDead" xml:space="preserve">
+    <value>a1 00 00 00 00          mov    eax,ds:0x0
+85 c0                   test   eax,eax
+74 0f                   je     18 &lt;dead&gt;
+8b 40 74                mov    eax,DWORD PTR [eax+0x74]
+85 c0                   test   eax,eax
+74 08                   je     18 &lt;dead&gt;
+83 b8 fc 00 00 00 00    cmp    DWORD PTR [eax+0xfc],0x0
+c3                      ret
+
+0018 &lt;dead&gt;:
+31 c0                   xor    eax,eax
+c3                      ret</value>
+  </data>
+  <data name="VanillaCountAuxHit" xml:space="preserve">
+    <value>f3 0f 10 55 0c          movss  xmm2,DWORD PTR [ebp+0xc]
+80 3d 00 00 00 00 00    cmp    BYTE PTR ds:0x0,0x0
+74 0d                   je     1b &lt;skip&gt;
+c6 05 00 00 00 00 00    mov    BYTE PTR ds:0x0,0x0
+ff 05 00 00 00 00       inc    DWORD PTR ds:0x0
+
+001b &lt;skip&gt;:
+e9 fc ff ff ff          jmp    1c &lt;skip+0x1&gt;</value>
+  </data>
+  <data name="VanillaGeneralApplyDamage" xml:space="preserve">
+    <value>50                      push   eax
+a1 00 00 00 00          mov    eax,ds:0x0
+85 c0                   test   eax,eax
+74 0f                   je     19 &lt;normal&gt;
+39 70 74                cmp    DWORD PTR [eax+0x74],esi
+75 0a                   jne    19 &lt;normal&gt;
+85 c9                   test   ecx,ecx
+79 06                   jns    19 &lt;normal&gt;
+ff 05 00 00 00 00       inc    DWORD PTR ds:0x0
+
+0019 &lt;normal&gt;:
+89 8e fc 00 00 00       mov    DWORD PTR [esi+0xfc],ecx
+58                      pop    eax
+e9 fc ff ff ff          jmp    21 &lt;normal+0x8&gt;</value>
+  </data>
+  <data name="VanillaKillBox" xml:space="preserve">
+    <value>8b 01                   mov    eax,DWORD PTR [ecx]
+8b 4d 08                mov    ecx,DWORD PTR [ebp+0x8]
+57                      push   edi
+8b 15 00 00 00 00       mov    edx,DWORD PTR ds:0x0
+85 d2                   test   edx,edx
+74 0f                   je     1f &lt;skip&gt;
+3b 42 74                cmp    eax,DWORD PTR [edx+0x74]
+75 0a                   jne    1f &lt;skip&gt;
+85 c9                   test   ecx,ecx
+75 06                   jne    1f &lt;skip&gt;
+ff 05 00 00 00 00       inc    DWORD PTR ds:0x0
+
+001f &lt;skip&gt;:
+5f                      pop    edi
+e9 fc ff ff ff          jmp    21 &lt;skip+0x2&gt;</value>
+  </data>
+  <data name="VanillaLightPoiseStagger" xml:space="preserve">
+    <value>51                      push   ecx
+8b 0d 00 00 00 00       mov    ecx,DWORD PTR ds:0x0
+85 c9                   test   ecx,ecx
+74 0b                   je     16 &lt;exit&gt;
+3b 41 74                cmp    eax,DWORD PTR [ecx+0x74]
+75 06                   jne    16 &lt;exit&gt;
+ff 05 00 00 00 00       inc    DWORD PTR ds:0x0
+
+0016 &lt;exit&gt;:
+59                      pop    ecx
+d9 80 b0 01 00 00       fld    DWORD PTR [eax+0x1b0]
+e9 fc ff ff ff          jmp    1e &lt;exit+0x8&gt;</value>
+  </data>
+  <data name="VanillaEventLog" xml:space="preserve">
+    <value>50                      push   eax
+53                      push   ebx
+57                      push   edi
+8b 3d 00 00 00 00       mov    edi,DWORD PTR ds:0x0
+89 f8                   mov    eax,edi
+6b c0 05                imul   eax,eax,0x5
+8d 1d 00 00 00 00       lea    ebx,ds:0x0
+01 c3                   add    ebx,eax
+89 33                   mov    DWORD PTR [ebx],esi
+8a 45 0c                mov    al,BYTE PTR [ebp+0xc]
+88 43 04                mov    BYTE PTR [ebx+0x4],al
+47                      inc    edi
+81 e7 ff 01 00 00       and    edi,0x1ff
+89 3d 00 00 00 00       mov    DWORD PTR ds:0x0,edi
+5f                      pop    edi
+5b                      pop    ebx
+58                      pop    eax
+b8 59 17 b7 d1          mov    eax,0xd1b71759
+e9 fc ff ff ff          jmp    34 &lt;_main+0x34&gt;</value>
+  </data>
+  <data name="VanillaIgtNewGame" xml:space="preserve">
+    <value>89 8b 60 13 00 00       mov    DWORD PTR [ebx+0x1360],ecx
+c7 05 00 00 00 00 01    mov    DWORD PTR ds:0x0,0x1
+00 00 00 
+e9 fc ff ff ff          jmp    11 &lt;_main+0x11&gt;</value>
+  </data>
+  <data name="VanillaIgtStop" xml:space="preserve">
+    <value>e8 fc ff ff ff          call   1 &lt;_main+0x1&gt;
+c7 05 00 00 00 00 02    mov    DWORD PTR ds:0x0,0x2
+00 00 00 
+e9 fc ff ff ff          jmp    10 &lt;_main+0x10&gt;</value>
+  </data>
+  <data name="VanillaIgtLoadGame" xml:space="preserve">
+    <value>89 8f 60 13 00 00       mov    DWORD PTR [edi+0x1360],ecx
+c7 05 00 00 00 00 03    mov    DWORD PTR ds:0x0,0x3
+00 00 00 
+e9 fc ff ff ff          jmp    11 &lt;_main+0x11&gt;</value>
+  </data>
+  <data name="DSREvents" xml:space="preserve">
+    <value>BossName,DeathFlag
+4 Kings,13
+Artorias,11215015
+Asylum Demon,16
+Bed of Chaos,10
+Bell Gargoyles,3
+Capra Demon,11015375
+Ceaseless Discharge,11410900
+Centipede Demon,11415384
+Chaos Witch Quelaag,9
+Demon Firesage,11415344
+Gaping Dragon,2
+Gwyndolin,11510900
+Gwyn,15
+Iron Golem,11
+Kalameet,11215065
+Manus,11215025
+Moonlight Butterfly,11200900
+Nito,7
+Ornstein &amp; Smough,12
+Pinwheel,6
+Priscilla,4
+Sanctuary Guardian,11215005
+Seath,14
+Sif,5
+Stray Demon,11810900
+Taurus Demon,11015385</value>
+  </data>
+  <data name="SKEvents" xml:space="preserve">
+    <value>BossName,DeathFlag
+Armored Warrior,12000400
+Ashina Elite - Jinsuke Saze,11110504
+Ashina Elite - Ujinari Mizuo,11110511
+Blazing Bull,11110440
+Centipede Giraffe,11700425
+Centipede Sen-Un,12000279
+Chained Ogre (Castle),11110620
+Chained Ogre (Outskirts),11100310
+Demon of Hatred,9313
+Divine Dragon,9310
+Fake Monk,9306
+Folding Screen Monkeys,9305
+General Kuranosuke Matsumoto,20005340
+General Naomori Kawarada,11100300
+General Tenzen Yamauchi,11100301
+Genichiro Ashina (Castle),9303
+Genichiro Ashina (Reservoir),9300
+Guardian Ape,9304
+Gyoubu Oniwa,9301
+Headless (Ako),11100330
+Headless Ape,9314
+Headless (Gachiin),11500680
+Headless (Gokan),11700500
+Headless (Ungo),11110660
+Headless (Yashariku),12500550
+Isshin Ashina,9316
+Isshin the Sword Saint,9312
+Juzou the Drunkard (Hirata 1),11000300
+Juzou the Drunkard (Hirata 2),11000301
+Lady Butterfly,9302
+Leader Shigenori Yamauchi,11120390
+Lone Shadow Longswordsman,11120450
+Lone Shadow Masanaga the Spear-Bearer (Castle),11110316
+Lone Shadow Masanaga the Spear-Bearer (Hirata),11000353
+Lone Shadow Vilehand,11110305
+Mist Noble,11500200
+Okami Leader Shizu,12500406
+O'Rin of the Water,11500690
+Owl,9308
+Owl (Father),9317
+Sakura Bull of the Palace,12500570
+Seven Ashina Spears - Shikibu Toshikatsu Yamauchi,11120530
+Seven Ashina Spears - Shume Masaji Oniwa,11120521
+Shichimen Warrior (Dungeon),11300200
+Shichimen Warrior (Fountainhead),12500580
+Shichimen Warrior (Sunken Valley),11700520
+Shigekichi,11100480
+Shinobi Hunter,11000330
+Snake Eyes Shirafuji,11700200
+Snake Eyes Shirahagi,11700201
+Tokujiro the Glutton,11500490
+True Monk,9309</value>
   </data>
 </root>

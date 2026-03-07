@@ -1,21 +1,23 @@
 using System.Collections.Generic;
+using AutoHitCounter.Enums;
 
 namespace AutoHitCounter.Services;
 
 public static class GameFlagRegistry
 {
-    private static readonly Dictionary<string, IReadOnlyList<(string Key, string DisplayName)>> _flags = new()
+    private static readonly Dictionary<GameTitle, IReadOnlyList<(string Key, string DisplayName)>> _flags = new()
     {
-        ["Dark Souls Remastered"] = [],
-        ["Dark Souls 2 Vanilla"]  = [],
-        ["Dark Souls 2 Scholar"]  = [
+        [GameTitle.DarkSoulsRemastered] = [],
+        [GameTitle.DarkSouls2]   = [
             ("ignore_shulva_spikes", "Ignore Shulva Spikes"),
         ],
-        ["Dark Souls 3"]          = [],
-        ["Sekiro"]                = [],
-        ["Elden Ring"]            = [],
+        [GameTitle.DarkSouls3]          = [],
+        [GameTitle.Sekiro]              = [
+            ("should_count_roberto", "Count Roberto stagger")
+        ],
+        [GameTitle.EldenRing]           = [],
     };
 
-    public static IReadOnlyList<(string Key, string DisplayName)> GetFlags(string gameName)
-        => _flags.TryGetValue(gameName, out var flags) ? flags : [];
+    public static IReadOnlyList<(string Key, string DisplayName)> GetFlags(GameTitle title)
+        => _flags.TryGetValue(title, out var flags) ? flags : [];
 }

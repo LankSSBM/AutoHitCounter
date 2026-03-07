@@ -8,21 +8,21 @@ using AutoHitCounter.Interfaces;
 using AutoHitCounter.Memory;
 using AutoHitCounter.Utilities;
 
-namespace AutoHitCounter.Games.DS2S;
+namespace AutoHitCounter.Games.DS2;
 
-public class DS2ScholarModule : IGameModule, IDisposable, IVersionedGameModule
+public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
 {
     private readonly IMemoryService _memoryService;
     private readonly IStateService _stateService;
     private readonly HookManager _hookManager;
     private readonly ITickService _tickService;
-    private DS2ScholarHitService _hitService;
-    private DS2ScholarEventService _eventService;
-    private DS2ScholarIgtService _igtService;
+    private DS2HitService _hitService;
+    private DS2EventService _eventService;
+    private DS2IgtService _igtService;
     private readonly Dictionary<uint, string> _events;
     private readonly IGameSettingsProvider _settings;
 
-    public string GameVersion => DS2ScholarOffsets.Version.GetDescription();
+    public string GameVersion => DS2Offsets.Version.GetDescription();
 
     private DateTime? _lastHit;
 
@@ -31,7 +31,7 @@ public class DS2ScholarModule : IGameModule, IDisposable, IVersionedGameModule
     public event Action<long> OnIgtChanged;
     public event Action OnVersionDetected;
 
-    public DS2ScholarModule(IMemoryService memoryService, IStateService stateService, HookManager hookManager,
+    public DS2Module(IMemoryService memoryService, IStateService stateService, HookManager hookManager,
         ITickService tickService, Dictionary<uint, string> events, IGameSettingsProvider settings)
     {
         _memoryService = memoryService;
@@ -55,17 +55,17 @@ public class DS2ScholarModule : IGameModule, IDisposable, IVersionedGameModule
         InitializeOffsets();
         OnVersionDetected?.Invoke();
 
-        DS2ScholarCustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
+        DS2CustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
 
 #if DEBUG
-        Console.WriteLine($@"Code cave: 0x{(long)DS2ScholarCustomCodeOffsets.Base:X}");
+        Console.WriteLine($@"Code cave: 0x{(long)DS2CustomCodeOffsets.Base:X}");
 #endif
 
-        _hitService = new DS2ScholarHitService(_memoryService, _hookManager);
+        _hitService = new DS2HitService(_memoryService, _hookManager);
         _hitService.InstallHooks();
-        _eventService = new DS2ScholarEventService(_memoryService, _hookManager, _events);
+        _eventService = new DS2EventService(_memoryService, _hookManager, _events);
         _eventService.InstallHook();
-        _igtService = new DS2ScholarIgtService(_memoryService, _hookManager);
+        _igtService = new DS2IgtService(_memoryService, _hookManager);
         _igtService.InstallHooks();
         
         ApplySettings();
@@ -80,7 +80,7 @@ public class DS2ScholarModule : IGameModule, IDisposable, IVersionedGameModule
         var fileInfo = new FileInfo(module.FileName);
         var fileSize = fileInfo.Length;
         var moduleBase = _memoryService.BaseAddress;
-        DS2ScholarOffsets.Initialize(fileSize, moduleBase);
+        DS2Offsets.Initialize(fileSize, moduleBase);
     }
 
     private void Tick()
@@ -95,7 +95,7 @@ public class DS2ScholarModule : IGameModule, IDisposable, IVersionedGameModule
         {
             OnEventSet?.Invoke();
         }
-
+        
         _igtService.Update();
         OnIgtChanged?.Invoke(_igtService.ElapsedMilliseconds);
     }
@@ -108,5 +108,10 @@ public class DS2ScholarModule : IGameModule, IDisposable, IVersionedGameModule
         OnHit = null;
         OnEventSet = null;
         OnIgtChanged = null;
+    }
+    
+    public void UpdateEvents(Dictionary<uint, string> events)
+    {
+        _eventService?.UpdateEvents(events);
     }
 }

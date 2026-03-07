@@ -60,6 +60,35 @@ namespace AutoHitCounter.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BossName,DeathFlag
+        ///The Last Giant,100971
+        ///The Pursuer,100968
+        ///Dragonrider,100959
+        ///Old Dragonslayer,100960
+        ///Flexile Sentry,100961
+        ///Ruin Sentinels,100962
+        ///The Lost Sinner,100963
+        ///Belfry Gargoyles,101001
+        ///Executioner&apos;s Chariot,100953
+        ///Skeleton Lords,100954
+        ///Covetous Demon,100955
+        ///&quot;Mytha, the Baneful Queen&quot;,100956
+        ///Red Smelter Demon,100964
+        ///Old Iron King,100952
+        ///Scorpioness Najka,100957
+        ///Royal Rat Authority,100967
+        ///Prowling Magus &amp; Congregation,101000
+        ///The Duke&apos;s Dear Freja,100951
+        ///Royal Rat Vanguard,100965
+        ///T [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string DS2Events {
+            get {
+                return ResourceManager.GetString("DS2Events", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 50                      push   rax
         ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 8 &lt;_main+0x8&gt;
         ///48 85 c0                test   rax,rax
@@ -174,24 +203,24 @@ namespace AutoHitCounter.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to BossName,DeathFlag
-        ///&quot;Aldrich, Devourer of Gods&quot;,13700800
+        ///&quot;Aldrich, Devourer of Gods&quot;,50002130
         ///Abyss Watchers,13300800
-        ///Ancient Wyvern,13200800
+        ///Ancient Wyvern,50002070
         ///Champion Gundyr,14000830
         ///Crystal Sage,13300850
         ///Curse-Rotted Greatwood,13100800
         ///Dancer of the Boreal Valley,13000890
-        ///Darkeater Midir,15100850
+        ///Darkeater Midir,50002350
         ///Deacons of the Deep,13500800
-        ///Demon Prince,15000800
+        ///Demon Prince,50002330
         ///Dragonslayer Armour,13010800
-        ///Gravetender,14500860
+        ///Gravetender,6323
         ///Halflight,15100800
-        ///High Lord Wolnir,13800800
+        ///High Lord Wolnir,63800561
         ///Iudex Gundyr,14000800
         ///Nameless King,13200850
         ///&quot;Oceiros, the Consumed King&quot;,13000830
-        ///Old Demon King,13800 [rest of string was truncated]&quot;;.
+        ///Old Demon King,50002150        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DS3Events {
             get {
@@ -224,16 +253,15 @@ namespace AutoHitCounter.Properties {
         ///   Looks up a localized string similar to 50                      push   rax
         ///e8 00 00 00 00          call   6 &lt;_main+0x6&gt;
         ///58                      pop    rax
-        ///0f 84 ae 00 00 00       je     bb &lt;skip_all&gt;
-        ///48 85 d2                test   rdx,rdx
-        ///75 29                   jne    3b &lt;continue&gt;
-        ///41 81 78 40 c6 16 00    cmp    DWORD PTR [r8+0x40],0x16c6
-        ///00 
-        ///74 14                   je     30 &lt;real_hit_no_pop&gt;
-        ///41 81 78 40 b4 14 00    cmp    DWORD PTR [r8+0x40],0x14b4
-        ///00 
-        ///74 0a                   je     30 &lt;real_hit_no_pop&gt;
-        ///41 81 78 40 58 1b 00    cmp  [rest of string was truncated]&quot;;.
+        ///0f 84 b7 00 00 00       je     c4 &lt;skip_all&gt;
+        ///50                      push   rax
+        ///57                      push   rdi
+        ///52                      push   rdx
+        ///53                      push   rbx
+        ///48 89 d7                mov    rdi,rdx
+        ///48 8b 15 00 00 00 00    mov    rdx,QWORD PTR [rip+0x0]        # 1b &lt;_main+0x1b&gt;
+        ///48 8b 82 80 00 00 00    mov    rax,QWORD PTR [rdx+0x80]
+        ///48 39 c7                cm [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DS3Hit {
             get {
@@ -337,6 +365,41 @@ namespace AutoHitCounter.Properties {
         internal static string DSREventLog {
             get {
                 return ResourceManager.GetString("DSREventLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BossName,DeathFlag
+        ///4 Kings,13
+        ///Artorias,11215015
+        ///Asylum Demon,16
+        ///Bed of Chaos,10
+        ///Bell Gargoyles,3
+        ///Capra Demon,11015375
+        ///Ceaseless Discharge,11410900
+        ///Centipede Demon,11415384
+        ///Chaos Witch Quelaag,9
+        ///Demon Firesage,11415344
+        ///Gaping Dragon,2
+        ///Gwyndolin,11510900
+        ///Gwyn,15
+        ///Iron Golem,11
+        ///Kalameet,11215065
+        ///Manus,11215025
+        ///Moonlight Butterfly,11200900
+        ///Nito,7
+        ///Ornstein &amp; Smough,12
+        ///Pinwheel,6
+        ///Priscilla,4
+        ///Sanctuary Guardian,11215005
+        ///Seath,14
+        ///Sif,5
+        ///Stray Demon,11810900
+        ///Taurus Demon,11015385.
+        /// </summary>
+        internal static string DSREvents {
+            get {
+                return ResourceManager.GetString("DSREvents", resourceCulture);
             }
         }
         
@@ -697,35 +760,6 @@ namespace AutoHitCounter.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BossName,DeathFlag
-        ///The Last Giant,100971
-        ///The Pursuer,100968
-        ///Dragonrider,100959
-        ///Old Dragonslayer,100960
-        ///Flexile Sentry,100961
-        ///Ruin Sentinels,100962
-        ///The Lost Sinner,100963
-        ///Belfry Gargoyles,101001
-        ///Executioner&apos;s Chariot,100953
-        ///Skeleton Lords,100954
-        ///Covetous Demon,100955
-        ///&quot;Mytha, the Baneful Queen&quot;,100956
-        ///Red Smelter Demon,100964
-        ///Old Iron King,100952
-        ///Scorpioness Najka,100957
-        ///Royal Rat Authority,100967
-        ///Prowling Magus &amp; Congregation,101000
-        ///The Duke&apos;s Dear Freja,100951
-        ///Royal Rat Vanguard,100965
-        ///T [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string ScholarEvents {
-            get {
-                return ResourceManager.GetString("ScholarEvents", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to 51                      push   rcx
         ///48 8b 0d 00 00 00 00    mov    rcx,QWORD PTR [rip+0x0]        # 8 &lt;_main+0x8&gt;
         ///48 39 99 d0 00 00 00    cmp    QWORD PTR [rcx+0xd0],rbx
@@ -748,14 +782,14 @@ namespace AutoHitCounter.Properties {
         ///   Looks up a localized string similar to c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 7 &lt;_main+0x7&gt;
         ///50                      push   rax
         ///e8 00 00 00 00          call   d &lt;_main+0xd&gt;
-        ///58                      pop    rax
-        ///74 65                   je     75 &lt;exit&gt;
-        ///81 7c 24 4c e6 50 f5    cmp    DWORD PTR [rsp+0x4c],0x5f550e6
+        ///74 73                   je     82 &lt;exit&gt;
+        ///81 7c 24 54 e6 50 f5    cmp    DWORD PTR [rsp+0x54],0x5f550e6
         ///05 
-        ///74 5b                   je     75 &lt;exit&gt;
+        ///74 69                   je     82 &lt;exit&gt;
         ///53                      push   rbx
-        ///48 8b 1d 00 00 00 00    mov    rbx,QWORD PTR [rip+0x0]        # 22 &lt;_main+0x22&gt;
-        ///48 8b 9b d0 00 00 00    mov    rbx,QWORD PTR [r [rest of string was truncated]&quot;;.
+        ///48 8b 1d 00 00 00 00    mov    rbx,QWORD PTR [rip+0x0]        # 21 &lt;_main+0x21&gt;
+        ///48 8b 9b d0 00 00 00    mov    rbx,QWORD PTR [rbx+0xd0]
+        ///48 3b 59 08             cm [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ScholarHit {
             get {
@@ -953,6 +987,32 @@ namespace AutoHitCounter.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BossName,DeathFlag
+        ///Armored Warrior,12000400
+        ///Ashina Elite - Jinsuke Saze,11110504
+        ///Ashina Elite - Ujinari Mizuo,11110511
+        ///Blazing Bull,11110440
+        ///Centipede Giraffe,11700425
+        ///Centipede Sen-Un,12000279
+        ///Chained Ogre (Castle),11110620
+        ///Chained Ogre (Outskirts),11100310
+        ///Demon of Hatred,9313
+        ///Divine Dragon,9310
+        ///Fake Monk,9306
+        ///Folding Screen Monkeys,9305
+        ///General Kuranosuke Matsumoto,20005340
+        ///General Naomori Kawarada,11100300
+        ///General Tenzen Yamauchi,11100301
+        ///Genichiro Ashina (Castle),9303
+        ///Genichiro Ashina  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string SKEvents {
+            get {
+                return ResourceManager.GetString("SKEvents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 53                      push   rbx
         ///48 8b 1d 00 00 00 00    mov    rbx,QWORD PTR [rip+0x0]        # 8 &lt;_main+0x8&gt;
         ///48 85 db                test   rbx,rbx
@@ -977,11 +1037,11 @@ namespace AutoHitCounter.Properties {
         ///48 89 44 24 50          mov    QWORD PTR [rsp+0x50],rax
         ///50                      push   rax
         ///e8 00 00 00 00          call   12 &lt;_main+0x12&gt;
-        ///0f 84 4b 01 00 00       je     163 &lt;skip_count&gt;
+        ///0f 84 62 01 00 00       je     17a &lt;skip_count&gt;
         ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 1f &lt;_main+0x1f&gt;
         ///48 8b 80 88 00 00 00    mov    rax,QWORD PTR [rax+0x88]
         ///48 39 d0                cmp    rax,rdx
-        ///0f 84 34 01 00 00       je     163 &lt;skip_count&gt;
+        ///0f 84 4b 01 00 00       je     17a &lt;skip_count&gt;
         ///48 8b 80 f8 1f 00 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SKHit {
@@ -1067,6 +1127,181 @@ namespace AutoHitCounter.Properties {
         internal static string SKStaggerIgnoreCheck {
             get {
                 return ResourceManager.GetString("SKStaggerIgnoreCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to a1 00 00 00 00          mov    eax,ds:0x0
+        ///85 c0                   test   eax,eax
+        ///74 0f                   je     18 &lt;dead&gt;
+        ///8b 40 74                mov    eax,DWORD PTR [eax+0x74]
+        ///85 c0                   test   eax,eax
+        ///74 08                   je     18 &lt;dead&gt;
+        ///83 b8 fc 00 00 00 00    cmp    DWORD PTR [eax+0xfc],0x0
+        ///c3                      ret
+        ///
+        ///0018 &lt;dead&gt;:
+        ///31 c0                   xor    eax,eax
+        ///c3                      ret.
+        /// </summary>
+        internal static string VanillaCheckPlayerDead {
+            get {
+                return ResourceManager.GetString("VanillaCheckPlayerDead", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to f3 0f 10 55 0c          movss  xmm2,DWORD PTR [ebp+0xc]
+        ///80 3d 00 00 00 00 00    cmp    BYTE PTR ds:0x0,0x0
+        ///74 0d                   je     1b &lt;skip&gt;
+        ///c6 05 00 00 00 00 00    mov    BYTE PTR ds:0x0,0x0
+        ///ff 05 00 00 00 00       inc    DWORD PTR ds:0x0
+        ///
+        ///001b &lt;skip&gt;:
+        ///e9 fc ff ff ff          jmp    1c &lt;skip+0x1&gt;.
+        /// </summary>
+        internal static string VanillaCountAuxHit {
+            get {
+                return ResourceManager.GetString("VanillaCountAuxHit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 50                      push   eax
+        ///53                      push   ebx
+        ///57                      push   edi
+        ///8b 3d 00 00 00 00       mov    edi,DWORD PTR ds:0x0
+        ///89 f8                   mov    eax,edi
+        ///6b c0 05                imul   eax,eax,0x5
+        ///8d 1d 00 00 00 00       lea    ebx,ds:0x0
+        ///01 c3                   add    ebx,eax
+        ///89 33                   mov    DWORD PTR [ebx],esi
+        ///8a 45 0c                mov    al,BYTE PTR [ebp+0xc]
+        ///88 43 04                mov    BYTE PTR [ebx+0x4],al
+        ///47                       [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string VanillaEventLog {
+            get {
+                return ResourceManager.GetString("VanillaEventLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 50                      push   eax
+        ///a1 00 00 00 00          mov    eax,ds:0x0
+        ///85 c0                   test   eax,eax
+        ///74 0f                   je     19 &lt;normal&gt;
+        ///39 70 74                cmp    DWORD PTR [eax+0x74],esi
+        ///75 0a                   jne    19 &lt;normal&gt;
+        ///85 c9                   test   ecx,ecx
+        ///79 06                   jns    19 &lt;normal&gt;
+        ///ff 05 00 00 00 00       inc    DWORD PTR ds:0x0
+        ///
+        ///0019 &lt;normal&gt;:
+        ///89 8e fc 00 00 00       mov    DWORD PTR [esi+0xfc],ecx
+        ///58                      pop    eax
+        ///e9 f [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string VanillaGeneralApplyDamage {
+            get {
+                return ResourceManager.GetString("VanillaGeneralApplyDamage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to c6 05 00 00 00 00 00    mov    BYTE PTR ds:0x0,0x0
+        ///50                      push   eax
+        ///e8 fc ff ff ff          call   9 &lt;_main+0x9&gt;
+        ///74 7b                   je     8a &lt;exit&gt;
+        ///81 bd f4 fd ff ff e6    cmp    DWORD PTR [ebp-0x20c],0x5f550e6
+        ///50 f5 05 
+        ///74 6f                   je     8a &lt;exit&gt;
+        ///53                      push   ebx
+        ///8b 1d 00 00 00 00       mov    ebx,DWORD PTR ds:0x0
+        ///8b 5b 74                mov    ebx,DWORD PTR [ebx+0x74]
+        ///3b 59 10                cmp    ebx,DWORD PTR [ecx+0x10]
+        ///75 5f            [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string VanillaHit {
+            get {
+                return ResourceManager.GetString("VanillaHit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 89 8f 60 13 00 00       mov    DWORD PTR [edi+0x1360],ecx
+        ///c7 05 00 00 00 00 03    mov    DWORD PTR ds:0x0,0x3
+        ///00 00 00 
+        ///e9 fc ff ff ff          jmp    11 &lt;_main+0x11&gt;.
+        /// </summary>
+        internal static string VanillaIgtLoadGame {
+            get {
+                return ResourceManager.GetString("VanillaIgtLoadGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 89 8b 60 13 00 00       mov    DWORD PTR [ebx+0x1360],ecx
+        ///c7 05 00 00 00 00 01    mov    DWORD PTR ds:0x0,0x1
+        ///00 00 00 
+        ///e9 fc ff ff ff          jmp    11 &lt;_main+0x11&gt;.
+        /// </summary>
+        internal static string VanillaIgtNewGame {
+            get {
+                return ResourceManager.GetString("VanillaIgtNewGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to e8 fc ff ff ff          call   1 &lt;_main+0x1&gt;
+        ///c7 05 00 00 00 00 02    mov    DWORD PTR ds:0x0,0x2
+        ///00 00 00 
+        ///e9 fc ff ff ff          jmp    10 &lt;_main+0x10&gt;.
+        /// </summary>
+        internal static string VanillaIgtStop {
+            get {
+                return ResourceManager.GetString("VanillaIgtStop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 8b 01                   mov    eax,DWORD PTR [ecx]
+        ///8b 4d 08                mov    ecx,DWORD PTR [ebp+0x8]
+        ///57                      push   edi
+        ///8b 15 00 00 00 00       mov    edx,DWORD PTR ds:0x0
+        ///85 d2                   test   edx,edx
+        ///74 0f                   je     1f &lt;skip&gt;
+        ///3b 42 74                cmp    eax,DWORD PTR [edx+0x74]
+        ///75 0a                   jne    1f &lt;skip&gt;
+        ///85 c9                   test   ecx,ecx
+        ///75 06                   jne    1f &lt;skip&gt;
+        ///ff 05 00 00 00 00       inc    DWORD PTR ds:0x0
+        ///
+        ///0 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string VanillaKillBox {
+            get {
+                return ResourceManager.GetString("VanillaKillBox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 51                      push   ecx
+        ///8b 0d 00 00 00 00       mov    ecx,DWORD PTR ds:0x0
+        ///85 c9                   test   ecx,ecx
+        ///74 0b                   je     16 &lt;exit&gt;
+        ///3b 41 74                cmp    eax,DWORD PTR [ecx+0x74]
+        ///75 06                   jne    16 &lt;exit&gt;
+        ///ff 05 00 00 00 00       inc    DWORD PTR ds:0x0
+        ///
+        ///0016 &lt;exit&gt;:
+        ///59                      pop    ecx
+        ///d9 80 b0 01 00 00       fld    DWORD PTR [eax+0x1b0]
+        ///e9 fc ff ff ff          jmp    1e &lt;exit+0x8&gt;.
+        /// </summary>
+        internal static string VanillaLightPoiseStagger {
+            get {
+                return ResourceManager.GetString("VanillaLightPoiseStagger", resourceCulture);
             }
         }
     }

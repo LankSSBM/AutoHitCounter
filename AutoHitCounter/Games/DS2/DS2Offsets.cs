@@ -2,24 +2,27 @@
 
 using System;
 using AutoHitCounter.Utilities;
-using static AutoHitCounter.Games.DS2S.DS2ScholarVersion;
+using static AutoHitCounter.Games.DS2.DS2Version;
 
-namespace AutoHitCounter.Games.DS2S;
+namespace AutoHitCounter.Games.DS2;
 
-public static class DS2ScholarOffsets
+public static class DS2Offsets
 {
-    
-    private static DS2ScholarVersion? _version;
+    private static DS2Version? _version;
 
-    public static DS2ScholarVersion Version => _version
-                                               ?? Version1_0_3;
+    public static DS2Version Version => _version
+                                        ?? Scholar1_0_3;
+
+    public static bool IsScholar => Version is Scholar1_0_2 or Scholar1_0_3;
 
     public static void Initialize(long fileSize, nint moduleBase)
     {
         _version = fileSize switch
         {
-            31605096 => Version1_0_2,
-            28200992 => Version1_0_3,
+            32340760 => Vanilla1_0_11,
+            29588960 => Vanilla1_0_12,
+            31605096 => Scholar1_0_2,
+            28200992 => Scholar1_0_3,
             _ => null
         };
 
@@ -34,13 +37,24 @@ public static class DS2ScholarOffsets
 
         InitializeBaseAddresses(moduleBase);
     }
-    
+
     public static class GameManagerImp
     {
         public static nint Base;
 
-        public const int GameDataManager = 0xA8;
-        public const int SaveDataManager = 0xD8;
+        public static int GameDataManager => Version switch
+        {
+            Vanilla1_0_11 or Vanilla1_0_12 => 0x60,
+            Scholar1_0_2 or Scholar1_0_3 => 0xA8,
+            _ => 0x0
+        };
+
+        public static int SaveDataManager => Version switch
+        {
+            Vanilla1_0_11 or Vanilla1_0_12 => 0x6C,
+            Scholar1_0_2 or Scholar1_0_3 => 0xD8,
+            _ => 0x0
+        };
 
         public static class SaveDataManagerOffsets
         {
@@ -52,11 +66,9 @@ public static class DS2ScholarOffsets
         {
             public const int PlayTime = 0x1CC;
         }
-
     }
 
     public static nint MapId;
-
 
     public static class Hooks
     {
@@ -75,109 +87,125 @@ public static class DS2ScholarOffsets
     {
         public static nint RequestSave;
     }
-    
-    
-    
+
     private static void InitializeBaseAddresses(nint moduleBase)
     {
-        
         GameManagerImp.Base = moduleBase + Version switch
         {
-            Version1_0_2 => 0x160B8D0,
-            Version1_0_3 => 0x16148F0,
-            _ => 0
-        };
-        
-        MapId = moduleBase + Version switch
-        {
-            Version1_0_2 => 0x15641B4,
-            Version1_0_3 => 0x156D1C4,
+            Vanilla1_0_11 => 0x11493F4,
+            Vanilla1_0_12 => 0x1150414,
+            Scholar1_0_2 => 0x160B8D0,
+            Scholar1_0_3 => 0x16148F0,
             _ => 0
         };
 
-        
-        
-        Hooks.Hit = moduleBase+ Version switch
+        MapId = moduleBase + Version switch
         {
-            Version1_0_2 => 0x133BB0,
-            Version1_0_3 => 0x136220,
+            Vanilla1_0_11 => 0x10CD2D0,
+            Vanilla1_0_12 => 0x10D42D8,
+            Scholar1_0_2 => 0x15641B4,
+            Scholar1_0_3 => 0x156D1C4,
             _ => 0
         };
-        
+
+
+        Hooks.Hit = moduleBase + Version switch
+        {
+            Vanilla1_0_11 => 0x1C5500,
+            Vanilla1_0_12 => 0x1C6A70,
+            Scholar1_0_2 => 0x133BB0,
+            Scholar1_0_3 => 0x136220,
+            _ => 0
+        };
+
         Hooks.GeneralApplyDamage = moduleBase + Version switch
         {
-            Version1_0_2 => 0x16727A,
-            Version1_0_3 => 0x16A39A,
+            Vanilla1_0_11 => 0x1F33D1,
+            Vanilla1_0_12 => 0x1F5AD1,
+            Scholar1_0_2 => 0x16727A,
+            Scholar1_0_3 => 0x16A39A,
             _ => 0
         };
-        
+
         Hooks.KillBox = moduleBase + Version switch
         {
-            Version1_0_2 => 0x167440,
-            Version1_0_3 => 0x16A560,
+            Vanilla1_0_11 => 0x1F3073,
+            Vanilla1_0_12 => 0x1F5773,
+            Scholar1_0_2 => 0x167440,
+            Scholar1_0_3 => 0x16A560,
             _ => 0
         };
-        
+
         Hooks.CountAuxHit = moduleBase + Version switch
         {
-            Version1_0_2 => 0x143D20,
-            Version1_0_3 => 0x146430,
+            Vanilla1_0_11 => 0x1D5D26,
+            Vanilla1_0_12 => 0x1D72C6,
+            Scholar1_0_2 => 0x143D20,
+            Scholar1_0_3 => 0x146430,
             _ => 0
         };
 
         Hooks.LightPoiseStagger = moduleBase + Version switch
         {
-            Version1_0_2 => 0x1432A7,
-            Version1_0_3 => 0x145997,
+            Vanilla1_0_11 => 0x1D55B4,
+            Vanilla1_0_12 => 0x1D6B54,
+            Scholar1_0_2 => 0x1432A7,
+            Scholar1_0_3 => 0x145997,
             _ => 0
         };
-        
+
         Hooks.SetEvent = moduleBase + Version switch
         {
-            Version1_0_2 => 0x46DED0,
-            Version1_0_3 => 0x4750C0,
+            Vanilla1_0_11 => 0x47884B,
+            Vanilla1_0_12 => 0x47FAEB,
+            Scholar1_0_2 => 0x46DED0,
+            Scholar1_0_3 => 0x4750C0,
             _ => 0
         };
-        
+
         Hooks.IgtNewGame = moduleBase + Version switch
         {
-            Version1_0_2 => 0xFC35F,
-            Version1_0_3 => 0xFC41F,
+            Vanilla1_0_11 => 0x191827,
+            Vanilla1_0_12 => 0x191A37,
+            Scholar1_0_2 => 0xFC35F,
+            Scholar1_0_3 => 0xFC41F,
             _ => 0
         };
-        
+
         Hooks.IgtStop = moduleBase + Version switch
         {
-            Version1_0_2 => 0x1BC25F,
-            Version1_0_3 => 0x1BF9CF,
+            Vanilla1_0_11 => 0x23D4DB,
+            Vanilla1_0_12 => 0x24030B,
+            Scholar1_0_2 => 0x1BC25F,
+            Scholar1_0_3 => 0x1BF9CF,
             _ => 0
         };
-        
+
         Hooks.IgtLoadGame = moduleBase + Version switch
         {
-            Version1_0_2 => 0xFCDBD,
-            Version1_0_3 => 0xFCE7D,
+            Vanilla1_0_11 => 0x193335,
+            Vanilla1_0_12 => 0x193545,
+            Scholar1_0_2 => 0xFCDBD,
+            Scholar1_0_3 => 0xFCE7D,
             _ => 0
         };
-        
+
         Functions.RequestSave = moduleBase + Version switch
         {
-            Version1_0_2 => 0x2E1080,
-            Version1_0_3 => 0x2E7410,
+            Vanilla1_0_11 => 0x3148E0,
+            Vanilla1_0_12 => 0x31AA60,
+            Scholar1_0_2 => 0x2E1080,
+            Scholar1_0_3 => 0x2E7410,
             _ => 0
         };
 
 
-
-        
-        
-        
 #if DEBUG
         _baseAddr = moduleBase;
         Console.WriteLine("--- Base Pointers ---");
         PrintOffset("GameManagerImp.Base", GameManagerImp.Base);
         PrintOffset("MapId", MapId);
-        
+
         Console.WriteLine("\n--- Hooks ---");
         PrintOffset("Hit", Hooks.Hit);
         PrintOffset("GeneralApplyDamage", Hooks.GeneralApplyDamage);
@@ -188,18 +216,16 @@ public static class DS2ScholarOffsets
         PrintOffset("IgtStart", Hooks.IgtNewGame);
         PrintOffset("IgtStop", Hooks.IgtStop);
         PrintOffset("IgtLoadGame", Hooks.IgtLoadGame);
-           
-            
+
+
         Console.WriteLine("\n--- Functions ---");
         PrintOffset("RequestSave", Functions.RequestSave);
-  
-            
+
 
         Console.WriteLine("\n====================================\n");
 #endif
-
     }
-    
+
 #if DEBUG
     private static nint _baseAddr;
     private static void PrintOffset(string name, nint value)

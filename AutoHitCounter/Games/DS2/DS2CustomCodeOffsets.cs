@@ -1,8 +1,8 @@
 ﻿// 
 
-namespace AutoHitCounter.Games.DS2S;
+namespace AutoHitCounter.Games.DS2;
 
-public static class DS2ScholarCustomCodeOffsets
+public static class DS2CustomCodeOffsets
 {
     public static nint Base;
 
