@@ -1396,36 +1396,38 @@ e9 00 00 00 00          jmp    29 &lt;exit+0xd&gt;</value>
   <data name="SKApplyHealthDelta" xml:space="preserve">
     <value>c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 7 &lt;_main+0x7&gt;
 50                      push   rax
-48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # f &lt;_main+0xf&gt;
+53                      push   rbx
+48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 10 &lt;_main+0x10&gt;
 48 85 c0                test   rax,rax
-74 4e                   je     62 &lt;skip&gt;
+74 4e                   je     63 &lt;skip&gt;
 48 8b 80 88 00 00 00    mov    rax,QWORD PTR [rax+0x88]
 48 85 c0                test   rax,rax
-74 42                   je     62 &lt;skip&gt;
+74 42                   je     63 &lt;skip&gt;
 48 8b 80 f8 1f 00 00    mov    rax,QWORD PTR [rax+0x1ff8]
 48 85 c0                test   rax,rax
-74 36                   je     62 &lt;skip&gt;
+74 36                   je     63 &lt;skip&gt;
 48 3b 48 18             cmp    rcx,QWORD PTR [rax+0x18]
-75 30                   jne    62 &lt;skip&gt;
-48 b8 00 00 00 00 00    movabs rax,0x0
+75 30                   jne    63 &lt;skip&gt;
+48 bb 00 00 00 00 00    movabs rbx,0x0
 00 00 00 
-48 39 44 24 08          cmp    QWORD PTR [rsp+0x8],rax
-75 09                   jne    4c &lt;continue&gt;
-c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 4a &lt;_main+0x4a&gt;
-eb 16                   jmp    62 &lt;skip&gt;
+48 39 5c 24 08          cmp    QWORD PTR [rsp+0x8],rbx
+75 09                   jne    4d &lt;continue&gt;
+c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 4b &lt;_main+0x4b&gt;
+eb 16                   jmp    63 &lt;skip&gt;
 
-00000000004c &lt;continue&gt;:
+00000000004d &lt;continue&gt;:
 48 8b 40 18             mov    rax,QWORD PTR [rax+0x18]
 8b 80 30 01 00 00       mov    eax,DWORD PTR [rax+0x130]
 01 d0                   add    eax,edx
 85 c0                   test   eax,eax
-7f 06                   jg     62 &lt;skip&gt;
-ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 62 &lt;skip&gt;
+7f 06                   jg     63 &lt;skip&gt;
+ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 63 &lt;skip&gt;
 
-000000000062 &lt;skip&gt;:
+000000000063 &lt;skip&gt;:
+5b                      pop    rbx
 58                      pop    rax
 48 89 5c 24 08          mov    QWORD PTR [rsp+0x8],rbx
-e9 00 00 00 00          jmp    6d &lt;skip+0xb&gt;</value>
+e9 00 00 00 00          jmp    6f &lt;skip+0xc&gt;</value>
   </data>
   <data name="SKPostHit" xml:space="preserve">
     <value>50                      push   rax

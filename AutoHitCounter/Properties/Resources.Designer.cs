@@ -909,14 +909,15 @@ namespace AutoHitCounter.Properties {
         /// <summary>
         ///   Looks up a localized string similar to c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 7 &lt;_main+0x7&gt;
         ///50                      push   rax
-        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # f &lt;_main+0xf&gt;
+        ///53                      push   rbx
+        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 10 &lt;_main+0x10&gt;
         ///48 85 c0                test   rax,rax
-        ///74 4e                   je     62 &lt;skip&gt;
+        ///74 4e                   je     63 &lt;skip&gt;
         ///48 8b 80 88 00 00 00    mov    rax,QWORD PTR [rax+0x88]
         ///48 85 c0                test   rax,rax
-        ///74 42                   je     62 &lt;skip&gt;
+        ///74 42                   je     63 &lt;skip&gt;
         ///48 8b 80 f8 1f 00 00    mov    rax,QWORD PTR [rax+0x1ff8]
-        ///48 85 c0                test   rax,rax        /// [rest of string was truncated]&quot;;.
+        ///4 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SKApplyHealthDelta {
             get {

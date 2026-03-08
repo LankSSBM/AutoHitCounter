@@ -43,8 +43,10 @@ public class DSRHitService(IMemoryService memoryService, HookManager hookManager
         var hit = Base + Hit;
         var envDeathFlag = Base + CheckEnvDeathFlag;
         var code = Base + HitCode;
+        var originalBytes = DSROriginalBytes.Hit.GetOriginal();
 
-
+        Array.Copy(originalBytes, 0, bytes, 0x9E, originalBytes.Length);
+        
         AsmHelper.WriteRelativeOffsets(bytes, [
             (code, envDeathFlag, 7, 2),
             (code + 0x8, WorldChrMan.Base, 7, 0x8 + 3),

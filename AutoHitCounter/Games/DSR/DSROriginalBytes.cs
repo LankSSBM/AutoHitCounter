@@ -16,4 +16,16 @@ public static class DSROriginalBytes
         };
     }
     
+    public static class Hit
+    {
+        public static byte[] GetOriginal() => DSROffsets.Version switch
+        {
+            Version1_0_1_0 or Version1_0_1_1 or Version1_0_3_0 => [0x48, 0x89, 0x6C, 0x24, 0x10],
+            Version1_0_1_2 or Version1_0_3_1 => [0x48, 0x89, 0x5C, 0x24, 0x08],
+            _ => []
+        };
+        
+        
+    }
+    
 }

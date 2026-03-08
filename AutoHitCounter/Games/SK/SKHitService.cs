@@ -147,13 +147,13 @@ public class SKHitService(IMemoryService memoryService, HookManager hookManager)
 
         AsmHelper.WriteRelativeOffsets(bytes, [
             (code, deferredFallCheckFlag, 7, 2),
-            (code + 0x8, WorldChrMan.Base, 7, 0x8 + 3),
-            (code + 0x43, deferredFallCheckFlag, 7, 0x43 + 2),
-            (code + 0x5C, hit, 6, 0x5C + 2),
-            (code + 0x68, Hooks.ApplyHealthDelta + 5, 5, 0x68 + 1),
+            (code + 0x9, WorldChrMan.Base, 7, 0x9 + 3),
+            (code + 0x44, deferredFallCheckFlag, 7, 0x44 + 2),
+            (code + 0x5D, hit, 6, 0x5D + 2),
+            (code + 0x6A, Hooks.ApplyHealthDelta + 5, 5, 0x6A + 1),
         ]);
 
-        AsmHelper.WriteAbsoluteAddress(bytes, FallDmgRetAddr, 0x32 + 2);
+        AsmHelper.WriteAbsoluteAddress(bytes, FallDmgRetAddr, 0x33 + 2);
 
         memoryService.WriteBytes(code, bytes);
         hookManager.InstallHook(code, Hooks.ApplyHealthDelta, [0x48, 0x89, 0x5C, 0x24, 0x08]);

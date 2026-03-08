@@ -100,11 +100,11 @@ public static class DSROffsets
         
         AuxDeathRetAddr = moduleBase + Version switch
         {
-            // WARNING: No match found for: Version1_0_3_1
             Version1_0_1_0 => 0x31CF9E,
             Version1_0_1_1 => 0x31CC9E,
             Version1_0_1_2 => 0x3201BE,
             Version1_0_3_0 => 0x32D384,
+            Version1_0_3_1 => 0x32f594,
             _ => 0
         };
         
@@ -123,10 +123,12 @@ public static class DSROffsets
         
         Hooks.Hit = moduleBase + Version switch
         {
-            // WARNING: No match found for: Version1_0_1_2, Version1_0_3_1
+            
             Version1_0_1_0 => 0x28065C5,
             Version1_0_1_1 => 0x210131E,
+            Version1_0_1_2 => 0x2B90267,
             Version1_0_3_0 => 0x2305994,
+            Version1_0_3_1 => 0x395221,
             _ => 0
         };
         
