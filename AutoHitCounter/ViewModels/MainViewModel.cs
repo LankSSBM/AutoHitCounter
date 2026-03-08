@@ -464,6 +464,9 @@ namespace AutoHitCounter.ViewModels
 
             ClearTotalPbCommand = new DelegateCommand(() =>
             {
+                var confirmed = MsgBox.ShowOkCancel("This will clear all personal bests. Are you sure?", "Clear PBs");
+                if (!confirmed) return;
+
                 foreach (var split in Splits.Where(s => s.Type == SplitType.Child))
                 {
                     split.PersonalBest = 0;

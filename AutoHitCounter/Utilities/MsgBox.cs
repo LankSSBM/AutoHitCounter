@@ -17,7 +17,7 @@ public static class MsgBox
     /// <param name="title"></param>
     public static void Show(string message, string title = "Message")
     {
-        var box = new CustomMessageBox(message, title, showYesNo: false, showCancel: true);
+        var box = new CustomMessageBox(message, title, showYesNo: false, showCancel: false);
         box.ShowDialog();
     }
 
@@ -41,7 +41,7 @@ public static class MsgBox
     {
         var box = new InputBox(prompt, defaultValue, title);
         box.ShowDialog();
-        return box.Result ? box.InputValue : string.Empty;
+        return box.Result ? box.InputValue : null;
     }
 
     /// <summary>

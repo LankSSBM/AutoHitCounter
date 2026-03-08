@@ -306,6 +306,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
     private void AddManualSplit()
     {
         var name = MsgBox.ShowInput("Split Name", "", "New Manual Split");
+        if (name == null) return;
         if (string.IsNullOrWhiteSpace(name))
         {
             MsgBox.Show("Split name required", "New Manual Split");

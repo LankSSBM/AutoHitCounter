@@ -19,6 +19,11 @@ public partial class ProfileEditorWindow : Window
         InitializeComponent();
         TemplatesListBox.SelectionChanged += TemplatesListBox_SelectionChanged;
         SplitsListBox.SelectionChanged += SplitsListBox_SelectionChanged;
+        
+        if (Application.Current.MainWindow != null)
+          {
+              Application.Current.MainWindow.Closing += (sender, args) => { Close(); };
+          }
     }
 
     protected override void OnClosing(CancelEventArgs e)
