@@ -216,7 +216,7 @@ namespace AutoHitCounter.Properties {
         ///Dragonslayer Armour,13010800
         ///Gravetender,6323
         ///Halflight,15100800
-        ///High Lord Wolnir,63800561
+        ///High Lord Wolnir,50002140
         ///Iudex Gundyr,14000800
         ///Nameless King,13200850
         ///&quot;Oceiros, the Consumed King&quot;,13000830
@@ -253,7 +253,7 @@ namespace AutoHitCounter.Properties {
         ///   Looks up a localized string similar to 50                      push   rax
         ///e8 00 00 00 00          call   6 &lt;_main+0x6&gt;
         ///58                      pop    rax
-        ///0f 84 b7 00 00 00       je     c4 &lt;skip_all&gt;
+        ///0f 84 c5 00 00 00       je     d2 &lt;skip_all&gt;
         ///50                      push   rax
         ///57                      push   rdi
         ///52                      push   rdx

@@ -1,5 +1,6 @@
 ﻿// 
 
+using System.Collections.Generic;
 using System.Linq;
 using AutoHitCounter.Enums;
 using AutoHitCounter.Interfaces;
@@ -13,6 +14,7 @@ namespace AutoHitCounter.Games.DS3;
 public class DS3HitService(IMemoryService memoryService, HookManager hookManager) : IHitService
 {
     private int _lastHitCount;
+    private readonly List<nint> _hooks = [];
 
     private const string Kernel32 = "kernel32.dll";
     private const string GetTickCount64 = "GetTickCount64";
@@ -43,11 +45,15 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
 
     public void EnsureHooksInstalled()
     {
-        nint[] hooks = [Hooks.Hit, Hooks.LethalFall, Hooks.CheckAuxAttacker,
-            Hooks.AuxProc, Hooks.HasJailerDrain, Hooks.ApplyHealthDelta,
-            Hooks.KillBox, Hooks.CheckStaggerIgnore];
-        if (hooks.Any(h => memoryService.Read<byte>(h) != 0xE9))
+        if (_hooks.Any(h => memoryService.Read<byte>(h) != 0xE9))
             InstallHooks();
+    }
+    
+    private void InstallHook(nint code, nint hookAddr, byte[] originalBytes)
+    {
+        hookManager.InstallHook(code, hookAddr, originalBytes);
+        if (!_hooks.Contains(hookAddr))
+            _hooks.Add(hookAddr);
     }
 
     private void WritePlayerDeadCheck()
@@ -79,13 +85,13 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         AsmHelper.WriteRelativeOffsets(bytes, [
             (code + 0x1, checkPlayerDeadFunc, 5, 0x1 + 1),
             (code + 0x14, WorldChrMan.Base, 7, 0x14 + 3),
-            (code + 0xB1, staggerCheckFlag, 7, 0xB1 + 2),
-            (code + 0xBA, hit, 6, 0xBA + 2),
-            (code + 0xCC, Hooks.Hit + 8, 5, 0xCC + 1),
+            (code + 0xBF, staggerCheckFlag, 7, 0xBF + 2),
+            (code + 0xC8, hit, 6, 0xC8 + 2),
+            (code + 0xDA, Hooks.Hit + 8, 5, 0xDA + 1),
         ]);
         
         memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, Hooks.Hit, [0x48, 0x83, 0xEC, 0x50, 0x48, 0x8B, 0x41, 0x08]);
+        InstallHook(code, Hooks.Hit, [0x48, 0x83, 0xEC, 0x50, 0x48, 0x8B, 0x41, 0x08]);
     }
 
     private void InstallLethalFallHook()
@@ -108,7 +114,7 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         
         memoryService.WriteBytes(code, bytes);
         
-        hookManager.InstallHook(code, Hooks.LethalFall, originalBytes);
+        InstallHook(code, Hooks.LethalFall, originalBytes);
         
     }
 
@@ -134,7 +140,7 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         ]);
         
         memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, Hooks.CheckAuxAttacker, [0x49, 0x89, 0xE3, 0x49, 0x89, 0x4B, 0x08]);
+        InstallHook(code, Hooks.CheckAuxAttacker, [0x49, 0x89, 0xE3, 0x49, 0x89, 0x4B, 0x08]);
     }
 
     private void InstallAuxProcHook(nint auxCheckFlag)
@@ -150,7 +156,7 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         ]);
         
         memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, Hooks.AuxProc, [0x41, 0x09, 0x42, 0x4C, 0x43, 0x8B, 0x4C, 0x9A, 0x24]);
+        InstallHook(code, Hooks.AuxProc, [0x41, 0x09, 0x42, 0x4C, 0x43, 0x8B, 0x4C, 0x9A, 0x24]);
         
     }
 
@@ -175,7 +181,7 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         AsmHelper.WriteAbsoluteAddress(bytes, getTickCount, 0x22 + 2);
         
         memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, Hooks.HasJailerDrain, [0x76, 0x04, 0xf3, 0x0f, 0x59, 0xf0]);
+        InstallHook(code, Hooks.HasJailerDrain, [0x76, 0x04, 0xf3, 0x0f, 0x59, 0xf0]);
     }
 
     private void InstallApplyHealthDeltaHook()
@@ -193,7 +199,7 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         ]);
         
         memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, Hooks.ApplyHealthDelta, [0x48, 0x8B, 0x49, 0x08, 0x41, 0x0F, 0xB6, 0xD0]);
+        InstallHook(code, Hooks.ApplyHealthDelta, [0x48, 0x8B, 0x49, 0x08, 0x41, 0x0F, 0xB6, 0xD0]);
     }
 
     private void InstallKillBoxHook()
@@ -211,7 +217,7 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         ]);
         
         memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, Hooks.KillBox, [0x48, 0x89, 0xCB, 0x31, 0xD2]);
+        InstallHook(code, Hooks.KillBox, [0x48, 0x89, 0xCB, 0x31, 0xD2]);
     }
 
     private void InstallCheckStaggerIgnore()
@@ -229,6 +235,6 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         ]);
         
         memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, Hooks.CheckStaggerIgnore, [0x45, 0x0F, 0x57, 0xC0, 0x85, 0xC0]);
+        InstallHook(code, Hooks.CheckStaggerIgnore, [0x45, 0x0F, 0x57, 0xC0, 0x85, 0xC0]);
     }
 }
