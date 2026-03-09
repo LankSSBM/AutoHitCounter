@@ -2040,4 +2040,55 @@ ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 16 &lt;exit&gt;
 000000000016 &lt;exit&gt;:
 e9 00 00 00 00          jmp    1b &lt;exit+0x5&gt;</value>
   </data>
+  <data name="DSRCheckAuxAttacker" xml:space="preserve">
+    <value>c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 7 &lt;_main+0x7&gt;
+0f b6 80 56 01 00 00    movzx  eax,BYTE PTR [rax+0x156]
+48 83 7c 24 10 00       cmp    QWORD PTR [rsp+0x10],0x0
+74 3d                   je     53 &lt;early_exit&gt;
+50                      push   rax
+48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 1e &lt;_main+0x1e&gt;
+48 85 c0                test   rax,rax
+74 2f                   je     52 &lt;exit&gt;
+48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
+48 85 c0                test   rax,rax
+74 26                   je     52 &lt;exit&gt;
+48 3b 44 24 10          cmp    rax,QWORD PTR [rsp+0x10]
+75 1f                   jne    52 &lt;exit&gt;
+48 3b 44 24 18          cmp    rax,QWORD PTR [rsp+0x18]
+74 18                   je     52 &lt;exit&gt;
+48 8b 44 24 18          mov    rax,QWORD PTR [rsp+0x18]
+81 b8 c8 00 00 00 69    cmp    DWORD PTR [rax+0xc8],0x81269
+12 08 00 
+74 07                   je     52 &lt;exit&gt;
+c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 52 &lt;exit&gt;
+
+000000000052 &lt;exit&gt;:
+58                      pop    rax
+
+000000000053 &lt;early_exit&gt;:
+e9 00 00 00 00          jmp    58 &lt;early_exit+0x5&gt;</value>
+  </data>
+  <data name="DSRAuxProc" xml:space="preserve">
+    <value>44 8b 83 34 04 00 00    mov    r8d,DWORD PTR [rbx+0x434]
+80 3d 00 00 00 00 00    cmp    BYTE PTR [rip+0x0],0x0        # e &lt;_main+0xe&gt;
+74 2b                   je     3b &lt;early_exit&gt;
+50                      push   rax
+48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 18 &lt;_main+0x18&gt;
+48 85 c0                test   rax,rax
+74 1d                   je     3a &lt;exit&gt;
+48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
+48 85 c0                test   rax,rax
+74 14                   je     3a &lt;exit&gt;
+48 39 d8                cmp    rax,rbx
+75 0f                   jne    3a &lt;exit&gt;
+f6 80 48 09 00 00 0f    test   BYTE PTR [rax+0x948],0xf
+74 06                   je     3a &lt;exit&gt;
+ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 3a &lt;exit&gt;
+
+00000000003a &lt;exit&gt;:
+58                      pop    rax
+
+00000000003b &lt;early_exit&gt;:
+e9 00 00 00 00          jmp    40 &lt;early_exit+0x5&gt;</value>
+  </data>
 </root>

@@ -350,6 +350,42 @@ namespace AutoHitCounter.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 44 8b 83 34 04 00 00    mov    r8d,DWORD PTR [rbx+0x434]
+        ///80 3d 00 00 00 00 00    cmp    BYTE PTR [rip+0x0],0x0        # e &lt;_main+0xe&gt;
+        ///74 2b                   je     3b &lt;early_exit&gt;
+        ///50                      push   rax
+        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 18 &lt;_main+0x18&gt;
+        ///48 85 c0                test   rax,rax
+        ///74 1d                   je     3a &lt;exit&gt;
+        ///48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
+        ///48 85 c0                test   rax,rax
+        ///74 14                   je     3 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string DSRAuxProc {
+            get {
+                return ResourceManager.GetString("DSRAuxProc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 7 &lt;_main+0x7&gt;
+        ///0f b6 80 56 01 00 00    movzx  eax,BYTE PTR [rax+0x156]
+        ///48 83 7c 24 10 00       cmp    QWORD PTR [rsp+0x10],0x0
+        ///74 3d                   je     53 &lt;early_exit&gt;
+        ///50                      push   rax
+        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 1e &lt;_main+0x1e&gt;
+        ///48 85 c0                test   rax,rax
+        ///74 2f                   je     52 &lt;exit&gt;
+        ///48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
+        ///48 85 c0         [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string DSRCheckAuxAttacker {
+            get {
+                return ResourceManager.GetString("DSRCheckAuxAttacker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 50                      push   rax
         ///53                      push   rbx
         ///57                      push   rdi

@@ -7,6 +7,8 @@ public enum AsmScript
     DSRHit,
     DSRApplyHealthDelta,
     DSRKillChr,
+    DSRCheckAuxAttacker,
+    DSRAuxProc,
     DSREventLog,
     
     VanillaCheckPlayerDead,

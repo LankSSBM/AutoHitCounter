@@ -62,6 +62,8 @@ public static class DSROffsets
         public static nint Hit;
         public static nint ApplyHealthDelta;
         public static nint KillChr;
+        public static nint CheckAuxAttacker;
+        public static nint CheckAuxProc;
         
         
         public static nint SetEvent;
@@ -150,6 +152,25 @@ public static class DSROffsets
             _ => 0
         };
         
+        Hooks.CheckAuxAttacker = moduleBase + Version switch
+        {
+            Version1_0_1_0 => 0x2A70883,
+            Version1_0_1_1 => 0x34C5E2E,
+            Version1_0_1_2 => 0xF60E84,
+            Version1_0_3_0 => 0xF87274,
+            Version1_0_3_1 => 0x48E8B4,
+            _ => 0
+        };
+
+        Hooks.CheckAuxProc = moduleBase + Version switch
+        {
+            // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1, Version1_0_1_2
+            Version1_0_3_0 => 0x90D184,
+            Version1_0_3_1 => 0x11B08D4,
+            _ => 0
+        };
+
+        
         Hooks.SetEvent = moduleBase + Version switch
         {
             Version1_0_1_0 => 0x4E7490,
@@ -166,20 +187,20 @@ public static class DSROffsets
 #if DEBUG
         _baseAddr = moduleBase;
         Console.WriteLine("--- Globals ---");
-        PrintOffset("WorldChrMan.Base", WorldChrMan.Base);
+        PrintOffset("WorldChrMan", WorldChrMan.Base);
 
         PrintOffset("FallDmgRetAddr", FallDmgRetAddr);
         PrintOffset("AuxDeathRetAddr", AuxDeathRetAddr);
         PrintOffset("EnvDeathRetAddr", EnvDeathRetAddr);
 
         Console.WriteLine("\n--- Hooks ---");
-        PrintOffset("Hooks.Hit", Hooks.Hit);
-        PrintOffset("Hooks.ApplyHealthDelta", Hooks.ApplyHealthDelta);
-        PrintOffset("Hooks.KillChr", Hooks.KillChr);
+        PrintOffset("Hit", Hooks.Hit);
+        PrintOffset("ApplyHealthDelta", Hooks.ApplyHealthDelta);
+        PrintOffset("KillChr", Hooks.KillChr);
+        PrintOffset("CheckAuxAttacker", Hooks.CheckAuxAttacker);
+        PrintOffset("CheckAuxProc", Hooks.CheckAuxProc);
         
-        
-        
-        PrintOffset("Hooks.SetEvent", Hooks.SetEvent);
+        PrintOffset("SetEvent", Hooks.SetEvent);
       
 
 

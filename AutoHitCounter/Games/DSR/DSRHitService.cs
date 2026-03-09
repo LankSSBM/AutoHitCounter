@@ -1,6 +1,7 @@
 ﻿// 
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoHitCounter.Enums;
 using AutoHitCounter.Interfaces;
@@ -14,12 +15,15 @@ namespace AutoHitCounter.Games.DSR;
 public class DSRHitService(IMemoryService memoryService, HookManager hookManager) : IHitService
 {
     private int _lastHitCount;
+    private readonly List<nint> _hooks = [];
 
     public void InstallHooks()
     {
         InstallHitHook();
         InstallApplyHealthDeltaHook();
         InstallKillChrHook();
+        InstallCheckAuxAttacker();
+        InstallAuxProcHook();
     }
 
     public bool HasHit()
@@ -32,9 +36,14 @@ public class DSRHitService(IMemoryService memoryService, HookManager hookManager
 
     public void EnsureHooksInstalled()
     {
-        nint[] hooks = [Hooks.Hit, Hooks.ApplyHealthDelta];
-        if (hooks.Any(h => memoryService.Read<byte>(h) != 0xE9))
+        if (_hooks.Any(h => memoryService.Read<byte>(h) != 0xE9))
             InstallHooks();
+    }
+
+    private void InstallHook(nint code, nint hookAddr, byte[] originalBytes)
+    {
+        hookManager.InstallHook(code, hookAddr, originalBytes);
+        _hooks.Add(hookAddr);
     }
 
     private void InstallHitHook()
@@ -56,7 +65,7 @@ public class DSRHitService(IMemoryService memoryService, HookManager hookManager
         ]);
 
         memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, Hooks.Hit, [0x48, 0x89, 0x6C, 0x24, 0x10]);
+        InstallHook(code, Hooks.Hit, [0x48, 0x89, 0x6C, 0x24, 0x10]);
     }
 
     private void InstallApplyHealthDeltaHook()
@@ -81,7 +90,7 @@ public class DSRHitService(IMemoryService memoryService, HookManager hookManager
         ]);
 
         memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, Hooks.ApplyHealthDelta, [0x48, 0x89, 0x7C, 0x24, 0x40]);
+        InstallHook(code, Hooks.ApplyHealthDelta, [0x48, 0x89, 0x7C, 0x24, 0x40]);
     }
 
     private void InstallKillChrHook()
@@ -100,6 +109,41 @@ public class DSRHitService(IMemoryService memoryService, HookManager hookManager
         ]);
         
         memoryService.WriteBytes(code, bytes);
-        hookManager.InstallHook(code, Hooks.KillChr, originalBytes);
+        InstallHook(code, Hooks.KillChr, originalBytes);
+    }
+
+    private void InstallCheckAuxAttacker()
+    {
+        var bytes = AsmLoader.GetAsmBytes(AsmScript.DSRCheckAuxAttacker);
+        var code = Base + CheckAuxAttacker;
+        var checkAuxProcFlag = Base + CheckAuxProcFlag;
+        
+        AsmHelper.WriteRelativeOffsets(bytes, [
+            (code, checkAuxProcFlag, 7, 2),
+            (code + 0x17, WorldChrMan.Base, 7, 0x17 + 3),
+            (code + 0x4B, checkAuxProcFlag, 7, 0x4B + 2),
+            (code + 0x53, Hooks.CheckAuxAttacker + 7, 5, 0x53 + 1)
+        ]);
+        
+        memoryService.WriteBytes(code, bytes);
+        InstallHook(code, Hooks.CheckAuxAttacker, [0x0F, 0xB6, 0x80, 0x56, 0x01, 0x00, 0x00]);
+    }
+
+    private void InstallAuxProcHook()
+    {
+        var bytes = AsmLoader.GetAsmBytes(AsmScript.DSRAuxProc);
+        var code = Base + CheckAuxProc;
+        var hit = Base + Hit;
+        var checkAuxProcFlag = Base + CheckAuxProcFlag;
+        
+        AsmHelper.WriteRelativeOffsets(bytes, [
+            (code + 0x7, checkAuxProcFlag, 7, 0x7 + 2),
+            (code + 0x11, WorldChrMan.Base, 7, 0x11 + 3),
+            (code + 0x34, hit, 6, 0x34 + 2),
+            (code + 0x3B, Hooks.CheckAuxProc + 7, 5, 0x3B + 1)
+        ]);
+        
+        memoryService.WriteBytes(code, bytes);
+        InstallHook(code, Hooks.CheckAuxProc, [0x44, 0x8B, 0x83, 0x34, 0x04, 0x00, 0x00]);
     }
 }
