@@ -102,19 +102,23 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         var code = Base + LethalFall;
 
         AsmHelper.WriteRelativeOffsets(bytes, [
-            (code + 0x1, checkPlayerDeadFunc, 5, 0x1 + 1),
-            (code + 0x8, WorldChrMan.Base, 7, 0x8 + 3),
-            (code + 0x26, Functions.HasSpEffectId, 5, 0x26 + 1),
-            (code + 0x31, hit, 6, 0x31 + 2),
-            (code + 0x38, FallDamageKillFloor, 8, 0x38 + 4),
-            (code + 0x40, Hooks.LethalFall + 8, 5, 0x40 + 1)
+            (code, Float20, 7, 3),
+            (code + 0xA, checkPlayerDeadFunc, 5, 0xA + 1),
+            (code + 0x11, WorldChrMan.Base, 7, 0x11 + 3),
+            (code + 0x32, Functions.HasSpEffectId, 5, 0x32 + 1),
+            (code + 0x43, Functions.HasSpEffectId, 5, 0x43 + 1),
+            (code + 0x54, Functions.HasSpEffectId, 5, 0x54 + 1),
+            (code + 0x65, Functions.HasSpEffectId, 5, 0x65 + 1),
+            (code + 0x6E, hit, 6, 0x6E + 2),
+            (code + 0x78, Float100, 8, 0x78 + 4),
+            (code + 0x80, Hooks.FallHeight + 8, 5, 0x80 + 1)
         ]);
         
-        var originalBytes = bytes.Skip(0x1F).Take(8).ToArray();
+        var originalBytes = bytes.Skip(0x78).Take(8).ToArray();
         
         memoryService.WriteBytes(code, bytes);
         
-        InstallHook(code, Hooks.LethalFall, originalBytes);
+        InstallHook(code, Hooks.FallHeight, originalBytes);
         
     }
 

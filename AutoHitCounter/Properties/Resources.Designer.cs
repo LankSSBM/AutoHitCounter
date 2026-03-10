@@ -311,17 +311,16 @@ namespace AutoHitCounter.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 50                      push   rax
-        ///e8 00 00 00 00          call   6 &lt;_main+0x6&gt;
-        ///74 2f                   je     37 &lt;skip_count&gt;
-        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # f &lt;_main+0xf&gt;
-        ///48 3b b0 80 00 00 00    cmp    rsi,QWORD PTR [rax+0x80]
-        ///75 1f                   jne    37 &lt;skip_count&gt;
-        ///51                      push   rcx
-        ///52                      push   rdx
-        ///48 8b 88 80 00 00 00    mov    rcx,QWORD PTR [rax+0x80]
-        ///ba e6 0f 00 00          mov    edx,0xfe6
-        ///e8 00 00 00 00          cal [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to 0f 2f 35 00 00 00 00    comiss xmm6,DWORD PTR [rip+0x0]        # 7 &lt;_main+0x7&gt;
+        ///76 6f                   jbe    78 &lt;early_out&gt;
+        ///50                      push   rax
+        ///e8 00 00 00 00          call   f &lt;_main+0xf&gt;
+        ///74 66                   je     77 &lt;skip_count&gt;
+        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 18 &lt;_main+0x18&gt;
+        ///48 8b 80 80 00 00 00    mov    rax,QWORD PTR [rax+0x80]
+        ///48 39 07                cmp    QWORD PTR [rdi],rax
+        ///75 53                   jne    77 &lt;skip_count&gt;
+        ///53                [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DS3LethalFall {
             get {

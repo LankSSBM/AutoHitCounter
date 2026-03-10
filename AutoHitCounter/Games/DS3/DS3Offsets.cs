@@ -72,11 +72,14 @@ public static class DS3Offsets
     }
 
     public static nint FallDamageKillFloor;
+    public static nint Float20;
+    public static nint Float100;
 
     public static class Hooks
     {
         public static nint Hit;
         public static nint LethalFall;
+        public static nint FallHeight;
         public static nint CheckAuxAttacker;
         public static nint AuxProc;
         public static nint HasJailerDrain;
@@ -172,6 +175,45 @@ public static class DS3Offsets
             _ => 0
         };
         
+        Float20 = moduleBase + Version switch
+        {
+            Version1_3_2_0 => 0x44BA1D0,
+            Version1_4_1_0 or Version1_4_2_0 or Version1_4_3_0 => 0x44BB1D0,
+            Version1_5_0_0 or Version1_6_0_0 => 0x44BF1E0,
+            Version1_5_1_0 => 0x44BE1E0,
+            Version1_7_0_0 => 0x44C31E0,
+            Version1_8_0_0 or Version1_9_0_0 or Version1_10_0_0 => 0x451B920,
+            Version1_11_0_0 => 0x454DEC0,
+            Version1_12_0_0 => 0x4550ED0,
+            Version1_13_0_0 => 0x4553ED0,
+            Version1_14_0_0 or Version1_15_0_0 => 0x4555ED0,
+            Version1_15_1_0 or Version1_15_2_0 => 0x456CED0,
+            _ => 0
+        };
+        
+        Float100 = moduleBase + Version switch
+        {
+            Version1_3_2_0 => 0x3CF0360,
+            Version1_4_1_0 => 0x3CF1400,
+            Version1_4_2_0 or Version1_4_3_0 => 0x3CF1680,
+            Version1_5_0_0 => 0x3CF4960,
+            Version1_5_1_0 => 0x3CF3BE0,
+            Version1_6_0_0 => 0x3CF4B00,
+            Version1_7_0_0 => 0x3CF7FD0,
+            Version1_8_0_0 => 0x3D3C670,
+            Version1_9_0_0 or Version1_10_0_0 => 0x3D3C330,
+            Version1_11_0_0 => 0x3D65390,
+            Version1_12_0_0 => 0x3D67910,
+            Version1_13_0_0 => 0x3D6A010,
+            Version1_14_0_0 => 0x3D6AF70,
+            Version1_15_0_0 => 0x3D6AF90,
+            Version1_15_1_0 => 0x3D7F010,
+            Version1_15_2_0 => 0x3D7EFD0,
+            _ => 0
+        };
+
+
+        
         Functions.OriginalLogoFunc = moduleBase + Version switch
         {
             Version1_3_2_0 => 0xB7B790,
@@ -232,7 +274,29 @@ public static class DS3Offsets
             Version1_15_2_0 => 0x634BF6,
             _ => 0
         };
+        
+        Hooks.FallHeight = moduleBase + Version switch
+        {
+            Version1_3_2_0 => 0x976E06,
+            Version1_4_1_0 or Version1_4_2_0 or Version1_4_3_0 => 0x976D06,
+            Version1_5_0_0 => 0x9777F6,
+            Version1_5_1_0 => 0x977626,
+            Version1_6_0_0 => 0x977BF6,
+            Version1_7_0_0 => 0x978B06,
+            Version1_8_0_0 => 0x985146,
+            Version1_9_0_0 => 0x985706,
+            Version1_10_0_0 => 0x985776,
+            Version1_11_0_0 => 0x98D3B6,
+            Version1_12_0_0 => 0x98DDD6,
+            Version1_13_0_0 => 0x98F776,
+            Version1_14_0_0 => 0x98FA46,
+            Version1_15_0_0 => 0x98FB46,
+            Version1_15_1_0 => 0x999C66,
+            Version1_15_2_0 => 0x999D96,
+            _ => 0
+        };
 
+        
         Hooks.CheckAuxAttacker = moduleBase + Version switch
         {
             Version1_3_2_0 => 0x96A570,

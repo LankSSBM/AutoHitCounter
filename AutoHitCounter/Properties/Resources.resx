@@ -1028,28 +1028,53 @@ ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # ce &lt;skip_count&gt
 e9 00 00 00 00          jmp    df &lt;skip_all+0xd&gt;</value>
   </data>
   <data name="DS3LethalFall" xml:space="preserve">
-    <value>50                      push   rax
-e8 00 00 00 00          call   6 &lt;_main+0x6&gt;
-74 2f                   je     37 &lt;skip_count&gt;
-48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # f &lt;_main+0xf&gt;
-48 3b b0 80 00 00 00    cmp    rsi,QWORD PTR [rax+0x80]
-75 1f                   jne    37 &lt;skip_count&gt;
+    <value>0f 2f 35 00 00 00 00    comiss xmm6,DWORD PTR [rip+0x0]        # 7 &lt;_main+0x7&gt;
+76 6f                   jbe    78 &lt;early_out&gt;
+50                      push   rax
+e8 00 00 00 00          call   f &lt;_main+0xf&gt;
+74 66                   je     77 &lt;skip_count&gt;
+48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 18 &lt;_main+0x18&gt;
+48 8b 80 80 00 00 00    mov    rax,QWORD PTR [rax+0x80]
+48 39 07                cmp    QWORD PTR [rdi],rax
+75 53                   jne    77 &lt;skip_count&gt;
+53                      push   rbx
 51                      push   rcx
 52                      push   rdx
-48 8b 88 80 00 00 00    mov    rcx,QWORD PTR [rax+0x80]
+48 89 c3                mov    rbx,rax
+48 89 d9                mov    rcx,rbx
+ba d2 0f 00 00          mov    edx,0xfd2
+e8 00 00 00 00          call   37 &lt;_main+0x37&gt;
+84 c0                   test   al,al
+75 39                   jne    74 &lt;exit&gt;
+48 89 d9                mov    rcx,rbx
+ba dc 0f 00 00          mov    edx,0xfdc
+e8 00 00 00 00          call   48 &lt;_main+0x48&gt;
+84 c0                   test   al,al
+75 28                   jne    74 &lt;exit&gt;
+48 89 d9                mov    rcx,rbx
 ba e6 0f 00 00          mov    edx,0xfe6
-e8 00 00 00 00          call   2b &lt;_main+0x2b&gt;
+e8 00 00 00 00          call   59 &lt;_main+0x59&gt;
+84 c0                   test   al,al
+75 17                   jne    74 &lt;exit&gt;
+48 89 d9                mov    rcx,rbx
+ba f0 0f 00 00          mov    edx,0xff0
+e8 00 00 00 00          call   6a &lt;_main+0x6a&gt;
+84 c0                   test   al,al
+75 06                   jne    74 &lt;exit&gt;
+ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 74 &lt;exit&gt;
+
+000000000074 &lt;exit&gt;:
 5a                      pop    rdx
 59                      pop    rcx
-84 c0                   test   al,al
-75 06                   jne    37 &lt;skip_count&gt;
-ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 37 &lt;skip_count&gt;
+5b                      pop    rbx
 
-000000000037 &lt;skip_count&gt;:
+000000000077 &lt;skip_count&gt;:
 58                      pop    rax
-f3 0f 10 05 00 00 00    movss  xmm0,DWORD PTR [rip+0x0]        # 40 &lt;skip_count+0x9&gt;
+
+000000000078 &lt;early_out&gt;:
+f3 0f 59 35 00 00 00    mulss  xmm6,DWORD PTR [rip+0x0]        # 80 &lt;early_out+0x8&gt;
 00 
-e9 00 00 00 00          jmp    45 &lt;skip_count+0xe&gt;</value>
+e9 00 00 00 00          jmp    85 &lt;early_out+0xd&gt;</value>
   </data>
   <data name="DS3CheckAuxAttacker" xml:space="preserve">
     <value>50                      push   rax
