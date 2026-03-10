@@ -72,6 +72,7 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
         _hitService.InstallHooks();
         _eventService.InstallHook();
         _igtService.InstallHooks();
+        _igtService.InitializeFromCurrentState();
 
         ApplyRules();
 

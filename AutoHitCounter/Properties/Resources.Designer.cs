@@ -892,10 +892,16 @@ namespace AutoHitCounter.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to e8 00 00 00 00          call   5 &lt;_main+0x5&gt;
-        ///c7 05 00 00 00 00 02    mov    DWORD PTR [rip+0x0],0x2        # f &lt;_main+0xf&gt;
-        ///00 00 00
-        ///e9 00 00 00 00          jmp    14 &lt;_main+0x14&gt;.
+        ///   Looks up a localized string similar to 83 f8 06                cmp    eax,0x6
+        ///75 0a                   jne    f &lt;exit&gt;
+        ///c7 05 00 00 00 00 02    mov    DWORD PTR [rip+0x0],0x2        # f &lt;exit&gt;
+        ///00 00 00 
+        ///
+        ///00000000000f &lt;exit&gt;:
+        ///24 fd                   and    al,0xfd
+        ///c7 86 ac 24 00 00 1f    mov    DWORD PTR [rsi+0x24ac],0x1f
+        ///00 00 00 
+        ///e9 00 00 00 00          jmp    20 &lt;exit+0x11&gt;.
         /// </summary>
         internal static string ScholarIgtStop {
             get {

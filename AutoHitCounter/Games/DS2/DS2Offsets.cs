@@ -209,8 +209,8 @@ public static class DS2Offsets
         {
             Vanilla1_0_11 => 0x23D4DB,
             Vanilla1_0_12 => 0x24030B,
-            Scholar1_0_2 => 0x1BC25F,
-            Scholar1_0_3 => 0x1BF9CF,
+            Scholar1_0_2 => 0x1BC157,
+            Scholar1_0_3 => 0x1BF8C7,
             _ => 0
         };
 
@@ -270,11 +270,7 @@ public static class DS2Offsets
         PrintOffset("IgtLoadGame", Hooks.IgtLoadGame);
         PrintOffset("NoBabyJump", Hooks.NoBabyJump);
         PrintOffset("CreditSkip", Hooks.CreditSkip);
-
-
-        Console.WriteLine("\n--- Functions ---");
-        PrintOffset("RequestSave", Functions.RequestSave);
-
+        
 
         Console.WriteLine("\n====================================\n");
 #endif

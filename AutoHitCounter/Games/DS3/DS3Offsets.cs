@@ -63,7 +63,7 @@ public static class DS3Offsets
 
         public const int Igt = 0xA4;
     }
-    
+
     public static class UserInputManager
     {
         public static nint Base;
@@ -71,14 +71,12 @@ public static class DS3Offsets
         public const int SteamInputEnum = 0x24B;
     }
 
-    public static nint FallDamageKillFloor;
     public static nint Float20;
     public static nint Float100;
 
     public static class Hooks
     {
         public static nint Hit;
-        public static nint LethalFall;
         public static nint FallHeight;
         public static nint CheckAuxAttacker;
         public static nint AuxProc;
@@ -132,7 +130,7 @@ public static class DS3Offsets
             Version1_15_1_0 or Version1_15_2_0 => 0x47572B8,
             _ => 0
         };
-        
+
         UserInputManager.Base = moduleBase + Version switch
         {
             Version1_3_2_0 => 0x48A9968,
@@ -152,29 +150,6 @@ public static class DS3Offsets
             _ => 0
         };
 
-
-
-        FallDamageKillFloor = moduleBase + Version switch
-        {
-            Version1_3_2_0 => 0x3CF01A0,
-            Version1_4_1_0 => 0x3CF1240,
-            Version1_4_2_0 or Version1_4_3_0 => 0x3CF14C0,
-            Version1_5_0_0 => 0x3CF47A0,
-            Version1_5_1_0 => 0x3CF3A20,
-            Version1_6_0_0 => 0x3CF4940,
-            Version1_7_0_0 => 0x3CF7E10,
-            Version1_8_0_0 => 0x3D3C4B0,
-            Version1_9_0_0 or Version1_10_0_0 => 0x3D3C170,
-            Version1_11_0_0 => 0x3D651D0,
-            Version1_12_0_0 => 0x3D67750,
-            Version1_13_0_0 => 0x3D69E50,
-            Version1_14_0_0 => 0x3D6ADB0,
-            Version1_15_0_0 => 0x3D6ADD0,
-            Version1_15_1_0 => 0x3D7EE50,
-            Version1_15_2_0 => 0x3D7EE10,
-            _ => 0
-        };
-        
         Float20 = moduleBase + Version switch
         {
             Version1_3_2_0 => 0x44BA1D0,
@@ -190,7 +165,7 @@ public static class DS3Offsets
             Version1_15_1_0 or Version1_15_2_0 => 0x456CED0,
             _ => 0
         };
-        
+
         Float100 = moduleBase + Version switch
         {
             Version1_3_2_0 => 0x3CF0360,
@@ -213,7 +188,6 @@ public static class DS3Offsets
         };
 
 
-        
         Functions.OriginalLogoFunc = moduleBase + Version switch
         {
             Version1_3_2_0 => 0xB7B790,
@@ -235,7 +209,7 @@ public static class DS3Offsets
             _ => 0
         };
 
-        
+
         Hooks.Hit = moduleBase + Version switch
         {
             Version1_3_2_0 => 0x99F498,
@@ -257,24 +231,7 @@ public static class DS3Offsets
             _ => 0
         };
 
-        Hooks.LethalFall = moduleBase + Version switch
-        {
-            Version1_3_2_0 => 0x626746,
-            Version1_4_1_0 or Version1_4_2_0 or Version1_4_3_0 => 0x626D16,
-            Version1_5_0_0 => 0x627186,
-            Version1_5_1_0 => 0x626FB6,
-            Version1_6_0_0 => 0x627586,
-            Version1_7_0_0 => 0x628496,
-            Version1_8_0_0 or Version1_9_0_0 or Version1_10_0_0 => 0x62EA06,
-            Version1_11_0_0 => 0x632056,
-            Version1_12_0_0 => 0x6326B6,
-            Version1_13_0_0 => 0x6327B6,
-            Version1_14_0_0 or Version1_15_0_0 => 0x6327E6,
-            Version1_15_1_0 => 0x634C06,
-            Version1_15_2_0 => 0x634BF6,
-            _ => 0
-        };
-        
+
         Hooks.FallHeight = moduleBase + Version switch
         {
             Version1_3_2_0 => 0x976E06,
@@ -296,7 +253,7 @@ public static class DS3Offsets
             _ => 0
         };
 
-        
+
         Hooks.CheckAuxAttacker = moduleBase + Version switch
         {
             Version1_3_2_0 => 0x96A570,
@@ -463,7 +420,7 @@ public static class DS3Offsets
             Version1_15_2_0 => 0x88BC00,
             _ => 0
         };
-        
+
         Patches.NoLogo = moduleBase + Version switch
         {
             Version1_3_2_0 => 0xBBAFDF,
@@ -485,7 +442,6 @@ public static class DS3Offsets
             _ => 0
         };
 
-        
 
 #if DEBUG
         _baseAddr = moduleBase;
@@ -494,11 +450,9 @@ public static class DS3Offsets
         PrintOffset("GameDataMan", GameDataMan.Base);
         PrintOffset("UserInputManager", UserInputManager.Base);
 
-        PrintOffset("FallDamageKillingFloor", FallDamageKillFloor);
 
         Console.WriteLine("\n--- Hooks ---");
         PrintOffset("Hit", Hooks.Hit);
-        PrintOffset("LethalFall", Hooks.LethalFall);
         PrintOffset("CheckAuxAttacker", Hooks.CheckAuxAttacker);
         PrintOffset("AuxProc", Hooks.AuxProc);
         PrintOffset("HasJailerDrain", Hooks.HasJailerDrain);
@@ -510,7 +464,7 @@ public static class DS3Offsets
         Console.WriteLine("\n--- Functions ---");
         PrintOffset("HasSpEffectId", Functions.HasSpEffectId);
         PrintOffset("OriginalLogoFunc", Functions.OriginalLogoFunc);
-        
+
         Console.WriteLine("\n--- Patches ---");
         PrintOffset("NoLogo", Patches.NoLogo);
 

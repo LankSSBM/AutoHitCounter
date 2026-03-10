@@ -1,5 +1,6 @@
 ﻿// 
 
+using System;
 using System.Diagnostics;
 using AutoHitCounter.Enums;
 using AutoHitCounter.Interfaces;
@@ -30,12 +31,63 @@ public class DS2IgtService
         _saveDataManager = ResolveSaveDataManager();
     }
 
+    private nint ResolveSaveDataManager()
+    {
+        if (IsScholar)
+        {
+            var gameMan = _memoryService.Read<nint>(GameManagerImp.Base);
+            var gameDataMan = _memoryService.Read<nint>(gameMan + GameManagerImp.GameDataManager);
+            return _memoryService.Read<nint>(gameDataMan + GameManagerImp.SaveDataManager);
+        }
+        else
+        {
+            var gameMan = _memoryService.Read<int>(GameManagerImp.Base);
+            var gameDataMan = _memoryService.Read<int>(gameMan + GameManagerImp.GameDataManager);
+            return _memoryService.Read<int>(gameDataMan + GameManagerImp.SaveDataManager);
+        }
+    }
+
     public long ElapsedMilliseconds => _baseMs + _stopwatch.ElapsedMilliseconds;
 
     public void InstallHooks()
     {
         if (IsScholar) InstallScholarHooks();
         else InstallVanillaHooks();
+    }
+
+    public void InitializeFromCurrentState()
+    {
+        if (!IsPlayerLoaded())
+            return;
+
+        var slotIndex = _memoryService.Read<int>(
+            _saveDataManager + GameManagerImp.SaveDataManagerOffsets.CurrentSaveSlotIdx);
+
+        if (slotIndex < 0 || slotIndex >= 10)
+            return;
+
+        var slotBase = _saveDataManager + slotIndex * SaveSlotSize;
+        var playTime = _memoryService.Read<uint>(slotBase + GameManagerImp.SaveSlotOffsets.PlayTime);
+
+        if (playTime == 0)
+            return;
+
+        _baseMs = playTime * 1000L;
+        _stopwatch.Restart();
+    }
+
+    private bool IsPlayerLoaded()
+    {
+        if (IsScholar)
+        {
+            var gameMan = _memoryService.Read<nint>(GameManagerImp.Base);
+            return _memoryService.Read<nint>(gameMan + GameManagerImp.PlayerCtrl) != IntPtr.Zero;
+        }
+        else
+        {
+            var gameMan = _memoryService.Read<int>(GameManagerImp.Base);
+            return (nint)_memoryService.Read<int>(gameMan + GameManagerImp.PlayerCtrl) != IntPtr.Zero;
+        }
     }
 
     public void Update()
@@ -71,22 +123,6 @@ public class DS2IgtService
 
     public void Stop() => _stopwatch.Stop();
 
-    private nint ResolveSaveDataManager()
-    {
-        if (IsScholar)
-        {
-            var gameMan = _memoryService.Read<nint>(GameManagerImp.Base);
-            var gameDataMan = _memoryService.Read<nint>(gameMan + GameManagerImp.GameDataManager);
-            return _memoryService.Read<nint>(gameDataMan + GameManagerImp.SaveDataManager);
-        }
-        else
-        {
-            var gameMan = _memoryService.Read<int>(GameManagerImp.Base);
-            var gameDataMan = _memoryService.Read<int>(gameMan + GameManagerImp.GameDataManager);
-            return _memoryService.Read<int>(gameDataMan + GameManagerImp.SaveDataManager);
-        }
-    }
-
     #region Scholar
 
     private void InstallScholarHooks()
@@ -116,12 +152,11 @@ public class DS2IgtService
         var code = Base + IgtStopCode;
         var bytes = AsmLoader.GetAsmBytes(AsmScript.ScholarIgtStop);
         var hook = Hooks.IgtStop;
-        var originalBytes = _memoryService.ReadBytes(hook, 5);
+        var originalBytes = _memoryService.ReadBytes(hook, 12);
 
         AsmHelper.WriteRelativeOffsets(bytes, [
-            (code, Functions.RequestSave, 5, 1),
-            (code + 5, _igtState, 10, 0x5 + 2),
-            (code + 0xF, hook + 5, 5, 0xF + 1)
+            (code + 0x5, _igtState, 10, 0x5 + 2),
+            (code + 0x1B, hook + 12, 5, 0x1B + 1)
         ]);
 
         _memoryService.WriteBytes(code, bytes);
