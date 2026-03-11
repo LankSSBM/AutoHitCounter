@@ -51,6 +51,12 @@ namespace AutoHitCounter
             SettingsManager.Default.MainWindowLeft = Left;
             SettingsManager.Default.MainWindowTop = Top;
             SettingsManager.Default.Save();
+            var vm = DataContext as MainViewModel;
+            if (vm.ActiveProfile == null) return;
+            var save = MsgBox.ShowYesNo(
+                "Would you like to save current progress before closing?", "Save Progress");
+            if (save)
+                vm.SaveRunState();
         }
 
 

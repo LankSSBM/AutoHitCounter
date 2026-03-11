@@ -42,7 +42,7 @@ public class SettingsManager
     [DefaultValue(true)] public bool ShowPb { get; set; }
     [DefaultValue(true)] public bool ShowIgt { get; set; }
     [DefaultValue(300)] public int OverlayWidth { get; set; }
-    public int OverlayHeight { get; set; }
+    [DefaultValue(420)] public int OverlayHeight { get; set; }
     public bool IsUnlocked { get; set; }
     public bool DS3NoLogo { get; set; }
     public bool DS3StutterFix { get; set; }
@@ -68,6 +68,10 @@ public class SettingsManager
     [DefaultValue(false)] public bool FontUnderline { get; set; }
     
     [DefaultValue("#e0e0e0")] public string SplitNameColor { get; set; }
+    
+    [DefaultValue("#e0e0e0")] public string SplitNameOnHitColor { get; set; }
+    
+    [DefaultValue("#e0e0e0")] public string SplitNameOnHitlessColor { get; set; }
     
     [DefaultValue("#999999")] public string GroupNameColor { get; set; }
     

@@ -111,14 +111,7 @@
             }
         }
 
-        /* Split completed without hits - color set dynamically */
-        .split-row.cleared {
-        }
-
-        /* Split completed with hits - color set dynamically */
-        .split-row.hit {
-        }
-
+        
         /* Parent category row styling */
         .split-row.parent {
             font-weight: 700;
@@ -267,6 +260,8 @@
             fontItalic: false,
             fontUnderline: false,
             splitNameColor: '#e0e0e0',
+            SplitNameOnHitColor: '#e0e0e0',
+            SplitNameOnHitlessColor: '#e0e0e0',
             groupNameColor: '#999999',
             pbColor: '#bbbbbb',
             showFooterTotals: true,
@@ -322,7 +317,9 @@
         }
 
         function getVisibleRowCount() {
-            return Math.floor((config.overlayHeight - 60) / config.rowHeight);
+            const h = config.overlayHeight > 0 ? config.overlayHeight : 420;
+            const rh = config.rowHeight > 0 ? config.rowHeight : 29;
+            return Math.floor((h - 60) / rh);
         }
 
         function getGridColumns() {
@@ -366,6 +363,8 @@
                 to { background: ${config.currentSplitColor}; border-left-color: ${config.currentSplitBorderColor}; }
             }
             .split-row .col-name { color: ${config.splitNameColor}; }
+            .split-row.hit .col-name { color: ${config.splitNameOnHitColor}; }
+            .split-row.cleared .col-name { color: ${config.splitNameOnHitlessColor}; }
             .split-row.parent { color: ${config.groupNameColor}; }
             .split-row .col-pb { color: ${config.pbColor}; }
             .footer .col-pb { color: ${config.pbColor}; }
@@ -409,28 +408,26 @@
             let html = '';
 
             let splits = state.splits;
-            const maxRows = getVisibleRowCount();
             const currentIndex = splits.findIndex(s => s.isCurrent);
+            const total = splits.length;
+            const maxRows = getVisibleRowCount();
 
             if (currentIndex >= 0) lastCurrentIndex = currentIndex;
 
-            const total = splits.length;
-            let start = 0;
+            const anchor = currentIndex >= 0 ? currentIndex : lastCurrentIndex >= 0 ? lastCurrentIndex : 0;
 
-            if (currentIndex >= 0) {
-                start = Math.max(0, currentIndex - config.prevSplits);
-                let end = Math.min(total, start + maxRows);
-                if (end === total) start = Math.max(0, total - maxRows);
+            let start = Math.max(0, anchor - config.prevSplits);
+            let end = Math.min(total, anchor + config.nextSplits + 1);
+
+            if (end - start > maxRows) {
                 end = Math.min(total, start + maxRows);
-                splits = splits.slice(start, end);
-            } else {
-                const anchor = lastCurrentIndex >= 0 ? lastCurrentIndex : 0;
-                start = Math.max(0, anchor - config.prevSplits);
-                let end = Math.min(total, start + maxRows);
-                if (end === total) start = Math.max(0, total - maxRows);
-                end = Math.min(total, start + maxRows);
-                splits = splits.slice(start, end);
             }
+
+            if (end === total) {
+                start = Math.max(0, total - maxRows);
+            }
+
+            splits = splits.slice(start, end);
 
             for (let i = 0; i < splits.length; i++) {
                 html += buildRow(splits[i], cols, start + i, currentIndex);
@@ -461,11 +458,11 @@
 
             footerEl.innerHTML =
                 `<span class="col-name">${igtHtml}</span>
-                ${config.showFooterTotals ? `
-                    <span class="col-hits" style="color:${state.totalHits > 0 ? config.hitsActiveColor : config.hitsZeroColor}">${state.totalHits}</span>
-                    ${config.showDiff ? `<span class="col-diff ${diffClass}">${diffText}</span>` : ''}
-                    ${config.showPb ? `<span class="col-pb">${state.totalPb}</span>` : ''}
-                ` : ''}`;
+        ${config.showFooterTotals ? `
+            <span class="col-hits" style="color:${state.totalHits > 0 ? config.hitsActiveColor : config.hitsZeroColor}">${state.totalHits}</span>
+            ${config.showDiff ? `<span class="col-diff ${diffClass}">${diffText}</span>` : ''}
+            ${config.showPb ? `<span class="col-pb">${state.totalPb}</span>` : ''}
+        ` : ''}`;
 
             runCompleteEl.style.display = state.isRunComplete ? 'block' : 'none';
         }

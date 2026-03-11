@@ -30,10 +30,10 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
-            <RowDefinition Height="*"  />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <controls:TitleBar Grid.Row="0" Title="Auto Hit Counter" />
-        
+
         <!-- Focus outline -->
         <Border Grid.Row="0" Grid.RowSpan="3"
                 BorderThickness="1" IsHitTestVisible="False" Panel.ZIndex="99"
@@ -50,7 +50,7 @@
                 </Style>
             </Border.Style>
         </Border>
-        
+
         <!-- Tool Attachment Info -->
         <Grid Grid.Row="1" Margin="5,3,8,3">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -145,7 +145,8 @@
                     </Grid>
 
                     <Border Grid.Row="1" BorderBrush="#333333" BorderThickness="0,0,0,1">
-                        <Grid Margin="{Binding IsSplitListScrollbarVisible, Converter={StaticResource ScrollbarVisibleToMarginConverter}}">
+                        <Grid
+                            Margin="{Binding IsSplitListScrollbarVisible, Converter={StaticResource ScrollbarVisibleToMarginConverter}}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="4*" />
                                 <ColumnDefinition Width="*" />
@@ -190,9 +191,11 @@
                                             </Style.Triggers>
                                         </Style>
                                     </TextBlock.Style>
-                                    <Run Text="(" /><Run Text="{Binding CurrentSplitNumber, Mode=OneWay}" ToolTip="Current Split" />
+                                    <Run Text="(" />
+                                    <Run Text="{Binding CurrentSplitNumber, Mode=OneWay}" ToolTip="Current Split" />
                                     <Run Text="/" />
-                                    <Run Text="{Binding TotalSplitCount, Mode=OneWay}" ToolTip="Total Splits" /><Run Text=")" />
+                                    <Run Text="{Binding TotalSplitCount, Mode=OneWay}" ToolTip="Total Splits" />
+                                    <Run Text=")" />
                                 </TextBlock>
 
                                 <!-- Splitter -->
@@ -257,7 +260,8 @@
                                 </TextBox>
 
                                 <!-- Reset Attempt count button -->
-                                <Button FontFamily="Segoe MDL2 Assets" Content="&#xE72C;" FontSize="12" Height="21" Width="24"
+                                <Button FontFamily="Segoe MDL2 Assets" Content="&#xE72C;" FontSize="12" Height="21"
+                                        Width="24"
                                         Margin="7,0,0,0"
                                         VerticalAlignment="Center"
                                         ToolTip="Reset attempts count"
@@ -285,8 +289,8 @@
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Grid>
                     </Border>
-                    <ListBox x:Name="SplitListBox" 
-                             Grid.Row="2" 
+                    <ListBox x:Name="SplitListBox"
+                             Grid.Row="2"
                              ItemsSource="{Binding Splits}"
                              SelectedItem="{Binding SelectedSplit}"
                              AlternationCount="2"
@@ -305,21 +309,20 @@
                                 <MenuItem Header="Rename"
                                           Command="{Binding PlacementTarget.DataContext.RenameSelectedSplitCommand,
                             RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                                <MenuItem Header="Save Notes"
-                                          Command="{Binding PlacementTarget.DataContext.SaveNotesCommand,
-                            RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                 <MenuItem Header="Reset Split Hits"
                                           Command="{Binding PlacementTarget.DataContext.ResetSelectedSplitHitsCommand,
                             RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                 <MenuItem Header="Edit PB"
                                           Command="{Binding PlacementTarget.DataContext.EditSplitPbCommand,
                             RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <MenuItem Header="Clear All Notes"
+                                          Command="{Binding PlacementTarget.DataContext.ClearAllNotesCommand,
+                            RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                 <MenuItem Header="Clear All PBs"
                                           Command="{Binding PlacementTarget.DataContext.ClearTotalPbCommand,
                             RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                                
-                                
-                                
+
+
                             </ContextMenu>
                         </ListBox.ContextMenu>
 
@@ -433,7 +436,7 @@
                                                     </Style>
                                                 </TextBlock.Style>
                                             </TextBlock>
-                                            
+
                                             <!-- In-line Rename box -->
                                             <TextBox x:Name="RenameBox"
                                                      Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
@@ -458,7 +461,7 @@
                                                 </TextBox.Style>
                                             </TextBox>
                                         </Grid>
-                                        
+
                                         <!-- Hit Count -->
                                         <TextBlock Grid.Column="1"
                                                    Text="{Binding NumOfHits}"
@@ -478,7 +481,7 @@
                                         </TextBlock>
                                         <!-- Diff -->
                                         <TextBlock Grid.Column="2"
-                                                   
+
                                                    Text="{Binding Diff}"
                                                    Foreground="{Binding DiffBrush}"
                                                    FontFamily="{StaticResource AppFont}"
@@ -532,7 +535,7 @@
                                                 </Style>
                                             </TextBox.Style>
                                         </TextBox>
-                                        
+
                                         <!-- Context Menu Indicator -->
                                         <TextBlock Grid.Column="3"
                                                    Text="⋯"
@@ -648,7 +651,8 @@
                                 </Style.Triggers>
                             </Style>
                         </Border.Style>
-                        <Grid Margin="{Binding IsSplitListScrollbarVisible, Converter={StaticResource ScrollbarVisibleToMarginConverter}}">
+                        <Grid
+                            Margin="{Binding IsSplitListScrollbarVisible, Converter={StaticResource ScrollbarVisibleToMarginConverter}}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="4*" />
                                 <ColumnDefinition Width="*" />
@@ -684,7 +688,7 @@
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Grid>
                     </Border>
-                        
+
 
                     <Grid Grid.Row="4">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"
@@ -714,6 +718,7 @@
                             <Button Content="Clear PB" Height="24"
                                     Command="{Binding ClearTotalPbCommand}" />
                             
+
                         </StackPanel>
                         <!-- Potentially turn this into a popup window -->
                         <StackPanel Visibility="{Binding IsRunComplete, Converter={StaticResource BoolToVisConverter}}"
@@ -765,12 +770,12 @@
             </TabItem>
         </TabControl>
         <Button Content="Help"
-        Grid.Row="2"
-        HorizontalAlignment="Right"
-        VerticalAlignment="Top"
-        Margin="0,2,5,0"
-        Height="25" Width="60" FontSize="12"
-        Panel.ZIndex="1"
-        Click="HelpButton_Click" />
+                Grid.Row="2"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,2,5,0"
+                Height="25" Width="60" FontSize="12"
+                Panel.ZIndex="1"
+                Click="HelpButton_Click" />
     </Grid>
 </Window>

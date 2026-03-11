@@ -76,6 +76,8 @@ public class OverlaySettingsViewModel : BaseViewModel
     public string AttemptsZeroColor        { get => Get<string>(); set => Set(value); }
     public string AttemptsActiveColor      { get => Get<string>(); set => Set(value); }
     public string SplitNameColor           { get => Get<string>(); set => Set(value); }
+    public string SplitNameOnHitColor           { get => Get<string>(); set => Set(value); }
+    public string SplitNameOnHitlessColor           { get => Get<string>(); set => Set(value); }
     public string GroupNameColor           { get => Get<string>(); set => Set(value); }
     public string HitsZeroColor            { get => Get<string>(); set => Set(value); }
     public string HitsActiveColor          { get => Get<string>(); set => Set(value); }
@@ -125,6 +127,8 @@ public class OverlaySettingsViewModel : BaseViewModel
         _values[nameof(AttemptsZeroColor)] = s.AttemptsZeroColor;
         _values[nameof(AttemptsActiveColor)] = s.AttemptsActiveColor;
         _values[nameof(SplitNameColor)]    = s.SplitNameColor;
+        _values[nameof(SplitNameOnHitColor)]    = s.SplitNameOnHitColor;
+        _values[nameof(SplitNameOnHitlessColor)]    = s.SplitNameOnHitlessColor;
         _values[nameof(GroupNameColor)]    = s.GroupNameColor;
         _values[nameof(HitsZeroColor)]     = s.HitsZeroColor;
         _values[nameof(HitsActiveColor)]   = s.HitsActiveColor;
@@ -171,6 +175,8 @@ public class OverlaySettingsViewModel : BaseViewModel
         s.AttemptsZeroColor = AttemptsZeroColor;
         s.AttemptsActiveColor = AttemptsActiveColor;
         s.SplitNameColor    = SplitNameColor;
+        s.SplitNameOnHitColor    = SplitNameOnHitColor;
+        s.SplitNameOnHitlessColor    = SplitNameOnHitlessColor;
         s.GroupNameColor    = GroupNameColor;
         s.HitsZeroColor     = HitsZeroColor;
         s.HitsActiveColor   = HitsActiveColor;
@@ -231,6 +237,8 @@ public class OverlaySettingsViewModel : BaseViewModel
             FontItalic = FontItalic,
             FontUnderline = FontUnderline,
             SplitNameColor = SplitNameColor,
+            SplitNameOnHitColor = SplitNameOnHitColor,
+            SplitNameOnHitlessColor = SplitNameOnHitlessColor,
             GroupNameColor = GroupNameColor,
             PbColor = PbColor,
             ShowFooterTotals = ShowFooterTotals,
@@ -276,6 +284,8 @@ public class OverlaySettingsViewModel : BaseViewModel
         AttemptsZeroColor        = "#ffffff";
         AttemptsActiveColor      = "#9D61A8";
         SplitNameColor           = "#e0e0e0";
+        SplitNameOnHitColor           = "#e0e0e0";
+        SplitNameOnHitlessColor           = "#e0e0e0";
         GroupNameColor           = "#999999";
         HitsZeroColor            = "#888888";
         HitsActiveColor          = "#c8843a";

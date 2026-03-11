@@ -49,4 +49,6 @@ public class OverlayConfig
     public string CurrentSplitHitBorderColor { get; set; }
     public string IgtColor { get; set; }
     public string RunCompleteBannerColor { get; set; }
+    public string SplitNameOnHitColor { get; set; }
+    public string SplitNameOnHitlessColor { get; set; }
 }
