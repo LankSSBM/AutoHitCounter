@@ -111,11 +111,11 @@
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                             <TextBlock Text="Prev Splits" Style="{StaticResource FieldLabel}" Width="80" />
-                            <xctk:IntegerUpDown Value="{Binding PrevSplits}" Minimum="0" Maximum="20" Width="55" />
+                            <xctk:IntegerUpDown Value="{Binding PrevSplits}" Minimum="0" Maximum="50" Width="55" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                             <TextBlock Text="Next Splits" Style="{StaticResource FieldLabel}" Width="80" />
-                            <xctk:IntegerUpDown Value="{Binding NextSplits}" Minimum="0" Maximum="20" Width="55" />
+                            <xctk:IntegerUpDown Value="{Binding NextSplits}" Minimum="0" Maximum="50" Width="55" />
                         </StackPanel>
 
                         <Separator Style="{StaticResource Separator}" />
@@ -123,11 +123,11 @@
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                             <TextBlock Text="Width" Style="{StaticResource FieldLabel}" Width="80" />
-                            <xctk:IntegerUpDown Value="{Binding OverlayWidth}" Minimum="100" Maximum="1920" Width="55" />
+                            <xctk:IntegerUpDown Value="{Binding OverlayWidth}" Minimum="100" Maximum="5000" Width="55" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                             <TextBlock Text="Height" Style="{StaticResource FieldLabel}" Width="80" />
-                            <xctk:IntegerUpDown Value="{Binding OverlayHeight}" Minimum="100" Maximum="2000" Width="55" />
+                            <xctk:IntegerUpDown Value="{Binding OverlayHeight}" Minimum="100" Maximum="5000" Width="55" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                             <TextBlock Text="Row Height" Style="{StaticResource FieldLabel}" Width="80" />
@@ -358,7 +358,7 @@
                         <TextBlock Text="SIZE" Style="{StaticResource SectionLabel}" />
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
                             <TextBlock Text="Font Size" Style="{StaticResource FieldLabel}" Width="90" />
-                            <xctk:IntegerUpDown Value="{Binding FontSize}" Minimum="8" Maximum="32" Width="55" />
+                            <xctk:IntegerUpDown Value="{Binding FontSize}" Minimum="2" Maximum="64" Width="55" />
                         </StackPanel>
                         
                         <Separator Style="{StaticResource Separator}" />
@@ -380,7 +380,7 @@
                         <TextBlock Text="SIZE" Style="{StaticResource SectionLabel}" />
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
                             <TextBlock Text="Font Size" Style="{StaticResource FieldLabel}" Width="90" />
-                            <xctk:IntegerUpDown Value="{Binding IgtFontSize}" Minimum="8" Maximum="32" Width="55" />
+                            <xctk:IntegerUpDown Value="{Binding IgtFontSize}" Minimum="2" Maximum="64" Width="55" />
                         </StackPanel>
 
                         <Separator Style="{StaticResource Separator}" />
