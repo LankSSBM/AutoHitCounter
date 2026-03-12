@@ -58,8 +58,6 @@ namespace AutoHitCounter
         {
         }
 
-        private bool _isRapidSplitting;
-        
         private void SplitItem_DoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (sender is not ListBoxItem { DataContext: SplitViewModel split }) return;
@@ -68,33 +66,9 @@ namespace AutoHitCounter
             var vm = (MainViewModel)DataContext;
 
             if (vm.IsUnlocked)
-            {
                 split.IsEditing = true;
-            }
             else
-            {
-                var targetIndex = vm.Splits.IndexOf(split);
-                var currentIndex = vm.CurrentSplit != null ? vm.Splits.IndexOf(vm.CurrentSplit) : -1;
-
-                if (targetIndex < 0 || targetIndex == currentIndex) return;
-
-                vm.IsRapidSplitting = true;
-
-                if (targetIndex > currentIndex)
-                {
-                    // Step forward until split is reached
-                    while (vm.CurrentSplit != split && !vm.IsRunComplete)
-                        vm.AdvanceSplitCommand.Execute(null);
-                }
-                else
-                {
-                    // Step backward until split is reached
-                    while (vm.CurrentSplit != split)
-                        vm.PrevSplitCommand.Execute(null);
-                }
-                vm.IsRapidSplitting = false;
-                vm.SaveRunState();
-            }
+                vm.JumpToSplit(split);
 
             e.Handled = true;
         }

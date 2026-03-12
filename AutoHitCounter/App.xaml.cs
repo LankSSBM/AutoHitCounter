@@ -38,6 +38,7 @@ namespace AutoHitCounter
             ITickService tickService = new TickService(memoryService, stateService);
             
             OverlayServerService overlayServerService = new OverlayServerService();
+            SplitNavigationService splitNavigationService = new SplitNavigationService();
 
             HookManager hookManager = new HookManager(memoryService);
             
@@ -54,7 +55,7 @@ namespace AutoHitCounter
 
             
             _mainViewModel = new MainViewModel(memoryService, hotkeyManager, gameModuleFactory, profileService, stateService,
-                settingsViewModel, hotkeysViewModel, overlayServerService);
+                settingsViewModel, hotkeysViewModel, overlayServerService, splitNavigationService);
             var mainWindow = new MainWindow
             {
                 DataContext = _mainViewModel
@@ -62,12 +63,6 @@ namespace AutoHitCounter
             mainWindow.Show();
             
             stateService.Publish(State.AppStart);
-        }
-        
-        protected override void OnExit(ExitEventArgs e)
-        {
-            _mainViewModel?.FlushRunState();
-            base.OnExit(e);
         }
     }
 }

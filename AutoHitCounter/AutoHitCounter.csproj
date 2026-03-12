@@ -188,6 +188,7 @@
         <Compile Include="Services\MemoryService.cs" />
         <Compile Include="Services\OverlayServerService.cs" />
         <Compile Include="Services\ProfileService.cs" />
+        <Compile Include="Services\SplitNavigationService.cs" />
         <Compile Include="Services\StateService.cs" />
         <Compile Include="Services\TickService.cs" />
         <Compile Include="Utilities\EnumExtensions.cs" />
