@@ -904,7 +904,7 @@ namespace AutoHitCounter.ViewModels
 
         private void IncrementHit()
         {
-            if (IsRunComplete || CurrentSplit == null) return;
+            if (IsRunComplete || CurrentSplit == null || Settings.IsPracticeMode) return;
             CurrentSplit.NumOfHits++;
             SaveRunState();
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
