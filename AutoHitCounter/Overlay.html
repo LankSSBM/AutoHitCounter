@@ -10,6 +10,7 @@
             box-sizing: border-box;
         }
 
+        /* Body styling for transparent overlay */
         body {
             background: transparent;
             font-family: 'Segoe UI', sans-serif;
@@ -18,24 +19,33 @@
             overflow: hidden;
         }
 
+        /* Container that holds all split rows */
         #splits {
-
             overflow-y: clip;
             height: calc(100% - 60px);
         }
-        
-         #progress {
+
+        /* Progress indicator formatting */
+        #progress {
             color: #bbb;
             font-size: 12px;
         }
-         
+
+        /* Attempt counter - purple when attempts > 0, white when 0 */
+        #attempts {
+            color: #FFF;
+            font-size: 13px;
+        }
+
+        /* Main overlay container */
         #overlay {
             display: inline-block;
             width: 300px;
             padding: 6px;
-            
+            border-radius: 4px;
         }
 
+        /* Header row styling (Split / Hits / Diff / PB) */
         .header {
             display: grid;
             padding: 4px 8px;
@@ -48,41 +58,61 @@
             margin-bottom: 2px;
         }
 
+        /* Center align header columns except the first */
         .header span:not(:first-child) {
             text-align: center;
             color: #bbb;
         }
 
+        /* Individual split row */
         .split-row {
             display: grid;
             padding: 4px 8px;
-            font-size: 15px;
-            font-weight: 400;
             transition: background 0.2s ease, border-color 0.2s ease;
             border-left: 3px solid transparent;
         }
 
-        .split-row:nth-child(even) {
-            background: rgba(255, 255, 255, 0.02);
-        }
 
+        /* Split name column */
         .split-row .col-name {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
+        /* Center align numeric columns */
         .split-row .col-hits,
         .split-row .col-diff,
         .split-row .col-pb {
             text-align: center;
         }
 
-        .split-row.current {
-            border-left-color: #00cc66;
-            background: rgba(0, 204, 102, 0.06);
+        /* Current split when hit (red) */
+        .split-row.current.hit {
+            animation: highlight-red 0.3s ease-out;
         }
 
+        @keyframes highlight-red {
+            from {
+                background: transparent;
+                border-left-color: transparent;
+            }
+        }
+
+        /* Current split when not hit (green) */
+        .split-row.current {
+            animation: highlight-green 0.3s ease-out;
+        }
+
+        @keyframes highlight-green {
+            from {
+                background: transparent;
+                border-left-color: transparent;
+            }
+        }
+
+        
+        /* Parent category row styling */
         .split-row.parent {
             font-weight: 700;
             font-size: 13px;
@@ -93,12 +123,14 @@
             background: transparent;
         }
 
+        /* Hide numbers for parent rows */
         .split-row.parent .col-hits,
         .split-row.parent .col-diff,
         .split-row.parent .col-pb {
             visibility: hidden;
         }
 
+        /* Diff colors - overridden dynamically */
         .diff-pos {
             color: #ff4c4c;
         }
@@ -108,39 +140,64 @@
         }
 
         .diff-zero {
-            color: #555;
+            color: #bbb;
         }
 
+        /* Footer container */
         .footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 8px 2px;
-            margin-top: 4px;
+            display: grid;
+            padding: 4px 8px 4px 10px;
+            margin-top: 1px;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
-            font-size: 13px;
-            color: #888;
+            font-size: 15px;
+            font-weight: 450;
+
+            color: #bbb;
         }
 
-        .footer .totals span {
-            margin-right: 12px;
+        /* Center align footer numeric columns */
+        .footer .col-hits,
+        .footer .col-diff,
+        .footer .col-pb {
+            text-align: center;
         }
 
-        .footer .totals .label {
-            color: #aaa;
+        .footer .col-name {
+            display: flex;
+            align-items: center;
         }
 
-        .footer .totals .value {
-            color: #fff;
-            font-weight: 600;
+        .footer .col-name .igt {
+            flex: 1;
         }
 
+        /* In-game timer styling */
         .igt {
-            font-family: Consolas, monospace;
             font-size: 16px;
             color: #c47fd4;
         }
 
+        /* Table mode - adds borders to make it look like a table */
+        .table-mode .header,
+        .table-mode .split-row,
+        .table-mode .footer {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            margin-bottom: -1px;
+        }
+
+        .table-mode .split-row {
+            border-left-width: 1px;
+        }
+
+        .table-mode .split-row.current {
+            border-left: 3px solid #00cc66;
+        }
+
+        .table-mode .split-row.current.hit {
+            border-left: 3px solid #ff4c4c;
+        }
+
+        /* Run complete banner */
         .run-complete {
             text-align: center;
             padding: 8px 12px;
@@ -152,32 +209,18 @@
             background: rgba(0, 204, 102, 0.06);
             letter-spacing: 0.05em;
         }
-
-        .split-row.current {
-            animation: highlight-in 0.3s ease-out;
-        }
-
-        @keyframes highlight-in {
-            from {
-                background: transparent;
-                border-left-color: transparent;
-            }
-            to {
-                background: rgba(0, 204, 102, 0.06);
-                border-left-color: #00cc66;
-            }
-        }
-
     </style>
 </head>
 <body>
+<!-- Main overlay container -->
 <div id="overlay">
+    <!-- Header row - columns injected by applyLayout() -->
     <div class="header" id="header"></div>
+    <!-- Split rows - injected by renderState() -->
     <div id="splits"></div>
-    <div class="footer">
-        <div class="totals" id="totals"></div>
-        <div class="igt" id="igt"></div>
-    </div>
+    <!-- Footer row - IGT + run totals, injected by renderState() -->
+    <div class="footer" id="footer"></div>
+    <!-- Shown when the run is complete -->
     <div class="run-complete" id="runComplete" style="display:none;">✓ Run Complete</div>
 </div>
 
@@ -194,57 +237,89 @@
             showPb: true,
             showIgt: true,
             overlayWidth: 300,
-            overlayHeight: 430,
-            showProgress: true
-        }
+            overlayHeight: 420,
+            showProgress: true,
+            fontFamily: 'Segoe UI',
+            fontSize: 15,
+            rowHeight: 29,
+            backgroundOpacity: 0,
+            tableMode: false,
+            hitsZeroColor: '#888888',
+            hitsActiveColor: '#c8843a',
+            rowHitColor: 'rgba(255, 76, 76, 0.17)',
+            rowClearedColor: 'rgba(0, 204, 102, 0.17)',
+            diffPosColor: '#ff4c4c',
+            diffNegColor: '#00cc66',
+            diffZeroColor: '#bbbbbb',
+            attemptsZeroColor: '#ffffff',
+            attemptsActiveColor: '#9D61A8',
+            headerTextColor: '#bbbbbb',
+            igtColor: '#c47fd4',
+            runCompleteBannerColor: '#00cc66',
+            fontBold: false,
+            fontItalic: false,
+            fontUnderline: false,
+            splitNameColor: '#e0e0e0',
+            SplitNameOnHitColor: '#e0e0e0',
+            SplitNameOnHitlessColor: '#e0e0e0',
+            groupNameColor: '#999999',
+            pbColor: '#bbbbbb',
+            showFooterTotals: true,
+            igtFontFamily: 'Consolas',
+            igtFontSize: 16,
+            alternatingRows: 'rgba(255, 255, 255, 0.05)'
+        };
 
-        let config = {...DEFAULTS}
+        let config = {...DEFAULTS};
+
+        const saved = localStorage.getItem('overlayConfig');
+        if (saved) {
+            try {
+                Object.assign(config, JSON.parse(saved));
+            } catch {
+            }
+        }
 
         const overlay = document.getElementById('overlay');
         const headerEl = document.getElementById('header');
         const splitsEl = document.getElementById('splits');
-        const totalsEl = document.getElementById('totals');
-        const igtEl = document.getElementById('igt');
         const runCompleteEl = document.getElementById('runComplete');
 
         let ws = null;
         let lastState = null;
+        let lastCurrentIndex = -1;
 
         function connect() {
             ws = new WebSocket(WS_URL);
-
             ws.onopen = function () {
             };
-
             ws.onclose = function () {
                 setTimeout(connect, RECONNECT_INTERVAL);
             };
-
             ws.onerror = function () {
                 ws.close();
             };
-
             ws.onmessage = function (event) {
                 const msg = JSON.parse(event.data);
-
                 if (msg.type === 'state') {
                     lastState = msg.data;
                     renderState(msg.data);
                 } else if (msg.type === 'igt') {
-                    igtEl.textContent = msg.data;
+                    const igtEl = document.getElementById('igt');
+                    if (igtEl) igtEl.textContent = msg.data;
                 } else if (msg.type === 'config') {
                     Object.assign(config, msg.data);
+                    localStorage.setItem('overlayConfig', JSON.stringify(config));
                     applyLayout();
                     if (lastState) renderState(lastState);
                 }
             };
         }
 
-        const ROW_HEIGHT = 29;
-
         function getVisibleRowCount() {
-            const availableHeight = config.overlayHeight - 60;
-            return Math.floor(availableHeight / ROW_HEIGHT);
+            const h = config.overlayHeight > 0 ? config.overlayHeight : 420;
+            const rh = config.rowHeight > 0 ? config.rowHeight : 29;
+            return Math.floor((h - 60) / rh);
         }
 
         function getGridColumns() {
@@ -254,56 +329,108 @@
             return cols;
         }
 
-        function applyLayout() {
-            headerEl.style.gridTemplateColumns = getGridColumns();
+        // Injects a dynamic <style> block for properties that can't be set inline
+        let dynamicStyleEl = null;
 
-            const progressHtml = config.showProgress ? ` <span id="progress"></span>` : '';
-            headerEl.innerHTML = `<span>Split${progressHtml}</span><span>Hits</span>`
-                + (config.showDiff ? '<span>Diff</span>' : '')
-                + (config.showPb ? '<span>PB</span>' : '');
-
-            igtEl.style.display = config.showIgt ? '' : 'none';
-            overlay.style.width = config.overlayWidth + 'px';
-            overlay.style.height = config.overlayHeight + 'px';
+        function applyDynamicStyles() {
+            if (!dynamicStyleEl) {
+                dynamicStyleEl = document.createElement('style');
+                document.head.appendChild(dynamicStyleEl);
+            }
+            dynamicStyleEl.textContent = `
+            .diff-pos { color: ${config.diffPosColor}; }
+            .diff-neg { color: ${config.diffNegColor}; }
+            .diff-zero { color: ${config.diffZeroColor}; }
+            .split-row.hit { background: ${config.rowHitColor}; }
+            .split-row.cleared { background: ${config.rowClearedColor}; }
+            .split-row.current { background: ${config.currentSplitColor}; border-left-color: ${config.currentSplitBorderColor}; }
+            .split-row.current.hit { background: ${config.currentSplitHitColor}; border-left-color: ${config.currentSplitHitBorderColor}; }
+            .split-row { height: ${config.rowHeight}px; font-size: ${config.fontSize}px; }
+            .footer { font-size: ${config.fontSize}px; }
+            .run-complete { 
+                color: ${config.runCompleteBannerColor}; 
+                border-top-color: ${config.runCompleteBannerColor}; 
+                background: ${config.runCompleteBannerColor}14; 
+            }
+            .header { color: ${config.headerTextColor}; }
+            .header span:not(:first-child) { color: ${config.headerTextColor}; }
+            @keyframes highlight-red {
+                from { background: transparent; border-left-color: transparent; }
+                to { background: ${config.currentSplitHitColor}; border-left-color: ${config.currentSplitHitBorderColor}; }
+            }
+            @keyframes highlight-green {
+                from { background: transparent; border-left-color: transparent; }
+                to { background: ${config.currentSplitColor}; border-left-color: ${config.currentSplitBorderColor}; }
+            }
+            .split-row .col-name { color: ${config.splitNameColor}; }
+            .split-row.hit .col-name { color: ${config.splitNameOnHitColor}; }
+            .split-row.cleared .col-name { color: ${config.splitNameOnHitlessColor}; }
+            .split-row.parent { color: ${config.groupNameColor}; }
+            .split-row .col-pb { color: ${config.pbColor}; }
+            .footer .col-pb { color: ${config.pbColor}; }
+            #overlay, .split-row, .footer, .header { 
+                font-weight: ${config.fontBold ? 'bold' : 'normal'};
+                font-style: ${config.fontItalic ? 'italic' : 'normal'};
+                text-decoration: ${config.fontUnderline ? 'underline' : 'none'};
+                font-family: ${config.fontFamily};
+            }
+            .igt { color: ${config.igtColor}; font-family: ${config.igtFontFamily || 'Consolas, monospace'}; font-size: ${config.igtFontSize || 16}px; }
+            .split-row:nth-child(even) { background: ${config.alternatingRows || 'transparent'}; }
+            `;
         }
 
-        let lastCurrentIndex = -1;
+        function applyLayout() {
+            const cols = getGridColumns();
+            headerEl.style.gridTemplateColumns = cols;
+            document.getElementById('footer').style.gridTemplateColumns = cols;
+
+
+            overlay.style.background = config.backgroundOpacity > 0
+                ? `rgba(0, 0, 0, ${config.backgroundOpacity})`
+                : 'transparent';
+
+            overlay.classList.toggle('table-mode', config.tableMode);
+
+            overlay.style.width = config.overlayWidth + 'px';
+            overlay.style.height = config.overlayHeight + 'px';
+
+            applyDynamicStyles();
+
+            const progressHtml = config.showProgress ? ` <span id="progress"></span>` : '';
+            const attemptsHtml = config.showAttempts ? ` <span id="attempts"></span>` : '';
+            headerEl.innerHTML = `<span>Split${progressHtml}${attemptsHtml}</span><span>Hits</span>`
+                + (config.showDiff ? '<span>Diff</span>' : '')
+                + (config.showPb ? '<span>PB</span>' : '');
+        }
 
         function renderState(state) {
             const cols = getGridColumns();
             let html = '';
 
             let splits = state.splits;
-            const maxRows = getVisibleRowCount();
             const currentIndex = splits.findIndex(s => s.isCurrent);
+            const total = splits.length;
+            const maxRows = getVisibleRowCount();
 
             if (currentIndex >= 0) lastCurrentIndex = currentIndex;
 
-            const total = splits.length;
+            const anchor = currentIndex >= 0 ? currentIndex : lastCurrentIndex >= 0 ? lastCurrentIndex : 0;
 
-            if (currentIndex >= 0) {
-                let start = Math.max(0, currentIndex - config.prevSplits);
-                let end = Math.min(total, start + maxRows);
+            let start = Math.max(0, anchor - config.prevSplits);
+            let end = Math.min(total, anchor + config.nextSplits + 1);
 
-                if (end === total) {
-                    start = Math.max(0, total - maxRows);
-                    end = total;
-                }
-
-                splits = splits.slice(start, end);
-            } else {
-                console.log('Run complete, lastCurrentIndex:', lastCurrentIndex);
-                let start = Math.max(0, lastCurrentIndex - config.prevSplits);
-                let end = Math.min(total, start + maxRows);
-                if (end === total) {
-                    start = Math.max(0, total - maxRows);
-                    end = total;
-                }
-                splits = splits.slice(start, end);
+            if (end - start > maxRows) {
+                end = Math.min(total, start + maxRows);
             }
 
-            for (const split of splits) {
-                html += buildRow(split, cols);
+            if (end === total) {
+                start = Math.max(0, total - maxRows);
+            }
+
+            splits = splits.slice(start, end);
+
+            for (let i = 0; i < splits.length; i++) {
+                html += buildRow(splits[i], cols, start + i, currentIndex);
             }
             splitsEl.innerHTML = html;
 
@@ -314,20 +441,28 @@
                 progressEl.textContent = `(${current}/${total})`;
             }
 
-            let totalsHtml = `<span><span class="label">Hits </span><span class="value">${state.totalHits}</span></span>`;
-            if (config.showPb) {
-                totalsHtml += `<span><span class="label">PB </span><span class="value">${state.totalPb}</span></span>`;
+            const attemptsEl = document.getElementById('attempts');
+            if (attemptsEl && state.attemptCount != null) {
+                attemptsEl.textContent = `#${state.attemptCount}`;
+                attemptsEl.style.color = state.attemptCount > 0
+                    ? config.attemptsActiveColor
+                    : config.attemptsZeroColor;
             }
 
-            if (config.showAttempts && state.attemptCount != null) {
-                totalsHtml += `<span><span class="label"># </span><span class="value">${state.attemptCount}</span></span>`;
-            }
+            const footerEl = document.getElementById('footer');
+            const igtHtml = config.showIgt
+                ? `<span class="igt" id="igt">${state.inGameTime ?? ''}</span>`
+                : `<span id="igt"></span>`;
+            const diffClass = state.totalDiff > 0 ? 'diff-pos' : state.totalDiff < 0 ? 'diff-neg' : 'diff-zero';
+            const diffText = state.totalDiff > 0 ? `+${state.totalDiff}` : `${state.totalDiff}`;
 
-            totalsEl.innerHTML = totalsHtml;
-
-            if (config.showIgt && state.inGameTime) {
-                igtEl.textContent = state.inGameTime;
-            }
+            footerEl.innerHTML =
+                `<span class="col-name">${igtHtml}</span>
+        ${config.showFooterTotals ? `
+            <span class="col-hits" style="color:${state.totalHits > 0 ? config.hitsActiveColor : config.hitsZeroColor}">${state.totalHits}</span>
+            ${config.showDiff ? `<span class="col-diff ${diffClass}">${diffText}</span>` : ''}
+            ${config.showPb ? `<span class="col-pb">${state.totalPb}</span>` : ''}
+        ` : ''}`;
 
             runCompleteEl.style.display = state.isRunComplete ? 'block' : 'none';
         }
@@ -338,15 +473,19 @@
             return div.innerHTML;
         }
 
-        function buildRow(s, cols) {
+        function buildRow(s, cols, index, currentIndex) {
             const current = s.isCurrent ? ' current' : '';
             const parent = s.isParent ? ' parent' : '';
             const diffClass = s.diff > 0 ? 'diff-pos' : s.diff < 0 ? 'diff-neg' : 'diff-zero';
             const diffText = s.diff > 0 ? `+${s.diff}` : `${s.diff}`;
+            const isPast = currentIndex === -1 ? true : index < currentIndex;
+            const cleared = isPast && !s.isParent && s.hits === 0 ? ' cleared' : '';
+            const hit = (isPast && !s.isParent && s.hits > 0) || (s.isCurrent && s.hits > 0) ? ' hit' : '';
+            const hitsColor = s.hits > 0 ? config.hitsActiveColor : config.hitsZeroColor;
 
-            return `<div class="split-row${parent}${current}" style="grid-template-columns: ${cols}">
+            return `<div class="split-row${parent}${current}${cleared}${hit}" style="grid-template-columns: ${cols}">
                 <span class="col-name">${escapeHtml(s.name)}</span>
-                <span class="col-hits">${s.hits}</span>
+                <span class="col-hits" style="color:${hitsColor}">${s.hits}</span>
                 ${config.showDiff ? `<span class="col-diff ${diffClass}">${diffText}</span>` : ''}
                 ${config.showPb ? `<span class="col-pb">${s.pb}</span>` : ''}
             </div>`;

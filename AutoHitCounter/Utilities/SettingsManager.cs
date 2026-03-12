@@ -11,10 +11,9 @@ namespace AutoHitCounter.Utilities;
 
 public class SettingsManager
 {
-    
     private static SettingsManager _default;
     public static SettingsManager Default => _default ??= Load();
-    
+
     private static string SettingsPath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "AutoHitCounter",
@@ -23,7 +22,7 @@ public class SettingsManager
     [DefaultValue(true)] public bool EnableUpdateChecks { get; set; }
     [DefaultValue("Dark Souls Remastered")]
     public string LastSelectedGame { get; set; }
-    
+
     public string LastSelectedProfile { get; set; }
     public double MainWindowLeft { get; set; }
     public double MainWindowTop { get; set; }
@@ -35,23 +34,15 @@ public class SettingsManager
     public bool ShowNotesSection { get; set; }
     public bool AllowManualSplitOnAutoSplits { get; set; }
     public bool PracticeMode { get; set; }
-    [DefaultValue(true)]
-    public bool ShowAttempts { get; set; }
-    [DefaultValue(true)]
-    public bool ShowProgress { get; set; }
-    [DefaultValue(4)]
-    public int PrevSplits { get; set; }
-    [DefaultValue(8)]
-    public int NextSplits { get; set; }
-    [DefaultValue(true)]
-    public bool ShowDiff { get; set; }
-    [DefaultValue(true)]
-    public bool ShowPb { get; set; }
-    [DefaultValue(true)]
-    public bool ShowIgt { get; set; }
-    [DefaultValue(300)]
-    public int OverlayWidth { get; set; }
-    public int OverlayHeight { get; set; }
+    [DefaultValue(true)] public bool ShowAttempts { get; set; }
+    [DefaultValue(true)] public bool ShowProgress { get; set; }
+    [DefaultValue(4)] public int PrevSplits { get; set; }
+    [DefaultValue(8)] public int NextSplits { get; set; }
+    [DefaultValue(true)] public bool ShowDiff { get; set; }
+    [DefaultValue(true)] public bool ShowPb { get; set; }
+    [DefaultValue(true)] public bool ShowIgt { get; set; }
+    [DefaultValue(300)] public int OverlayWidth { get; set; }
+    [DefaultValue(420)] public int OverlayHeight { get; set; }
     public bool IsUnlocked { get; set; }
     public bool DS3NoLogo { get; set; }
     public bool DS3StutterFix { get; set; }
@@ -63,9 +54,79 @@ public class SettingsManager
     public bool DS2NoBabyJump { get; set; }
     public bool DS2SkipCredits { get; set; }
     public bool DS2DisableDoubleClick { get; set; }
-    
+
     public string LastImportExportPath { get; set; }
+
+    // Typography
+    [DefaultValue("Segoe UI")] public string FontFamily { get; set; }
+    [DefaultValue(15)] public int FontSize { get; set; }
     
+    [DefaultValue(false)] public bool FontBold { get; set; }
+    
+    [DefaultValue(false)] public bool FontItalic { get; set; }
+    
+    [DefaultValue(false)] public bool FontUnderline { get; set; }
+    
+    [DefaultValue("#e0e0e0")] public string SplitNameColor { get; set; }
+    
+    [DefaultValue("#e0e0e0")] public string SplitNameOnHitColor { get; set; }
+    
+    [DefaultValue("#e0e0e0")] public string SplitNameOnHitlessColor { get; set; }
+    
+    [DefaultValue("#999999")] public string GroupNameColor { get; set; }
+    
+    [DefaultValue("#bbbbbb")] public string PbColor { get; set; }
+    
+    [DefaultValue(29)] public int RowHeight { get; set; }
+
+// Background
+    [DefaultValue(0)] public double BackgroundOpacity { get; set; }
+    [DefaultValue(false)] public bool TableMode { get; set; }
+
+// Hit column
+    [DefaultValue("#888888")] public string HitsZeroColor { get; set; }
+    [DefaultValue("#c8843a")] public string HitsActiveColor { get; set; }
+
+// Colours
+    [DefaultValue("rgba(255, 76, 76, 0.17)")]
+    public string RowHitColor { get; set; }
+
+    [DefaultValue("rgba(0, 204, 102, 0.17)")]
+    public string RowClearedColor { get; set; }
+
+    [DefaultValue("rgba(0, 204, 102, 0.06)")]
+    public string CurrentSplitColor { get; set; }
+
+    [DefaultValue("#00cc66")] public string CurrentSplitBorderColor { get; set; }
+
+    [DefaultValue("rgba(255, 76, 76, 0.06)")]
+    public string CurrentSplitHitColor { get; set; }
+
+    [DefaultValue("#ff4c4c")] public string CurrentSplitHitBorderColor { get; set; }
+
+// Diff
+    [DefaultValue("#ff4c4c")] public string DiffPosColor { get; set; }
+    [DefaultValue("#00cc66")] public string DiffNegColor { get; set; }
+    [DefaultValue("#bbbbbb")] public string DiffZeroColor { get; set; }
+
+// Attempts
+    [DefaultValue("#ffffff")] public string AttemptsZeroColor { get; set; }
+    [DefaultValue("#9D61A8")] public string AttemptsActiveColor { get; set; }
+
+// Header
+    [DefaultValue("#bbbbbb")] public string HeaderTextColor { get; set; }
+
+// Footer
+    [DefaultValue("#c47fd4")] public string IgtColor { get; set; }
+    [DefaultValue("#00cc66")] public string RunCompleteBannerColor { get; set; }
+    
+    [DefaultValue(true)] public bool ShowFooterTotals { get; set; }
+    
+    [DefaultValue("Consolas")] public string IgtFontFamily { get; set; }
+    
+    [DefaultValue(16)] public int IgtFontSize { get; set; }
+    
+    [DefaultValue("rgba(255,255,255,0.05)")] public string AlternatingRows { get; set; }
 
 
     public void Save()

@@ -23,7 +23,8 @@ public partial class HelpWindow
             (StackPanel)FindName("PageOverview"),
             (StackPanel)FindName("PageSplits"),
             (StackPanel)FindName("PageProfileEditor"),
-            (StackPanel)FindName("PageHotkeys")
+            (StackPanel)FindName("PageHotkeys"),
+            (StackPanel)FindName("PageSettingsAndOverlay")
             
         ];
         _tabs =
@@ -31,7 +32,9 @@ public partial class HelpWindow
             (Button)FindName("TabOverview"),
             (Button)FindName("TabSplits"),
             (Button)FindName("TabProfileEditor"),
-            (Button)FindName("TabHotkeys")
+            (Button)FindName("TabHotkeys"),
+            (Button)FindName("TabSettingsAndOverlay")
+            
         ];
         ShowPage(0);
     }
@@ -96,15 +99,5 @@ public partial class HelpWindow
         var selected = (ExampleGame.SelectedItem as ComboBoxItem)?.Content?.ToString();
         TrackingText.Text = $"Currently Tracking: {selected}";
     }
-
-    private void LockedItem_DoubleClick(object sender, MouseButtonEventArgs e)
-    {
-        if (sender is not ListBoxItem item) return;
-        var lockedList = (ListBox)FindName("LockedDemo");
-        if (lockedList == null) return;
-
-        lockedList.SelectedItem = null;
-        item.IsSelected = true;
-        e.Handled = true;
-    }
+    
 }

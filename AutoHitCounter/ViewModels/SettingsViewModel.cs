@@ -4,17 +4,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using AutoHitCounter.Core;
 using AutoHitCounter.Enums;
 using AutoHitCounter.Interfaces;
 using AutoHitCounter.Models;
 using AutoHitCounter.Services;
 using AutoHitCounter.Utilities;
+using AutoHitCounter.Views.Windows;
 
 namespace AutoHitCounter.ViewModels;
 
 public class SettingsViewModel : BaseViewModel
 {
-    private readonly OverlayServerService _overlayServerService;
+    private readonly OverlaySettingsViewModel _overlaySettingsViewModel;
 
     public event Action OnGameSettingChanged;
 
@@ -29,12 +31,19 @@ public class SettingsViewModel : BaseViewModel
         set => SetProperty(ref _selectedSettingsGame, value);
     }
 
-    public SettingsViewModel(IStateService stateService, OverlayServerService overlayServerService)
+    public SettingsViewModel(IStateService stateService, OverlaySettingsViewModel overlaySettingsViewModel)
     {
-        _overlayServerService = overlayServerService;
+        _overlaySettingsViewModel = overlaySettingsViewModel;
         SelectedSettingsGame = GameTitle.DarkSouls2;
         stateService.Subscribe(State.AppStart, OnAppStart);
+        OpenOverlaySettingsCommand = new DelegateCommand(OpenOverlaySettings);
     }
+
+    #region Commands
+
+    public DelegateCommand OpenOverlaySettingsCommand { get; }
+
+    #endregion
 
     #region Properties
 
@@ -92,131 +101,6 @@ public class SettingsViewModel : BaseViewModel
         }
     }
 
-    private bool _showAttempts;
-
-    public bool ShowAttempts
-    {
-        get => _showAttempts;
-        set
-        {
-            if (!SetProperty(ref _showAttempts, value)) return;
-            SettingsManager.Default.ShowAttempts = value;
-            SettingsManager.Default.Save();
-            BroadcastConfigChanged();
-        }
-    }
-
-    private bool _showProgress;
-
-    public bool ShowProgress
-    {
-        get => _showProgress;
-        set
-        {
-            if (!SetProperty(ref _showProgress, value)) return;
-            SettingsManager.Default.ShowProgress = value;
-            SettingsManager.Default.Save();
-            BroadcastConfigChanged();
-        }
-    }
-
-    private int _prevSplits;
-
-    public int PrevSplits
-    {
-        get => _prevSplits;
-        set
-        {
-            if (!SetProperty(ref _prevSplits, value)) return;
-            SettingsManager.Default.PrevSplits = value;
-            SettingsManager.Default.Save();
-            BroadcastConfigChanged();
-        }
-    }
-
-    private int _nextSplits;
-
-    public int NextSplits
-    {
-        get => _nextSplits;
-        set
-        {
-            if (!SetProperty(ref _nextSplits, value)) return;
-            SettingsManager.Default.NextSplits = value;
-            SettingsManager.Default.Save();
-            BroadcastConfigChanged();
-        }
-    }
-
-    private bool _showDiff;
-
-    public bool ShowDiff
-    {
-        get => _showDiff;
-        set
-        {
-            if (!SetProperty(ref _showDiff, value)) return;
-            SettingsManager.Default.ShowDiff = value;
-            SettingsManager.Default.Save();
-            BroadcastConfigChanged();
-        }
-    }
-
-    private bool _showPb;
-
-    public bool ShowPb
-    {
-        get => _showPb;
-        set
-        {
-            if (!SetProperty(ref _showPb, value)) return;
-            SettingsManager.Default.ShowPb = value;
-            SettingsManager.Default.Save();
-            BroadcastConfigChanged();
-        }
-    }
-
-    private bool _showIgt;
-
-    public bool ShowIgt
-    {
-        get => _showIgt;
-        set
-        {
-            if (!SetProperty(ref _showIgt, value)) return;
-            SettingsManager.Default.ShowIgt = value;
-            SettingsManager.Default.Save();
-            BroadcastConfigChanged();
-        }
-    }
-
-    private int _overlayWidth;
-
-    public int OverlayWidth
-    {
-        get => _overlayWidth;
-        set
-        {
-            if (!SetProperty(ref _overlayWidth, value)) return;
-            SettingsManager.Default.OverlayWidth = value;
-            SettingsManager.Default.Save();
-            BroadcastConfigChanged();
-        }
-    }
-    
-    private int _overlayHeight;
-    
-    public int  OverlayHeight
-    {
-        get => _overlayHeight;
-        set
-        {
-            if (!SetProperty(ref _overlayHeight, value)) return;
-            SettingsManager.Default.OverlayHeight = value;
-            SettingsManager.Default.Save();
-            BroadcastConfigChanged();
-        }
-    }
 
     #region Elden Ring
 
@@ -311,7 +195,7 @@ public class SettingsViewModel : BaseViewModel
             OnGameSettingChanged?.Invoke();
         }
     }
-    
+
     private bool _skNoTutorials;
 
     public bool SKNoTutorials
@@ -343,7 +227,7 @@ public class SettingsViewModel : BaseViewModel
             OnGameSettingChanged?.Invoke();
         }
     }
-    
+
     private bool _ds2SkipCredits;
 
     public bool DS2SkipCredits
@@ -357,7 +241,7 @@ public class SettingsViewModel : BaseViewModel
             OnGameSettingChanged?.Invoke();
         }
     }
-    
+
     private bool _ds2DisableDoubleClick;
 
     public bool DS2DisableDoubleClick
@@ -373,7 +257,6 @@ public class SettingsViewModel : BaseViewModel
     }
 
     #endregion
-    
 
     #endregion
 
@@ -385,7 +268,7 @@ public class SettingsViewModel : BaseViewModel
         ApplyDS3Settings();
         ApplySKSettings();
         ApplyDS2Settings();
-        
+
         IsAlwaysOnTopEnabled = SettingsManager.Default.AlwaysOnTop;
 
         _isShowNotesEnabled = SettingsManager.Default.ShowNotesSection;
@@ -396,8 +279,21 @@ public class SettingsViewModel : BaseViewModel
 
         _isPracticeMode = SettingsManager.Default.PracticeMode;
         OnPropertyChanged(nameof(IsPracticeMode));
+    }
 
-        LoadSplitConfig();
+    private OverlaySettingsWindow _overlaySettingsWindow;
+
+    private void OpenOverlaySettings()
+    {
+        if (_overlaySettingsWindow != null)
+        {
+            _overlaySettingsWindow.Activate();
+            return;
+        }
+
+        _overlaySettingsWindow = new OverlaySettingsWindow { DataContext = _overlaySettingsViewModel };
+        _overlaySettingsWindow.Closed += (s, e) => _overlaySettingsWindow = null;
+        _overlaySettingsWindow.Show();
     }
 
     private void ApplyERSettings()
@@ -416,7 +312,7 @@ public class SettingsViewModel : BaseViewModel
     {
         _ds3NoLogo = SettingsManager.Default.DS3NoLogo;
         OnPropertyChanged(nameof(DS3NoLogo));
-        
+
         _ds3StutterFix = SettingsManager.Default.DS3StutterFix;
         OnPropertyChanged(nameof(DS3StutterFix));
     }
@@ -425,7 +321,7 @@ public class SettingsViewModel : BaseViewModel
     {
         _skNoLogo = SettingsManager.Default.SKNoLogo;
         OnPropertyChanged(nameof(SKNoLogo));
-        
+
         _skNoTutorials = SettingsManager.Default.SKNoTutorials;
         OnPropertyChanged(nameof(SKNoTutorials));
     }
@@ -434,50 +330,12 @@ public class SettingsViewModel : BaseViewModel
     {
         _ds2NoBabyJump = SettingsManager.Default.DS2NoBabyJump;
         OnPropertyChanged(nameof(DS2NoBabyJump));
-        
+
         _ds2SkipCredits = SettingsManager.Default.DS2SkipCredits;
         OnPropertyChanged(nameof(DS2SkipCredits));
-        
+
         _ds2DisableDoubleClick = SettingsManager.Default.DS2DisableDoubleClick;
         OnPropertyChanged(nameof(DS2DisableDoubleClick));
-    }
-
-    private void LoadSplitConfig()
-    {
-        _showAttempts = SettingsManager.Default.ShowAttempts;
-        OnPropertyChanged(nameof(ShowAttempts));
-        
-        _showProgress = SettingsManager.Default.ShowProgress;
-        OnPropertyChanged(nameof(ShowProgress));
-
-        _prevSplits = SettingsManager.Default.PrevSplits;
-        OnPropertyChanged(nameof(PrevSplits));
-
-        _nextSplits = SettingsManager.Default.NextSplits;
-        OnPropertyChanged(nameof(NextSplits));
-
-        _showDiff = SettingsManager.Default.ShowDiff;
-        OnPropertyChanged(nameof(ShowDiff));
-
-        _showPb = SettingsManager.Default.ShowPb;
-        OnPropertyChanged(nameof(ShowPb));
-
-        _showIgt = SettingsManager.Default.ShowIgt;
-        OnPropertyChanged(nameof(ShowIgt));
-
-        _overlayWidth = SettingsManager.Default.OverlayWidth;
-        OnPropertyChanged(nameof(OverlayWidth));
-        
-        _overlayHeight = SettingsManager.Default.OverlayHeight;
-        OnPropertyChanged(nameof(OverlayHeight));
-
-        BroadcastConfigChanged();
-    }
-
-    private void BroadcastConfigChanged()
-    {
-        var config = new OverlayConfig(ShowAttempts, PrevSplits, NextSplits, ShowDiff, ShowPb, ShowIgt, OverlayWidth, OverlayHeight, _showProgress);
-        _overlayServerService.BroadcastConfig(config);
     }
 
     #endregion

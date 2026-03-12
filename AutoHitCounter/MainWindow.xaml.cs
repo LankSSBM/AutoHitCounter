@@ -58,6 +58,8 @@ namespace AutoHitCounter
         {
         }
 
+        private bool _isRapidSplitting;
+        
         private void SplitItem_DoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (sender is not ListBoxItem { DataContext: SplitViewModel split }) return;
@@ -76,6 +78,8 @@ namespace AutoHitCounter
 
                 if (targetIndex < 0 || targetIndex == currentIndex) return;
 
+                vm.IsRapidSplitting = true;
+
                 if (targetIndex > currentIndex)
                 {
                     // Step forward until split is reached
@@ -88,6 +92,8 @@ namespace AutoHitCounter
                     while (vm.CurrentSplit != split)
                         vm.PrevSplitCommand.Execute(null);
                 }
+                vm.IsRapidSplitting = false;
+                vm.SaveRunState();
             }
 
             e.Handled = true;

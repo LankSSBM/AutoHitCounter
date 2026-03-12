@@ -8,6 +8,8 @@ public class OverlayState
 {
     public List<OverlaySplit> Splits { get; set; } = new List<OverlaySplit>();
     public int TotalHits { get; set; }
+    
+    public int TotalDiff { get; set; }
     public int TotalPb { get; set; }
     public string InGameTime { get; set; }
     public bool IsRunComplete { get; set; }

@@ -34,7 +34,9 @@
                 <Button x:Name="TabOverview" Content="Overview" Click="Tab_Click" Tag="0" />
                 <Button x:Name="TabSplits" Content="Splits" Click="Tab_Click" Tag="1" />
                 <Button x:Name="TabProfileEditor" Content="Profile Editor" Click="Tab_Click" Tag="2" />
-                <Button x:Name="TabHotkeys" Content="Hotkeys" Click="Tab_Click" Tag="3" Margin="0,0,210,0" />
+                <Button x:Name="TabHotkeys" Content="Hotkeys" Click="Tab_Click" Tag="3" />
+                <Button x:Name="TabSettingsAndOverlay" Content="Settings &amp; Overlay" Click="Tab_Click" Tag="4"
+                        Margin="0,0,90,0" />
                 <Button Content="A-" FontSize="11" Click="FontDecrease_Click" HorizontalAlignment="Right" />
                 <Button Content="A+" FontSize="11" Click="FontIncrease_Click" HorizontalAlignment="Right" />
             </StackPanel>
@@ -46,14 +48,14 @@
                               HorizontalScrollBarVisibility="Disabled">
                     <Grid>
                         <StackPanel x:Name="PageOverview">
-                            <TextBlock Text="Overview" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,10" />
+                            <TextBlock Text="Overview" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10" />
                             <TextBlock TextWrapping="Wrap" Foreground="#CCC" LineHeight="22">
                                 Welcome to the Auto Hit Counter Help Center!
                             </TextBlock>
                             <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 Auto Hit Counter is a tool which tracks boss hits in all From Software Titles that are available on PC
                                 (Dark Souls Remastered,Dark Souls 2,Dark Souls 3, Sekiro and Elden Ring).
-                                This tool both increment hits and advance splits once a boss is defeated automatically.
+                                This tool both increment hits and advance splits once a boss is defeated automatically, while the tool is capable of counting every instance of a hit it only adds one for every 3 seconds to avoid counting 20 on attacks similar to Malenia's Waterfowl Dance.
                             </TextBlock>
                             <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 In the next panels you will get familiar with the capabilities of the tool and how you can set things up for your desired game. Good luck running, and don't get hit!
@@ -80,6 +82,7 @@
                                 Right under the Splits tab you can see a dropdown menu called Game.
                                 Here is where you choose what game the tool should track hits for.
                                 Depending on the game certain features will unlock for both the settings tab and the profile editor settings.
+                                You can see the indicator of which game is being tracked by hovering the word Track or looking at the attachment message in top right.
                                 Make sure to click the "Track" Button to let the tool know what you want to attach it to, give it a quick try here!
                             </TextBlock>
 
@@ -244,12 +247,14 @@
 
 
                             <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
-                                Profile dropdown - Selects which profile you are currently editing.
+                                Profile dropdown
                                 <LineBreak />
-                                </TextBlock>
-                            
-                            
-                                <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
+                                Selects which profile you are currently editing.
+                                <LineBreak />
+                            </TextBlock>
+
+
+                            <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 <Run FontWeight="SemiBold">New</Run>
                                 <LineBreak />
                                 Creates a new blank profile.
@@ -258,53 +263,53 @@
                                 <LineBreak />
                                 In both instances the user will get a new prompt asking for the profile name.
                                 <LineBreak />
-                                </TextBlock>
-                            
-                            
-                                <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
+                            </TextBlock>
+
+
+                            <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 <Run FontWeight="SemiBold">Rename</Run>
                                 <LineBreak />
                                 Changes the name of the currently selected profile.
                                 <LineBreak />
-                                </TextBlock>
-                            
-                            
-                                <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
+                            </TextBlock>
+
+
+                            <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 <Run FontWeight="SemiBold">Delete</Run>
                                 <LineBreak />
                                 Removes the selected profile.
                                 <LineBreak />
-                                </TextBlock>
-                            
-                                <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
+                            </TextBlock>
+
+                            <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 <Run FontWeight="SemiBold">Saved ✓</Run>
                                 <LineBreak />
                                 Indicates that the current profile has been saved.
-                                 <LineBreak />
+                                <LineBreak />
                                 If there are unsaved data the button will switch into "Save" instead to prompt the user to save.
                                 <LineBreak />
                                 Closing the window will also prompt the user and ask if they want to save the changes or discard them.
                                 <LineBreak />
-                                </TextBlock>
-                            
-                                <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
+                            </TextBlock>
+
+                            <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 <Run FontWeight="SemiBold">Import</Run>
                                 <LineBreak />
                                 Loads any profile file from your computer.
                                 <LineBreak />
-                                </TextBlock>
-                            
-                            
-                                <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
+                            </TextBlock>
+
+
+                            <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 <Run FontWeight="SemiBold">Export</Run>
                                 <LineBreak />
                                 Saves the current profile or all profiles as a file so it can be backed up or shared to others.
                                 <LineBreak />
-                                </TextBlock>
-                            
-                            
-                                <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
-                                <Run FontWeight="SemiBold">Available Templates Panel</Run> 
+                            </TextBlock>
+
+
+                            <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
+                                <Run FontWeight="SemiBold">Available Templates Panel</Run>
                                 <LineBreak />
                                 This section is a list of pre-made splits that will automatically advance to the next split once a boss is defeated.
                                 <LineBreak />
@@ -314,11 +319,11 @@
                                 <LineBreak />
                                 You can also add bosses to the Profile Splits panel by using the + sign, selecting one or multiple bosses then dragging them to the Profile Splits panel on the right, or opening the context menu with a right click then clicking Add.
                                 <LineBreak />
-                                </TextBlock>
-                            
-                            
-                                <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
-                                <Run FontWeight="SemiBold">Profile Splits Panel</Run>  
+                            </TextBlock>
+
+
+                            <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
+                                <Run FontWeight="SemiBold">Profile Splits Panel</Run>
                                 <LineBreak />
                                 This section shows the splits that you have added to a specific profile and are the ones that will show up on the main window when you select it.
                                 <LineBreak />
@@ -343,31 +348,31 @@
                             <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 1. Click on the New button.
                             </TextBlock>
-                            
+
                             <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 2. -Optional- Choose whether you want to keep any existing items into the profile or not.
                             </TextBlock>
-                            
+
                             <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 3. Choose a name for the profile.
                             </TextBlock>
-                            
+
                             <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
-                                4. Create your very first split. 
+                                4. Create your very first split.
                                 You can either do so by adding one of the templates and clicking the + button, opening the context menu and clicking "Add" or dragging the items you want into the profile panel.
                                 Alternatively you can make a split of your own which will require manual splitting with the Custom Split button.
                             </TextBlock>
-                            
+
                             <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 5. Organize it to your liking, rename stuff, group others, re-order the items however you prefer.
                             </TextBlock>
-                            
+
                             <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 6. Click the save button and close the window.
                             </TextBlock>
-                            
+
                             <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
-                                7. Congratulations! your profile is now ready to be used :)
+                                7. Depending on your game of choice you might have extra options just below the profile name such as counting Roberto's stagger in Sekiro as a hit or ignoring Shulva's Spikes for melee players in Dark Souls 2.
                             </TextBlock>
                         </StackPanel>
 
@@ -392,6 +397,104 @@
                             <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
                                 You can set it so hotkeys would function globally regardless of what app is being focused at the time.
                             </TextBlock>
+                        </StackPanel>
+
+
+                        <!-- Settings And Overlay -->
+                        <StackPanel x:Name="PageSettingsAndOverlay">
+                            <TextBlock Text="Settings" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10" />
+                            
+                            <!-- General Settings -->
+                            <TextBlock FontSize="15" FontWeight="SemiBold"
+                                       Margin="0,0,0,10">
+                                <LineBreak />
+                                General Settings
+                            </TextBlock>
+                            
+                            <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
+                                In the General Settings you can find options that work for pretty much any game.
+                                <LineBreak />
+                                Always on top keeps the main hit counter window over any other window you have even when it's not focused.
+                                <LineBreak />
+                                Show Notes enables the Notes section under every split. To edit notes click once on the "Add Notes..." message. The notes automatically save after you hit enter so you don't need to worry about losing them.
+                                <LineBreak />
+                                Allow manually splitting auto splits essentially enables the ability to go to the next split even if the current split requires an event to progress.
+                                <LineBreak />
+                                Practice Mode makes it so hits don't count, simple as that!
+                                <LineBreak />
+                            </TextBlock>
+                            
+                            
+                            <!-- Game Specific Settings -->
+                            <TextBlock FontSize="15" FontWeight="SemiBold"
+                                       Margin="0,0,0,10">
+                                <LineBreak />
+                                Game Specific Settings
+                            </TextBlock>
+                            
+                            <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
+                                Game Specific Settings are just Quality of Life options depending on the game you're playing for example "No Logo" or "No Stutter" in Elden Ring.
+                                <LineBreak />
+                            </TextBlock>
+                            
+                            
+                            <!-- Adding Overlay -->
+                            <TextBlock FontSize="15" FontWeight="SemiBold"
+                                       Margin="0,0,0,10">
+                                <LineBreak />
+                                Adding The Overlay to your OBS Scene
+                            </TextBlock>
+                            
+                            
+                            <TextBlock>
+                                To add the Overlay to your OBS Scene simply open the OBS Application and look for the "Sources" panel.
+                                <LineBreak />
+                                <LineBreak />
+                                Once you find that you will see a + Sign at the bottom of the panel, click it then click add a "Browser Source"
+                                <LineBreak />
+                                <LineBreak />
+                                Name the Source whatever you want (For example "Auto Hit Counter") then hit "Ok"
+                                <LineBreak />
+                                <LineBreak />
+                                Under the small preview you will find an empty checkbox saying "Local file".
+                                <LineBreak />
+                                <LineBreak />
+                                Check that and the box right below it will switch from URL to Local file.
+                                <LineBreak />
+                                <LineBreak />
+                                Click Browse and find where you saved the Auto Hit Counter files.
+                                <LineBreak />
+                                <LineBreak />
+                                Once you find the file "Overlay.html" double click that and adjust the Width/Height of your browser source then click "Ok".
+                                <LineBreak />
+                                <LineBreak />
+                                Note: The Run Completed Banner is roughly 30 pixels so add 30 pixels of height to your source if you want it to show up on screen.
+                                <LineBreak />
+                                <LineBreak />
+                                That's pretty much it! Now you can move it around and put it in the placement you prefer.
+                            </TextBlock>
+                            
+
+                            <!-- Editing Overlay -->
+                            <TextBlock FontSize="15" FontWeight="SemiBold"
+                                       Margin="0,0,0,10">
+                                <LineBreak />
+                                Customizing the Overlay
+                            </TextBlock>
+
+                            <TextBlock TextWrapping="Wrap" Foreground="#CCC" Margin="0,10,0,0" LineHeight="22">
+                                In the settings tab you can click on Open Overlay Settings to pop out a window that contains many options to customize the hit counter to your taste.
+                                <LineBreak />
+                                <LineBreak />
+                                The Layout Section contains The basics like what's visible and what isn't. The Styling Section (colours) accepts RGB, RGBA and Hex values so go wild and mess around with the themeing.
+                                <LineBreak />
+                                <LineBreak />
+                                And finally the text section, you can change fonts, size and style it a little with the buttons available. Text Size can go up to 64px
+                                <LineBreak />
+                                <LineBreak />
+                                For more advanced editing it can all be done by editing the Overlay.html file to your liking :)
+                            </TextBlock>
+                            
                         </StackPanel>
 
                     </Grid>

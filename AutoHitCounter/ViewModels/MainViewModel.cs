@@ -72,6 +72,16 @@ namespace AutoHitCounter.ViewModels
 
             OpenProfileEditorCommand = new DelegateCommand(OpenProfileEditor);
             SaveNotesCommand = new DelegateCommand(SaveNotes);
+            ClearAllNotesCommand = new DelegateCommand(() =>
+            {
+                var confirmed = MsgBox.ShowOkCancel("This will clear all notes. Are you sure?", "Clear Notes");
+                if (!confirmed) return;
+
+                foreach (var split in Splits)
+                    split.Notes = string.Empty;
+
+                SaveNotes();
+            });
             TrackGameCommand = new DelegateCommand(StartTrackingGame);
 
             ManualSplitCommand = new DelegateCommand(ManualAdvanceSplit);
@@ -83,7 +93,7 @@ namespace AutoHitCounter.ViewModels
 
             ResetCommand = new DelegateCommand(ResetSplits);
             SetPbCommand = new DelegateCommand(SetPb);
-
+            
 
             _isUnlocked = SettingsManager.Default.IsUnlocked;
             ToggleLockCommand = new DelegateCommand(() =>
@@ -129,8 +139,10 @@ namespace AutoHitCounter.ViewModels
 
         public DelegateCommand SaveNotesCommand { get; }
 
-        public DelegateCommand ToggleLockCommand { get; set; }
+        public DelegateCommand ClearAllNotesCommand { get; set; }
 
+        public DelegateCommand ToggleLockCommand { get; set; }
+        
         public DelegateCommand ResetSelectedSplitHitsCommand { get; set; }
 
         public DelegateCommand RenameSelectedSplitCommand { get; set; }
@@ -372,11 +384,11 @@ namespace AutoHitCounter.ViewModels
 
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
-        
+
         public bool HasSplits => TotalSplitCount > 0;
 
         private bool _isSplitListScrollbarVisible;
-        
+
         public bool IsSplitListScrollbarVisible
         {
             get => _isSplitListScrollbarVisible;
@@ -394,7 +406,7 @@ namespace AutoHitCounter.ViewModels
             get => _isEditingAttempts;
             set => SetProperty(ref _isEditingAttempts, value);
         }
-        
+
         private bool _isUnlocked = true;
 
         public bool IsUnlocked
@@ -402,7 +414,7 @@ namespace AutoHitCounter.ViewModels
             get => _isUnlocked;
             set => SetProperty(ref _isUnlocked, value);
         }
-        
+
         public int AttemptCount => _activeProfile?.AttemptCount ?? 0;
 
         public int CurrentSplitNumber
@@ -475,7 +487,7 @@ namespace AutoHitCounter.ViewModels
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
 
-        
+
         public void CommitAttemptsEdit(string value)
         {
             if (int.TryParse(value, out var count) && count >= 0)
@@ -630,6 +642,7 @@ namespace AutoHitCounter.ViewModels
                 CurrentSplit.IsCurrent = false;
                 IsRunComplete = true;
                 OnPropertyChanged(nameof(TotalHits));
+                OnPropertyChanged(nameof(TotalDiff));
                 OnPropertyChanged(nameof(TotalPb));
             }
             else
@@ -655,9 +668,17 @@ namespace AutoHitCounter.ViewModels
             }
         }
 
+        private ProfileEditorWindow _profileEditorWindow;
+
         private void OpenProfileEditor()
         {
             if (_selectedGame == null) return;
+
+            if (_profileEditorWindow != null)
+            {
+                _profileEditorWindow.Activate();
+                return;
+            }
 
             var vm = new ProfileEditorViewModel(
                 GetAllEventsForGame(_selectedGame.Title),
@@ -666,10 +687,12 @@ namespace AutoHitCounter.ViewModels
                 _selectedGame.Title,
                 _activeProfile);
 
-            var window = new ProfileEditorWindow { DataContext = vm };
+            _profileEditorWindow = new ProfileEditorWindow { DataContext = vm };
 
-            window.Closed += (s, e) =>
+            _profileEditorWindow.Closed += (s, e) =>
             {
+                _profileEditorWindow = null;
+
                 if (_activeProfile != null)
                 {
                     var key = $"{_selectedGame.GameName}|{_activeProfile.Name}";
@@ -691,7 +714,8 @@ namespace AutoHitCounter.ViewModels
 
                 ActiveProfile = vm.SelectedProfile;
             };
-            window.Show();
+
+            _profileEditorWindow.Show();
         }
 
         private void UpdateSplits()
@@ -800,6 +824,7 @@ namespace AutoHitCounter.ViewModels
 
             OnPropertyChanged(nameof(TotalHits));
             OnPropertyChanged(nameof(TotalPb));
+            OnPropertyChanged(nameof(TotalDiff));
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
 
@@ -879,6 +904,7 @@ namespace AutoHitCounter.ViewModels
 
         private void PreviousSplit()
         {
+            if (CurrentSplit == null || !Settings.AllowManualSplitOnAutoSplits) return;
             var currentIndex = Splits.IndexOf(CurrentSplit);
             if (currentIndex < 0) return;
             var prev = Splits.Take(currentIndex).LastOrDefault(s => s.Type == SplitType.Child);
@@ -908,7 +934,7 @@ namespace AutoHitCounter.ViewModels
         
         private void MarkRunDirty()
         {
-            if (_activeProfile == null) return;
+            if (_activeProfile == null || IsRapidSplitting) return;
 
             var children = Splits.Where(s => s.Type == SplitType.Child).ToList();
             _activeProfile.SavedRun = new RunState

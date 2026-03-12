@@ -2,7 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:AutoHitCounter"
-             xmlns:converters="clr-namespace:AutoHitCounter.Converters">
+             xmlns:converters="clr-namespace:AutoHitCounter.Converters"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
     <Application.Resources>
         <Color x:Key="BackgroundColor">#121212</Color>
         <Color x:Key="PanelColor">#1A1A1A</Color>
@@ -865,6 +866,7 @@
         </Style>
         <converters:ScrollbarVisibleToMarginConverter x:Key="ScrollbarVisibleToMarginConverter" />
         <FontFamily x:Key="AppFont" />
+        <converters:StringToBrushConverter x:Key="StringToBrushConverter" />
 
     </Application.Resources>
 </Application>
