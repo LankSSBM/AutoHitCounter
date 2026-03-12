@@ -589,6 +589,7 @@ namespace AutoHitCounter.ViewModels
                 if (IsRunComplete || CurrentSplit == null) return;
                 if (_selectedGame != _activeGame) return;
                 CurrentSplit.NumOfHits += count;
+                SaveRunState();
                 _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
             };
             _currentModule.OnEventSet += AutoAdvanceSplit;
@@ -634,7 +635,7 @@ namespace AutoHitCounter.ViewModels
                 CurrentSplit = next;
             }
 
-            
+            SaveRunState();
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
 
@@ -900,6 +901,7 @@ namespace AutoHitCounter.ViewModels
         {
             if (IsRunComplete || CurrentSplit == null) return;
             CurrentSplit.NumOfHits++;
+            SaveRunState();
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
 
@@ -907,10 +909,10 @@ namespace AutoHitCounter.ViewModels
         {
             if (IsRunComplete || CurrentSplit == null || CurrentSplit.NumOfHits <= 0) return;
             CurrentSplit.NumOfHits--;
+            SaveRunState();
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
-
-        public void SaveRunState()
+        private void SaveRunState()
         {
             if (_activeProfile == null) return;
 
@@ -922,7 +924,7 @@ namespace AutoHitCounter.ViewModels
                 IsRunComplete = IsRunComplete,
                 IgtMilliseconds = (long)InGameTime.TotalMilliseconds
             };
-            _profileService.SaveProfile(_activeProfile);
+            Task.Run(() => _profileService.SaveProfile(_activeProfile));
         }
 
         private void RestoreFromSavedRun(RunState state)
