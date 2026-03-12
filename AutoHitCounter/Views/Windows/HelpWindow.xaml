@@ -420,7 +420,7 @@
                                 <LineBreak />
                                 Allow manually splitting auto splits essentially enables the ability to go to the next split even if the current split requires an event to progress.
                                 <LineBreak />
-                                Practice Mode makes it so hits don't count, simple as that!
+                                Enabling Practice Mode makes it so hits don't count and doesn't automatically split in case you kill a boss, simple as that!
                                 <LineBreak />
                             </TextBlock>
                             

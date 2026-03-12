@@ -36,7 +36,7 @@ public class SettingsManager
     [DefaultValue(true)] public bool ShowAttempts { get; set; }
     [DefaultValue(true)] public bool ShowProgress { get; set; }
     [DefaultValue(4)] public int PrevSplits { get; set; }
-    [DefaultValue(8)] public int NextSplits { get; set; }
+    [DefaultValue(13)] public int NextSplits { get; set; }
     [DefaultValue(true)] public bool ShowDiff { get; set; }
     [DefaultValue(true)] public bool ShowPb { get; set; }
     [DefaultValue(true)] public bool ShowIgt { get; set; }

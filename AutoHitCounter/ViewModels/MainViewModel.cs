@@ -618,7 +618,7 @@ namespace AutoHitCounter.ViewModels
             _memoryService.StartAutoAttach(_activeGame.ProcessName);
             _currentModule.OnHit += count =>
             {
-                if (IsRunComplete || CurrentSplit == null) return;
+                if (IsRunComplete || CurrentSplit == null || Settings.IsPracticeMode) return;
                 if (_selectedGame != _activeGame) return;
                 CurrentSplit.NumOfHits += count;
                 SaveRunState();

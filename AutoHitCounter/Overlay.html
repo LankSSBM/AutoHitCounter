@@ -232,7 +232,7 @@
         const DEFAULTS = {
             showAttempts: true,
             prevSplits: 4,
-            nextSplits: 8,
+            nextSplits: 13,
             showDiff: true,
             showPb: true,
             showIgt: true,
@@ -341,15 +341,16 @@
             .diff-pos { color: ${config.diffPosColor}; }
             .diff-neg { color: ${config.diffNegColor}; }
             .diff-zero { color: ${config.diffZeroColor}; }
+            .split-row:nth-child(even) { background: ${config.alternatingRows || 'transparent'}; }
+            .split-row.current { background: ${config.currentSplitColor}; border-left-color: ${config.currentSplitBorderColor}; }
             .split-row.hit { background: ${config.rowHitColor}; }
             .split-row.cleared { background: ${config.rowClearedColor}; }
-            .split-row.current { background: ${config.currentSplitColor}; border-left-color: ${config.currentSplitBorderColor}; }
             .split-row.current.hit { background: ${config.currentSplitHitColor}; border-left-color: ${config.currentSplitHitBorderColor}; }
             .split-row { height: ${config.rowHeight}px; font-size: ${config.fontSize}px; }
             .footer { font-size: ${config.fontSize}px; }
             .run-complete { 
                 color: ${config.runCompleteBannerColor}; 
-                border-top-color: ${config.runCompleteBannerColor}; 
+            border-top-color: ${config.runCompleteBannerColor}; 
                 background: ${config.runCompleteBannerColor}14; 
             }
             .header { color: ${config.headerTextColor}; }
@@ -375,7 +376,6 @@
                 font-family: ${config.fontFamily};
             }
             .igt { color: ${config.igtColor}; font-family: ${config.igtFontFamily || 'Consolas, monospace'}; font-size: ${config.igtFontSize || 16}px; }
-            .split-row:nth-child(even) { background: ${config.alternatingRows || 'transparent'}; }
             `;
         }
 
