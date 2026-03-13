@@ -56,6 +56,10 @@ public class SettingsManager
 
     public string LastImportExportPath { get; set; }
 
+    public double EventLogWindowLeft { get; set; }
+    public double EventLogWindowTop { get; set; }
+    public bool EventLogWindowAlwaysOnTop { get; set; }
+
     // Typography
     [DefaultValue("Segoe UI")] public string FontFamily { get; set; }
     [DefaultValue(15)] public int FontSize { get; set; }

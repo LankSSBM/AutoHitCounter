@@ -6,7 +6,10 @@ using System.IO;
 using AutoHitCounter.Enums;
 using AutoHitCounter.Interfaces;
 using AutoHitCounter.Memory;
+using AutoHitCounter.Models;
+using AutoHitCounter.Services;
 using AutoHitCounter.Utilities;
+using static AutoHitCounter.Games.DSR.DSRCustomCodeOffsets;
 using static AutoHitCounter.Games.DSR.DSROffsets;
 
 namespace AutoHitCounter.Games.DSR;
@@ -24,9 +27,11 @@ public class DSRModule : IGameModule, IDisposable, IVersionedGameModule
     private DateTime? _lastHit;
     private DSRHitService _hitService;
     private DSREventService _eventService;
+    private EventLogReader _eventLogReader;
     
     public event Action<int> OnHit;
     public event Action OnEventSet;
+    public event Action<List<EventLogEntry>> OnEventLogEntriesReceived;
     public event Action<long> OnIgtChanged;
     public event Action OnVersionDetected;
     
@@ -47,15 +52,19 @@ public class DSRModule : IGameModule, IDisposable, IVersionedGameModule
     {
         InitializeOffsets();
         
-        DSRCustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
+        Base = _memoryService.AllocCustomCodeMem();
         
 #if DEBUG
-        Console.WriteLine($@"Code cave: 0x{(long)DSRCustomCodeOffsets.Base:X}");
+        Console.WriteLine($@"Code cave: 0x{(long)Base:X}");
 #endif
 
          _hitService = new DSRHitService(_memoryService, _hookManager);
          _eventService = new DSREventService(_memoryService, _hookManager, _events);
-         
+         _eventLogReader = new EventLogReader(_memoryService,
+             Base + EventLogWriteIdx,
+             Base + EventLogBuffer);
+         _eventLogReader.EntriesReceived += entries => OnEventLogEntriesReceived?.Invoke(entries);
+
          _eventService.InstallHook();
          _hitService.InstallHooks();
          
@@ -90,7 +99,9 @@ public class DSRModule : IGameModule, IDisposable, IVersionedGameModule
         {
             OnEventSet?.Invoke();
         }
-        
+
+        _eventLogReader.Poll();
+
         var igtPtr  = _memoryService.Read<nint>(GameDataMan.Base) + GameDataMan.Igt;
         OnIgtChanged?.Invoke(_memoryService.Read<uint>(igtPtr));
     }
@@ -107,12 +118,18 @@ public class DSRModule : IGameModule, IDisposable, IVersionedGameModule
         _tickService.UnregisterGameTick();
         OnHit = null;
         OnEventSet = null;
+        OnEventLogEntriesReceived = null;
         OnIgtChanged = null;
     }
     
     public void UpdateEvents(Dictionary<uint, (string Name, int Required, int Hit)> events)
     {
         _eventService?.UpdateEvents(events);
+    }
+
+    public void SetEventLogEnabled(bool enabled)
+    {
+        if (_eventLogReader != null) _eventLogReader.IsEnabled = enabled;
     }
 
     public void ApplySettings(bool onlyEnabled = false)

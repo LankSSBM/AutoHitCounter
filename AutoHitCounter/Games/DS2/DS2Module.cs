@@ -6,7 +6,10 @@ using System.IO;
 using AutoHitCounter.Enums;
 using AutoHitCounter.Interfaces;
 using AutoHitCounter.Memory;
+using AutoHitCounter.Models;
+using AutoHitCounter.Services;
 using AutoHitCounter.Utilities;
+using static AutoHitCounter.Games.DS2.DS2CustomCodeOffsets;
 using static AutoHitCounter.Games.DS2.DS2Offsets;
 
 namespace AutoHitCounter.Games.DS2;
@@ -22,6 +25,7 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
     private DS2EventService _eventService;
     private DS2SettingsService _settingsService;
     private DS2IgtService _igtService;
+    private EventLogReader _eventLogReader;
     private readonly IHitRulesProvider _rules;
 
     public string GameVersion => DS2Offsets.Version.GetDescription();
@@ -30,6 +34,7 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
 
     public event Action<int> OnHit;
     public event Action OnEventSet;
+    public event Action<List<EventLogEntry>> OnEventLogEntriesReceived;
     public event Action<long> OnIgtChanged;
     public event Action OnVersionDetected;
 
@@ -57,16 +62,20 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
     {
         InitializeOffsets();
 
-        DS2CustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
+        Base = _memoryService.AllocCustomCodeMem();
 
 #if DEBUG
-        Console.WriteLine($@"Code cave: 0x{(long)DS2CustomCodeOffsets.Base:X}");
+        Console.WriteLine($@"Code cave: 0x{(long)Base:X}");
 #endif
 
         _hitService = new DS2HitService(_memoryService, _hookManager);
         _eventService = new DS2EventService(_memoryService, _hookManager, _events);
         _settingsService = new DS2SettingsService(_memoryService, _hookManager);
         _igtService = new DS2IgtService(_memoryService, _hookManager);
+        _eventLogReader = new EventLogReader(_memoryService,
+            Base + EventLogWriteIdx,
+            Base + EventLogBuffer);
+        _eventLogReader.EntriesReceived += entries => OnEventLogEntriesReceived?.Invoke(entries);
 
         ApplySettings(onlyEnabled: true);
 
@@ -107,6 +116,8 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
             OnEventSet?.Invoke();
         }
 
+        _eventLogReader.Poll();
+
         _igtService.Update();
         OnIgtChanged?.Invoke(_igtService.ElapsedMilliseconds);
     }
@@ -132,12 +143,18 @@ public class DS2Module : IGameModule, IDisposable, IVersionedGameModule
         _tickService.UnregisterGameTick();
         OnHit = null;
         OnEventSet = null;
+        OnEventLogEntriesReceived = null;
         OnIgtChanged = null;
     }
 
     public void UpdateEvents(Dictionary<uint, (string Name, int Required, int Hit)> events)
     {
         _eventService?.UpdateEvents(events);
+    }
+
+    public void SetEventLogEnabled(bool enabled)
+    {
+        if (_eventLogReader != null) _eventLogReader.IsEnabled = enabled;
     }
 
     public void ApplySettings(bool onlyEnabled = false)

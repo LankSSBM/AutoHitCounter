@@ -90,6 +90,7 @@ public class ProfileEditorViewModel : BaseViewModel, IReorderHandler
 
     public DelegateCommand AddSelectedCommand { get; private set; }
     public DelegateCommand RemoveSelectedCommand { get; private set; }
+    
 
     #endregion
 

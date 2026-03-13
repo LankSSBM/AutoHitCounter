@@ -5,7 +5,10 @@ using System.Collections.Generic;
 using AutoHitCounter.Enums;
 using AutoHitCounter.Interfaces;
 using AutoHitCounter.Memory;
+using AutoHitCounter.Models;
+using AutoHitCounter.Services;
 using AutoHitCounter.Utilities;
+using static AutoHitCounter.Games.SK.SKCustomCodeOffsets;
 using static AutoHitCounter.Games.SK.SKOffsets;
 
 namespace AutoHitCounter.Games.SK;
@@ -25,9 +28,11 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
     private SKHitService _hitService;
     private SKEventService _eventService;
     private SKSettingsService _settingsService;
+    private EventLogReader _eventLogReader;
 
     public event Action<int> OnHit;
     public event Action OnEventSet;
+    public event Action<List<EventLogEntry>> OnEventLogEntriesReceived;
     public event Action<long> OnIgtChanged;
     public event Action OnVersionDetected;
 
@@ -57,15 +62,19 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
         InitializeOffsets();
 
 
-        SKCustomCodeOffsets.Base = _memoryService.AllocCustomCodeMem();
+        Base = _memoryService.AllocCustomCodeMem();
 
 #if DEBUG
-        Console.WriteLine($@"Code cave: 0x{(long)SKCustomCodeOffsets.Base:X}");
+        Console.WriteLine($@"Code cave: 0x{(long)Base:X}");
 #endif
 
         _hitService = new SKHitService(_memoryService, _hookManager);
         _eventService = new SKEventService(_memoryService, _hookManager, _events);
         _settingsService = new SKSettingsService(_memoryService);
+        _eventLogReader = new EventLogReader(_memoryService,
+            Base + EventLogWriteIdx,
+            Base + EventLogBuffer);
+        _eventLogReader.EntriesReceived += entries => OnEventLogEntriesReceived?.Invoke(entries);
 
         ApplySettings(onlyEnabled: true);
 
@@ -103,6 +112,8 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
             OnEventSet?.Invoke();
         }
 
+        _eventLogReader.Poll();
+
         var igtPtr  = _memoryService.Read<nint>(GameDataMan.Base) + GameDataMan.Igt;
         OnIgtChanged?.Invoke(_memoryService.Read<uint>(igtPtr));
     }
@@ -119,12 +130,18 @@ public class SKModule : IGameModule, IDisposable, IVersionedGameModule
         _tickService.UnregisterGameTick();
         OnHit = null;
         OnEventSet = null;
+        OnEventLogEntriesReceived = null;
         OnIgtChanged = null;
     }
 
     public void UpdateEvents(Dictionary<uint, (string Name, int Required, int Hit)> events)
     {
         _eventService?.UpdateEvents(events);
+    }
+
+    public void SetEventLogEnabled(bool enabled)
+    {
+        if (_eventLogReader != null) _eventLogReader.IsEnabled = enabled;
     }
 
     public void ApplySettings(bool onlyEnabled = false)

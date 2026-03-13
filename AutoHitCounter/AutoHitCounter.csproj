@@ -115,6 +115,7 @@
         <Compile Include="Converters\ExpanderArrowConverter.cs" />
         <Compile Include="Converters\InverseBoolConverter.cs" />
         <Compile Include="Converters\LockIconConverter.cs" />
+        <Compile Include="Converters\LogEntryToBrushConverter.cs" />
         <Compile Include="Converters\ParentChildMarginConverter.cs" />
         <Compile Include="Converters\ParentChildMarginMultiConverter.cs" />
         <Compile Include="Converters\ScrollbarVisibleToMarginConverter.cs" />
@@ -176,12 +177,14 @@
         <Compile Include="Mappers\OverlayMapper.cs" />
         <Compile Include="Memory\HookManager.cs" />
         <Compile Include="Memory\Kernel32.cs" />
+        <Compile Include="Models\EventLogEntry.cs" />
         <Compile Include="Models\Game.cs" />
         <Compile Include="Models\OverlayConfig.cs" />
         <Compile Include="Models\OverlayState.cs" />
         <Compile Include="Models\Profile.cs" />
         <Compile Include="Models\RunState.cs" />
         <Compile Include="Models\SplitEntry.cs" />
+        <Compile Include="Services\EventLogReader.cs" />
         <Compile Include="Services\EventServiceBase.cs" />
         <Compile Include="Services\GameFlagRegistry.cs" />
         <Compile Include="Services\GameModuleFactory.cs" />
@@ -203,6 +206,7 @@
         <Compile Include="Utilities\VersionChecker.cs" />
         <Compile Include="Utilities\VisualTreeHelpers.cs" />
         <Compile Include="ViewModels\BaseViewModel.cs" />
+        <Compile Include="ViewModels\EventLogViewModel.cs" />
         <Compile Include="ViewModels\GameFlagViewModel.cs" />
         <Compile Include="ViewModels\HotkeyBindingViewModel.cs" />
         <Compile Include="ViewModels\HotkeyTabViewModel.cs" />
@@ -225,6 +229,7 @@
           <DependentUpon>TitleBar.xaml</DependentUpon>
         </Compile>
         <Compile Include="Views\Windows\CustomMessageBox.xaml.cs" />
+        <Compile Include="Views\Windows\EventLogWindow.xaml.cs" />
         <Compile Include="Views\Windows\HelpWindow.xaml.cs">
           <DependentUpon>HelpWindow.xaml</DependentUpon>
         </Compile>
@@ -253,6 +258,7 @@
         <Page Include="Views\Controls\SplitEventEditorWindow.xaml" />
         <Page Include="Views\Controls\TitleBar.xaml" />
         <Page Include="Views\Windows\CustomMessageBox.xaml" />
+        <Page Include="Views\Windows\EventLogWindow.xaml" />
         <Page Include="Views\Windows\HelpWindow.xaml" />
         <Page Include="Views\Windows\InputBox.xaml" />
         <Page Include="Views\Windows\OverlaySettingsWindow.xaml" />

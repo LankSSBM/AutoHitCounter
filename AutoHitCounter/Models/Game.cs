@@ -10,5 +10,6 @@ namespace AutoHitCounter.Models
         public GameTitle Title { get; set; }
         public string GameName => Title.GetDescription();
         public string ProcessName { get; set; }
+        public bool IsEventLogSupported { get; set; }
     }
 }

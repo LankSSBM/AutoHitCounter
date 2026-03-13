@@ -6,7 +6,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using AutoHitCounter.Core;
@@ -71,29 +70,6 @@ namespace AutoHitCounter.ViewModels
             _splitNav.StateChanged += OnSplitStateChanged;
 
             RegisterHotkeys();
-
-            OpenProfileEditorCommand = new DelegateCommand(OpenProfileEditor);
-            SaveNotesCommand = new DelegateCommand(SaveNotes);
-            ClearAllNotesCommand = new DelegateCommand(() =>
-            {
-                var confirmed = MsgBox.ShowOkCancel("This will clear all notes. Are you sure?", "Clear Notes");
-                if (!confirmed) return;
-
-                foreach (var split in Splits)
-                    split.Notes = string.Empty;
-
-                SaveNotes();
-            });
-            TrackGameCommand = new DelegateCommand(StartTrackingGame);
-
-            ManualSplitCommand = new DelegateCommand(ManualAdvanceSplit);
-            AdvanceSplitCommand = new DelegateCommand(() => _splitNav.Advance());
-            PrevSplitCommand = new DelegateCommand(() => _splitNav.Previous());
-            IncrementHitCommand = new DelegateCommand(IncrementHit);
-            DecrementHitCommand = new DelegateCommand(DecrementHit);
-
-            ResetCommand = new DelegateCommand(ResetSplits);
-            SetPbCommand = new DelegateCommand(SetPb);
             
             _saveDebounce = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
             _saveDebounce.Tick += (_, _) =>
@@ -105,26 +81,15 @@ namespace AutoHitCounter.ViewModels
 
 
             _isUnlocked = SettingsManager.Default.IsUnlocked;
-            ToggleLockCommand = new DelegateCommand(() =>
-            {
-                IsUnlocked = !IsUnlocked;
-                SettingsManager.Default.IsUnlocked = IsUnlocked;
-                SettingsManager.Default.Save();
-            });
-
-
-            EditAttemptsCommand = new DelegateCommand(() => IsEditingAttempts = true);
-
-            CheckUpdateCommand = new DelegateCommand(CheckUpdate);
 
             InitialiseCommands();
 
 
-            Games.Add(new Game { Title = GameTitle.DarkSoulsRemastered, ProcessName = "darksoulsremastered" });
-            Games.Add(new Game { Title = GameTitle.DarkSouls2, ProcessName = "darksoulsii" });
-            Games.Add(new Game { Title = GameTitle.DarkSouls3, ProcessName = "darksoulsiii" });
-            Games.Add(new Game { Title = GameTitle.Sekiro, ProcessName = "sekiro" });
-            Games.Add(new Game { Title = GameTitle.EldenRing, ProcessName = "eldenring" });
+            Games.Add(new Game { Title = GameTitle.DarkSoulsRemastered, ProcessName = "darksoulsremastered", IsEventLogSupported = true });
+            Games.Add(new Game { Title = GameTitle.DarkSouls2, ProcessName = "darksoulsii", IsEventLogSupported = true });
+            Games.Add(new Game { Title = GameTitle.DarkSouls3, ProcessName = "darksoulsiii", IsEventLogSupported = true });
+            Games.Add(new Game { Title = GameTitle.Sekiro, ProcessName = "sekiro", IsEventLogSupported = true });
+            Games.Add(new Game { Title = GameTitle.EldenRing, ProcessName = "eldenring", IsEventLogSupported = true });
 
             SelectedGame = Games.FirstOrDefault(game => game.GameName == SettingsManager.Default.LastSelectedGame);
             if (_selectedGame != null)
@@ -133,23 +98,24 @@ namespace AutoHitCounter.ViewModels
 
         #region Commands
 
-        public DelegateCommand CheckUpdateCommand { get; }
-        public DelegateCommand OpenProfileEditorCommand { get; }
+        public DelegateCommand CheckUpdateCommand { get; set; }
+        public DelegateCommand OpenProfileEditorCommand { get; set; }
+        public DelegateCommand OpenEventLogCommand { get; set; }
 
-        public DelegateCommand TrackGameCommand { get; }
+        public DelegateCommand TrackGameCommand { get; set; }
 
-        public DelegateCommand ManualSplitCommand { get; }
-        public DelegateCommand AdvanceSplitCommand { get; }
-        public DelegateCommand PrevSplitCommand { get; }
+        public DelegateCommand ManualSplitCommand { get; set; }
+        public DelegateCommand AdvanceSplitCommand { get; set; }
+        public DelegateCommand PrevSplitCommand { get; set; }
 
-        public DelegateCommand IncrementHitCommand { get; }
-        public DelegateCommand DecrementHitCommand { get; }
+        public DelegateCommand IncrementHitCommand { get; set; }
+        public DelegateCommand DecrementHitCommand { get; set; }
 
-        public DelegateCommand ResetCommand { get; }
+        public DelegateCommand ResetCommand { get; set; }
 
-        public DelegateCommand SetPbCommand { get; }
+        public DelegateCommand SetPbCommand { get; set; }
 
-        public DelegateCommand SaveNotesCommand { get; }
+        public DelegateCommand SaveNotesCommand { get; set; }
 
         public DelegateCommand ClearAllNotesCommand { get; set; }
 
@@ -365,7 +331,6 @@ namespace AutoHitCounter.ViewModels
 
         public int TotalDiff => Splits.Where(s => s.Type == SplitType.Child).Sum(s => s.Diff);
 
-
         public int TotalPb => Splits.Where(s => s.Type == SplitType.Child).Sum(s => s.PersonalBest);
 
         public Brush TotalPbBrush
@@ -501,7 +466,6 @@ namespace AutoHitCounter.ViewModels
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
 
-
         public void CommitAttemptsEdit(string value)
         {
             if (int.TryParse(value, out var count) && count >= 0)
@@ -520,18 +484,44 @@ namespace AutoHitCounter.ViewModels
         #endregion
 
         #region Private Methods
-        
+
         private void OnAppStart()
         {
             AppVer = VersionChecker.GetVersionText();
             VersionChecker.CheckForUpdates(Application.Current.MainWindow);
         }
-        
-        private void CheckUpdate() => 
+
+        private void CheckUpdate() =>
             VersionChecker.CheckForUpdates(Application.Current.MainWindow, true);
 
         private void InitialiseCommands()
         {
+            CheckUpdateCommand = new DelegateCommand(CheckUpdate);
+            TrackGameCommand = new DelegateCommand(StartTrackingGame);
+            OpenProfileEditorCommand = new DelegateCommand(OpenProfileEditor);
+            OpenEventLogCommand = new DelegateCommand(OpenEventLog);
+            ManualSplitCommand = new DelegateCommand(ManualAdvanceSplit);
+            AdvanceSplitCommand = new DelegateCommand(() => _splitNav.Advance());
+            PrevSplitCommand = new DelegateCommand(() => _splitNav.Previous());
+            IncrementHitCommand = new DelegateCommand(IncrementHit);
+            DecrementHitCommand = new DelegateCommand(DecrementHit);
+            ResetCommand = new DelegateCommand(ResetSplits);
+            SetPbCommand = new DelegateCommand(SetPb);
+
+            ClearAllNotesCommand = new DelegateCommand(() =>
+            {
+                var confirmed = MsgBox.ShowOkCancel("This will clear all notes. Are you sure?", "Clear Notes");
+                if (!confirmed) return;
+
+                foreach (var split in Splits)
+                    split.Notes = string.Empty;
+
+                SaveNotes();
+            });
+
+            EditAttemptsCommand = new DelegateCommand(() => IsEditingAttempts = true);
+            SaveNotesCommand = new DelegateCommand(SaveNotes);
+
             RenameSelectedSplitCommand = new DelegateCommand(() =>
             {
                 if (SelectedSplit == null || SelectedSplit.IsParent) return;
@@ -567,6 +557,13 @@ namespace AutoHitCounter.ViewModels
             {
                 if (SelectedSplit != null)
                     SelectedSplit.IsEditingPb = true;
+            });
+            
+            ToggleLockCommand = new DelegateCommand(() =>
+            {
+                IsUnlocked = !IsUnlocked;
+                SettingsManager.Default.IsUnlocked = IsUnlocked;
+                SettingsManager.Default.Save();
             });
         }
 
@@ -640,7 +637,11 @@ namespace AutoHitCounter.ViewModels
                 _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
             };
             _currentModule.OnEventSet += AutoAdvanceSplit;
+            _currentModule.OnEventLogEntriesReceived += entries => _eventLogViewModel?.RefreshEventLogs(entries);
             _currentModule.OnIgtChanged += UpdateInGameTime;
+
+            if (_eventLogWindow != null)
+                _currentModule.SetEventLogEnabled(true);
 
             SettingsManager.Default.LastSelectedGame = _activeGame.GameName;
             SettingsManager.Default.Save();
@@ -673,6 +674,31 @@ namespace AutoHitCounter.ViewModels
         }
 
         private ProfileEditorWindow _profileEditorWindow;
+        private EventLogWindow _eventLogWindow;
+        private EventLogViewModel _eventLogViewModel;
+
+        private void OpenEventLog()
+        {
+            if (_eventLogWindow != null)
+            {
+                _eventLogWindow.Activate();
+                return;
+            }
+
+            _eventLogViewModel = new EventLogViewModel();
+            _eventLogWindow = new EventLogWindow { DataContext = _eventLogViewModel };
+
+            _currentModule?.SetEventLogEnabled(true);
+
+            _eventLogWindow.Closed += (s, e) =>
+            {
+                _currentModule?.SetEventLogEnabled(false);
+                _eventLogWindow = null;
+                _eventLogViewModel = null;
+            };
+
+            _eventLogWindow.Show();
+        }
 
         private void OpenProfileEditor()
         {
@@ -867,7 +893,7 @@ namespace AutoHitCounter.ViewModels
         private void ResetSplits()
         {
             _saveDebounce.Stop();
-            
+
             if (_activeProfile != null)
             {
                 _activeProfile.AttemptCount++;
@@ -949,7 +975,7 @@ namespace AutoHitCounter.ViewModels
             _saveDebounce.Stop();
             _saveDebounce.Start();
         }
-        
+
         public void FlushRunState()
         {
             _saveDebounce.Stop();
