@@ -1130,7 +1130,7 @@ namespace AutoHitCounter.Properties {
         ///Divine Dragon,9310
         ///Fake Monk,9306
         ///Folding Screen Monkeys,9305
-        ///General Kuranosuke Matsumoto,20005340
+        ///General Kuranosuke Matsumoto,11110410
         ///General Naomori Kawarada,11100300
         ///General Tenzen Yamauchi,11100301
         ///Genichiro Ashina (Castle),9303

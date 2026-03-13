@@ -26,11 +26,12 @@ public partial class EventLogWindow : Window
 
         CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, (s, e) =>
         {
-            var selectedItems = LogListBox.SelectedItems
-                .Cast<EventLogEntry>()
-                .Select(x => x.DisplayText);
+            if (LogListBox.SelectedItems.Count == 0) return;
 
-            Clipboard.SetText(string.Join(Environment.NewLine, selectedItems));
+            var text = string.Join(Environment.NewLine,
+                LogListBox.SelectedItems.Cast<EventLogEntry>().Select(x => x.DisplayText));
+
+            Clipboard.SetDataObject(text, false);
         }));
 
         if (Application.Current.MainWindow != null)
