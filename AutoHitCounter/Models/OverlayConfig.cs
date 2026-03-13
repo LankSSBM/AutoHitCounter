@@ -55,4 +55,11 @@ public class OverlayConfig
     public string HitsClearedColor { get; set; }
     public string HeaderFontFamily { get; set; }
     public int HeaderFontSize { get; set; }
+
+    // Title
+    public bool ShowTitle { get; set; }
+    public string TitleText { get; set; }
+    public string TitleColor { get; set; }
+    public string TitleFontFamily { get; set; }
+    public int TitleFontSize { get; set; }
 }

@@ -45,6 +45,14 @@
             border-radius: 4px;
         }
 
+        /* Title bar above header */
+        #title {
+            padding: 6px 8px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
         /* Header row styling (Split / Hits / Diff / PB) */
         .header {
             display: grid;
@@ -214,6 +222,8 @@
 <body>
 <!-- Main overlay container -->
 <div id="overlay">
+    <!-- Title - shown above header when enabled -->
+    <div id="title" style="display:none;"></div>
     <!-- Header row - columns injected by applyLayout() -->
     <div class="header" id="header"></div>
     <!-- Split rows - injected by renderState() -->
@@ -271,6 +281,11 @@
             alternatingRows: 'rgba(255, 255, 255, 0.05)',
             headerFontFamily: 'Segoe UI',
             headerFontSize: 11,
+            showTitle: false,
+            titleText: '',
+            titleColor: '#e0e0e0',
+            titleFontFamily: 'Segoe UI',
+            titleFontSize: 18,
         };
 
         let config = {...DEFAULTS};
@@ -386,6 +401,7 @@
             #attempts { font-size: ${config.headerFontSize + 2}px; }
             .header span:not(:first-child) { color: ${config.headerTextColor}; }
             .igt { color: ${config.igtColor}; font-family: ${config.igtFontFamily || 'Consolas, monospace'}; font-size: ${config.igtFontSize || 16}px; }
+            #title { color: ${config.titleColor}; font-family: ${config.titleFontFamily || 'Segoe UI'}; font-size: ${config.titleFontSize || 18}px; }
             `;
         }
 
@@ -405,6 +421,14 @@
             overlay.style.height = config.overlayHeight + 'px';
 
             applyDynamicStyles();
+
+            const titleEl = document.getElementById('title');
+            if (config.showTitle && config.titleText) {
+                titleEl.textContent = config.titleText;
+                titleEl.style.display = 'block';
+            } else {
+                titleEl.style.display = 'none';
+            }
 
             const progressHtml = config.showProgress ? ` <span id="progress"></span>` : '';
             const attemptsHtml = config.showAttempts ? ` <span id="attempts"></span>` : '';

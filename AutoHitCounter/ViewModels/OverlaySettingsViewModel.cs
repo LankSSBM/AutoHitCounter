@@ -105,8 +105,16 @@ public class OverlaySettingsViewModel : BaseViewModel
     public string HitsClearedColor          { get => Get<string>(); set => Set(value); }
     public string HeaderFontFamily          { get => Get<string>(); set => Set(value); }
     public int HeaderFontSize          { get => Get<int>(); set => Set(value); }
-    
-    
+
+    #endregion
+
+    #region Title
+
+    public bool   ShowTitle       { get => Get<bool>();   set => Set(value); }
+    public string TitleText       { get => Get<string>(); set => Set(value); }
+    public string TitleColor      { get => Get<string>(); set => Set(value); }
+    public string TitleFontFamily { get => Get<string>(); set => Set(value); }
+    public int    TitleFontSize   { get => Get<int>();    set => Set(value); }
 
     #endregion
     
@@ -161,6 +169,11 @@ public class OverlaySettingsViewModel : BaseViewModel
         _values[nameof(HitsClearedColor)]   = s.HitsClearedColor;
         _values[nameof(HeaderFontFamily)]   = s.HeaderFontFamily;
         _values[nameof(HeaderFontSize)]     = s.HeaderFontSize;
+        _values[nameof(ShowTitle)]          = s.ShowTitle;
+        _values[nameof(TitleText)]          = s.TitleText;
+        _values[nameof(TitleColor)]         = s.TitleColor;
+        _values[nameof(TitleFontFamily)]    = s.TitleFontFamily;
+        _values[nameof(TitleFontSize)]      = s.TitleFontSize;
     }
     
     private void Save()
@@ -212,6 +225,11 @@ public class OverlaySettingsViewModel : BaseViewModel
         s.HitsClearedColor   = HitsClearedColor;
         s.HeaderFontFamily   = HeaderFontFamily;
         s.HeaderFontSize    = HeaderFontSize;
+        s.ShowTitle          = ShowTitle;
+        s.TitleText          = TitleText;
+        s.TitleColor         = TitleColor;
+        s.TitleFontFamily    = TitleFontFamily;
+        s.TitleFontSize      = TitleFontSize;
 
         s.Save();
         BroadcastCurrentConfig();
@@ -267,6 +285,11 @@ public class OverlaySettingsViewModel : BaseViewModel
             HitsClearedColor = HitsClearedColor,
             HeaderFontFamily = HeaderFontFamily,
             HeaderFontSize = HeaderFontSize,
+            ShowTitle = ShowTitle,
+            TitleText = TitleText,
+            TitleColor = TitleColor,
+            TitleFontFamily = TitleFontFamily,
+            TitleFontSize = TitleFontSize,
         };
         _overlayServerService.BroadcastConfig(config);
     }
@@ -330,7 +353,12 @@ public class OverlaySettingsViewModel : BaseViewModel
         IgtFontFamily = "Consolas";
         IgtFontSize = 16;
         AlternatingRows = "rgba(255,255,255,0.05)";
-        
+
+        ShowTitle = false;
+        TitleText = "";
+        TitleColor = "#e0e0e0";
+        TitleFontFamily = "Segoe UI";
+        TitleFontSize = 18;
 
         {
             IsDirty = true;

@@ -138,6 +138,13 @@ public class SettingsManager
     [DefaultValue("Segoe UI")] public string HeaderFontFamily { get; set; }
     [DefaultValue(11)] public int HeaderFontSize { get; set; }
 
+    // Title
+    [DefaultValue(false)] public bool ShowTitle { get; set; }
+    [DefaultValue("")] public string TitleText { get; set; }
+    [DefaultValue("#e0e0e0")] public string TitleColor { get; set; }
+    [DefaultValue("Segoe UI")] public string TitleFontFamily { get; set; }
+    [DefaultValue(18)] public int TitleFontSize { get; set; }
+
 
     public void Save()
     {
