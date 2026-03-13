@@ -450,8 +450,19 @@
 
             const anchor = currentIndex >= 0 ? currentIndex : lastCurrentIndex >= 0 ? lastCurrentIndex : 0;
 
-            let start = Math.max(0, anchor - config.prevSplits);
-            let end = Math.min(total, anchor + config.nextSplits + 1);
+            // Use prev/next as preferences, but redistribute unused slots
+            const prevAvailable = anchor;
+            const nextAvailable = total - anchor - 1;
+            let prevWanted = config.prevSplits;
+            let nextWanted = config.nextSplits;
+
+            // If we can't fill prev, give surplus to next and vice versa
+            const prevActual = Math.min(prevWanted, prevAvailable);
+            const nextActual = Math.min(nextWanted + (prevWanted - prevActual), nextAvailable);
+            const prevFinal = Math.min(prevWanted + (nextWanted - Math.min(nextWanted, nextAvailable)), prevAvailable);
+
+            let start = Math.max(0, anchor - prevFinal);
+            let end = Math.min(total, anchor + nextActual + 1);
 
             if (end - start > maxRows) {
                 end = Math.min(total, start + maxRows);
