@@ -27,6 +27,8 @@
             <StackPanel Grid.Column="2" Orientation="Horizontal">
                 <Button Content="—" Width="46" Height="30" Click="MinimizeButton_Click"
                         Style="{StaticResource TitleBarButtonStyle}" />
+                <Button x:Name="MaximizeButton" Content="☐" Width="46" Height="30" Click="MaximizeButton_Click"
+                        Style="{StaticResource TitleBarButtonStyle}" />
                 <Button Content="✕" Width="46" Height="30" Click="CloseButton_Click"
                         Style="{StaticResource TitleBarCloseButtonStyle}" />
             </StackPanel>
