@@ -32,11 +32,13 @@
                               IsChecked="{Binding IsEnableHotkeysEnabled}"
                               Margin="0,0,10,0" />
                     <CheckBox Content="Enable Global Hotkeys"
+                              IsEnabled="{Binding IsEnableHotkeysEnabled}"
                               IsChecked="{Binding IsGlobalHotkeysEnabled}"
                               Margin="0,0,0,0" />
                     <CheckBox Content="Block Game Actions"
+                              IsEnabled="{Binding IsEnableHotkeysEnabled}"
                               IsChecked="{Binding IsBlockGameHotkeysEnabled}"
-                              Margin="0,0,0,0" />
+                              Margin="10,0,0,0" />
                     
                 </StackPanel>
 

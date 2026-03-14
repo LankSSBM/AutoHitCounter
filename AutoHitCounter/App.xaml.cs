@@ -49,7 +49,7 @@ namespace AutoHitCounter
 
             var overlaySettingsViewModel = new OverlaySettingsViewModel(overlayServerService);
             
-            var settingsViewModel = new SettingsViewModel(stateService, overlaySettingsViewModel);
+            var settingsViewModel = new SettingsViewModel(stateService, overlaySettingsViewModel, hotkeyManager);
             
             var hotkeysViewModel = new HotkeyTabViewModel(hotkeyManager, stateService);
 

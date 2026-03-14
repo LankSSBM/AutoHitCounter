@@ -40,8 +40,7 @@ public class HotkeyTabViewModel : BaseViewModel
             new("Reset", HotkeyActions.Reset),
             new("Increment Hit", HotkeyActions.IncrementHit),
             new("Decrement Hit", HotkeyActions.DecrementHit),
-            
-            
+            new ("Toggle Practice Mode", HotkeyActions.TogglePracticeMode),
         ];
 
         _hotkeyLookup = HotkeyBindings.ToDictionary(h => h.ActionId);

@@ -8,5 +8,6 @@ public enum HotkeyActions
     PreviousSplit,
     Reset,
     IncrementHit,
-    DecrementHit
+    DecrementHit,
+    TogglePracticeMode,
 }

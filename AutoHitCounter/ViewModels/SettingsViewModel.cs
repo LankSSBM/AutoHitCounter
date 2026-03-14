@@ -17,6 +17,7 @@ namespace AutoHitCounter.ViewModels;
 public class SettingsViewModel : BaseViewModel
 {
     private readonly OverlaySettingsViewModel _overlaySettingsViewModel;
+    private readonly HotkeyManager _hotkeyManager;
 
     public event Action OnGameSettingChanged;
 
@@ -24,6 +25,7 @@ public class SettingsViewModel : BaseViewModel
         .Where(title => title != GameTitle.DarkSoulsRemastered).ToList();
 
     private GameTitle _selectedSettingsGame;
+    private OverlaySettingsWindow _overlaySettingsWindow;
 
     public GameTitle SelectedSettingsGame
     {
@@ -31,14 +33,18 @@ public class SettingsViewModel : BaseViewModel
         set => SetProperty(ref _selectedSettingsGame, value);
     }
 
-    public SettingsViewModel(IStateService stateService, OverlaySettingsViewModel overlaySettingsViewModel)
+    public SettingsViewModel(IStateService stateService, OverlaySettingsViewModel overlaySettingsViewModel,
+        HotkeyManager hotkeyManager)
     {
         _overlaySettingsViewModel = overlaySettingsViewModel;
+        _hotkeyManager = hotkeyManager;
         SelectedSettingsGame = GameTitle.DarkSouls2;
         stateService.Subscribe(State.AppStart, OnAppStart);
         OpenOverlaySettingsCommand = new DelegateCommand(OpenOverlaySettings);
+        RegisterHotkeys();
     }
 
+    
     #region Commands
 
     public DelegateCommand OpenOverlaySettingsCommand { get; }
@@ -264,9 +270,13 @@ public class SettingsViewModel : BaseViewModel
         _isPracticeMode = SettingsManager.Default.PracticeMode;
         OnPropertyChanged(nameof(IsPracticeMode));
     }
-
-    private OverlaySettingsWindow _overlaySettingsWindow;
-
+    
+    
+    private void RegisterHotkeys()
+    {
+        _hotkeyManager.RegisterAction(HotkeyActions.TogglePracticeMode, () => { IsPracticeMode = !IsPracticeMode; });
+    }
+    
     private void OpenOverlaySettings()
     {
         if (_overlaySettingsWindow != null)
