@@ -21,8 +21,31 @@ public class SplitEntry : INotifyPropertyChanged
         }
     }
 
-    public string Name { get; set; }
-    public string DisplayName { get; set; }
+    private string _name;
+
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            _name = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(Label));
+        }
+    }
+
+    private string _displayName;
+
+    public string DisplayName
+    {
+        get => _displayName;
+        set
+        {
+            _displayName = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(Label));
+        }
+    }
     public int PersonalBest { get; set; }
     public SplitType Type { get; set; } = SplitType.Child;
     public string GroupId { get; set; }

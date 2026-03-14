@@ -151,10 +151,14 @@ public partial class ProfileEditorWindow : Window
                 if (result == CustomMessageBoxResult.Skip) continue;
                 if (result == CustomMessageBoxResult.Rename)
                 {
-                    var baseName = profile.Name;
-                    var counter = 1;
-                    while (vm.Profiles.Any(p => p.Name == profile.Name))
-                        profile.Name = $"{baseName} ({counter++})";
+                    var newName = MsgBox.ShowInput("New profile name", profile.Name, "Rename Profile");
+                    if (string.IsNullOrWhiteSpace(newName) || newName == profile.Name) continue;
+                    if (vm.Profiles.Any(p => p.Name == newName))
+                    {
+                        MsgBox.Show($"A profile named \"{newName}\" already exists.", "Rename Profile");
+                        continue;
+                    }
+                    profile.Name = newName;
                 }
             }
 
