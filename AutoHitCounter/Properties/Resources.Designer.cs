@@ -275,12 +275,12 @@ namespace AutoHitCounter.Properties {
         ///53                      push   rbx
         ///48 8b 1d 00 00 00 00    mov    rbx,QWORD PTR [rip+0x0]        # e &lt;_main+0xe&gt;
         ///48 85 db                test   rbx,rbx
-        ///0f 84 af 00 00 00       je     c6 &lt;exit&gt;
+        ///0f 84 b6 00 00 00       je     cd &lt;exit&gt;
         ///48 8b 9b 80 00 00 00    mov    rbx,QWORD PTR [rbx+0x80]
         ///48 85 db                test   rbx,rbx
-        ///0f 84 9f 00 00 00       je     c6 &lt;exit&gt;
+        ///0f 84 a6 00 00 00       je     cd &lt;exit&gt;
         ///48 3b 5e 08             cmp    rbx,QWORD PTR [rsi+0x8]
-        ///0f 85 95 00 00 00       jne    c6 &lt;exi [rest of string was truncated]&quot;;.
+        ///0f 85 9c 00 00 00       jne    cd &lt;exi [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DS3IsFallDamageDisabled {
             get {
