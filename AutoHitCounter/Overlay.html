@@ -514,11 +514,17 @@
             let end = Math.min(total, anchor + nextActual + 1);
 
             if (end - start > maxRows) {
+                if (anchor - start >= maxRows) {
+                    start = Math.max(0, anchor - Math.min(prevFinal, maxRows - 1));
+                }
                 end = Math.min(total, start + maxRows);
             }
 
             if (end === total) {
-                start = Math.max(0, total - maxRows);
+                const newStart = Math.max(0, total - maxRows);
+                if (anchor >= newStart) {
+                    start = newStart;
+                }
             }
 
             splits = splits.slice(start, end);
