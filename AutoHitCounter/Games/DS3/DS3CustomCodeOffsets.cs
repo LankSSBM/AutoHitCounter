@@ -9,6 +9,7 @@ public static class DS3CustomCodeOffsets
     public const int CheckAuxProcFlag = 0x0;
     public const int CheckStaggerFlag = 0x1;
     public const int FallHitCountedFlag = 0x2;
+    public const int InThrowFlag = 0x3;
     
     public const int Hit = 0x10;
     
@@ -27,6 +28,8 @@ public static class DS3CustomCodeOffsets
     public const int KillBox = 0xA00;
     public const int CheckStagger = 0xC00;
     public const int LethalFallCheck = 0xE00;
+    public const int SetThrowState = 0x1000;
+    public const int ClearThrowState = 0x1100;
     
     
     public const int EventLogWriteIdx = 0x2000;

@@ -32,14 +32,21 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         InstallCheckStaggerIgnore();
         InstallStoreFallHeightHook();
         InstallFallDamageDisabledHook();
+        InstallSetThrowStateHook();
+        InstallClearThrowStateHook();
     }
-    
+
     public bool HasHit()
     {
         var current = memoryService.Read<int>(Base + Hit);
         var newHits = current - _lastHitCount;
         _lastHitCount = current;
         return newHits > 0;
+    }
+    
+    public void ResetFlags()
+    {
+        memoryService.Write(Base + InThrowFlag, false);
     }
 
     // Needed because arxan can restore any hook site
@@ -79,22 +86,24 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
     {
         var bytes = AsmLoader.GetAsmBytes(AsmScript.DS3Hit);
         var hit = Base + Hit;
+        var throwStateFlag = Base + InThrowFlag;
         var staggerCheckFlag = Base + CheckStaggerFlag;
         var checkPlayerDeadFunc = Base + CheckPlayerDead;
         var code = Base + HitCode;
 
         AsmHelper.WriteRelativeOffsets(bytes, [
-            (code + 0x1, checkPlayerDeadFunc, 5, 0x1 + 1),
-            (code + 0x14, WorldChrMan.Base, 7, 0x14 + 3),
-            (code + 0xBF, staggerCheckFlag, 7, 0xBF + 2),
-            (code + 0xC8, hit, 6, 0xC8 + 2),
-            (code + 0xDA, Hooks.Hit + 8, 5, 0xDA + 1),
+            (code, throwStateFlag, 7,  2),
+            (code + 0xE, checkPlayerDeadFunc, 5, 0xE + 1),
+            (code + 0x21, WorldChrMan.Base, 7, 0x21 + 3),
+            (code + 0xCC, staggerCheckFlag, 7, 0xCC + 2),
+            (code + 0xD5, hit, 6, 0xD5 + 2),
+            (code + 0xE7, Hooks.Hit + 8, 5, 0xE7 + 1),
         ]);
 
         memoryService.WriteBytes(code, bytes);
         InstallHook(code, Hooks.Hit, [0x48, 0x83, 0xEC, 0x50, 0x48, 0x8B, 0x41, 0x08]);
     }
-    
+
     private void InstallAuxHitHooks()
     {
         var auxCheckFlag = Base + CheckAuxProcFlag;
@@ -164,14 +173,16 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
     {
         var bytes = AsmLoader.GetAsmBytes(AsmScript.DS3ApplyHealthDelta);
         var hit = Base + Hit;
+        var throwStateFlag = Base + InThrowFlag;
         var code = Base + ApplyHealthDelta;
 
         AsmHelper.WriteRelativeOffsets(bytes, [
-            (code + 0x1, WorldChrMan.Base, 7, 0x1 + 3),
-            (code + 0x42, WorldChrMan.Base, 7, 0x42 + 3),
-            (code + 0x50, Functions.HasSpEffectId, 5, 0x50 + 1),
-            (code + 0x5B, hit, 6, 0x5B + 2),
-            (code + 0x6A, Hooks.ApplyHealthDelta + 8, 5, 0x6A + 1)
+            (code, throwStateFlag, 7,  2),
+            (code + 0xA, WorldChrMan.Base, 7, 0xA + 3),
+            (code + 0x4B, WorldChrMan.Base, 7, 0x4B + 3),
+            (code + 0x59, Functions.HasSpEffectId, 5, 0x59 + 1),
+            (code + 0x64, hit, 6, 0x64 + 2),
+            (code + 0x73, Hooks.ApplyHealthDelta + 8, 5, 0x73 + 1)
         ]);
 
         memoryService.WriteBytes(code, bytes);
@@ -213,7 +224,7 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
         memoryService.WriteBytes(code, bytes);
         InstallHook(code, Hooks.CheckStaggerIgnore, [0x45, 0x0F, 0x57, 0xC0, 0x85, 0xC0]);
     }
-    
+
     private void InstallStoreFallHeightHook()
     {
         var bytes = AsmLoader.GetAsmBytes(AsmScript.DS3StoreFallHeight);
@@ -269,5 +280,39 @@ public class DS3HitService(IMemoryService memoryService, HookManager hookManager
 
         memoryService.WriteBytes(code, bytes);
         InstallHook(code, Hooks.IsFallDmgDisabledHook, originalBytes);
+    }
+
+    private void InstallSetThrowStateHook()
+    {
+        var bytes = AsmLoader.GetAsmBytes(AsmScript.DS3SetThrowState);
+        var throwStateFlag = Base + InThrowFlag;
+        var checkPlayerDeadFunc = Base + CheckPlayerDead;
+        var code = Base + SetThrowState;
+        
+        AsmHelper.WriteRelativeOffsets(bytes, [
+            (code + 0x8, checkPlayerDeadFunc, 5, 0x8 + 1),
+            (code + 0xF, WorldChrMan.Base, 7, 0xF + 3),
+            (code + 0x3C, throwStateFlag, 7, 0x3C + 2),
+            (code + 0x44, Hooks.SetThrowState + 7, 5, 0x44 + 1),
+        ]);
+
+        memoryService.WriteBytes(code, bytes);
+        InstallHook(code, Hooks.SetThrowState, [0x80, 0x8B, 0x11, 0x02, 0x00, 0x00, 0x20]);
+    }
+
+    private void InstallClearThrowStateHook()
+    {
+        var bytes = AsmLoader.GetAsmBytes(AsmScript.DS3ClearThrowState);
+        var throwStateFlag = Base + InThrowFlag;
+        var code = Base + ClearThrowState;
+        
+        AsmHelper.WriteRelativeOffsets(bytes, [
+            (code + 0x6, WorldChrMan.Base, 7, 0x6 + 3),
+            (code + 0x1B, throwStateFlag, 7, 0x1B + 2),
+            (code + 0x23, Hooks.ClearThrowState + 5, 5, 0x23 + 1),
+        ]);
+
+        memoryService.WriteBytes(code, bytes);
+        InstallHook(code, Hooks.ClearThrowState, [ 0x0F, 0x29, 0x74, 0x24, 0x40]);
     }
 }

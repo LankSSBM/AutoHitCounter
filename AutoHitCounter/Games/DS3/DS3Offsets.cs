@@ -85,6 +85,8 @@ public static class DS3Offsets
         public static nint KillBox;
         public static nint CheckStaggerIgnore;
         public static nint IsFallDmgDisabledHook;
+        public static nint SetThrowState;
+        public static nint ClearThrowState;
         public static nint SetEvent;
     }
 
@@ -445,6 +447,42 @@ public static class DS3Offsets
             Version1_15_2_0 => 0x9D6A10,
             _ => 0
         };
+        
+        Hooks.SetThrowState = moduleBase + Version switch
+        {
+            // WARNING: No match found for: Version1_3_2_0, Version1_4_1_0, Version1_4_2_0, Version1_4_3_0, Version1_5_0_0, Version1_5_1_0, Version1_6_0_0, Version1_7_0_0, Version1_8_0_0, Version1_9_0_0, Version1_10_0_0
+            Version1_11_0_0 => 0x3F32D1,
+            Version1_12_0_0 => 0x41E741,
+            Version1_13_0_0 => 0x427B51,
+            Version1_14_0_0 => 0x4127B1,
+            Version1_15_0_0 => 0x4750C1,
+            Version1_15_1_0 => 0x5182ECB,
+            Version1_15_2_0 => 0x4EC31FA,
+            _ => 0
+        };
+        
+        Hooks.ClearThrowState = moduleBase + Version switch
+        {
+            Version1_3_2_0 => 0x9C77D5,
+            Version1_4_1_0 or Version1_4_2_0 or Version1_4_3_0 => 0x9C76D5,
+            Version1_5_0_0 => 0x9C8215,
+            Version1_5_1_0 => 0x9C8045,
+            Version1_6_0_0 => 0x9C8615,
+            Version1_7_0_0 => 0x9C9525,
+            Version1_8_0_0 => 0x9D5CD5,
+            Version1_9_0_0 => 0x9D6295,
+            Version1_10_0_0 => 0x9D6305,
+            Version1_11_0_0 => 0x9DFF25,
+            Version1_12_0_0 => 0x9E0975,
+            Version1_13_0_0 => 0x9E2345,
+            Version1_14_0_0 => 0x9E2615,
+            Version1_15_0_0 => 0x9E2715,
+            Version1_15_1_0 => 0x9EC825,
+            Version1_15_2_0 => 0x9EC955,
+            _ => 0
+        };
+
+
 
 
         Patches.NoLogo = moduleBase + Version switch
@@ -487,6 +525,8 @@ public static class DS3Offsets
         PrintOffset("KillBox", Hooks.KillBox);
         PrintOffset("CheckStaggerIgnore", Hooks.CheckStaggerIgnore);
         PrintOffset("IsFallDmgDisabledHook", Hooks.IsFallDmgDisabledHook);
+        PrintOffset("SetThrowState", Hooks.SetThrowState);
+        PrintOffset("ClearThrowState", Hooks.ClearThrowState);
         PrintOffset("SetEvent", Hooks.SetEvent);
 
 

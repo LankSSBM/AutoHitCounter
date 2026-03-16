@@ -53,6 +53,8 @@ public enum AsmScript
     DS3EventLog,
     DS3StoreFallHeight,
     DS3IsFallDamageDisabled,
+    DS3SetThrowState,
+    DS3ClearThrowState,
     
     
     SKCheckPlayerDead,
