@@ -433,7 +433,7 @@
         let customCssElement = null;
 
         function applyCustomCss() {
-            const customCss = config.customCss.trim();
+            const customCss = (config.customCss || '').trim();
             if (!customCss) {
                 if (customCssElement && customCssElement.parentNode) {
                     customCssElement.parentNode.removeChild(customCssElement);
