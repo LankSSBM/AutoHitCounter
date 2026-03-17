@@ -98,7 +98,6 @@ public static class DS2Offsets
         public static nint GeneralApplyDamage;
         public static nint KillBox;
         public static nint CountAuxHit;
-        public static nint LightPoiseStagger;
         public static nint ClearWetPoisonBit;
         public static nint StaggerCheck;
         public static nint SetEvent;
@@ -175,14 +174,6 @@ public static class DS2Offsets
             _ => 0
         };
 
-        Hooks.LightPoiseStagger = moduleBase + Version switch
-        {
-            Vanilla1_0_11 => 0x1D55B4,
-            Vanilla1_0_12 => 0x1D6B54,
-            Scholar1_0_2 => 0x1432A7,
-            Scholar1_0_3 => 0x145997,
-            _ => 0
-        };
         
         Hooks.ClearWetPoisonBit = moduleBase + Version switch
         {
@@ -268,7 +259,6 @@ public static class DS2Offsets
         PrintOffset("GeneralApplyDamage", Hooks.GeneralApplyDamage);
         PrintOffset("KillBox", Hooks.KillBox);
         PrintOffset("CountAuxHit", Hooks.CountAuxHit);
-        PrintOffset("LightPoiseStagger", Hooks.LightPoiseStagger);
         PrintOffset("ClearWetPoisonBit", Hooks.ClearWetPoisonBit);
         PrintOffset("StaggerCheck", Hooks.StaggerCheck);
         PrintOffset("SetEvent", Hooks.SetEvent);

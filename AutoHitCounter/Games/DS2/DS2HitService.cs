@@ -64,7 +64,6 @@ public class DS2HitService(IMemoryService memoryService, HookManager hookManager
         InstallScholarGeneralDamageHook();
         InstallScholarKillBoxHook();
         InstallScholarCountAuxHook();
-        InstallScholarLightPoiseStaggerHook();
         InstallClearWetPoisonBitHook();
         InstallStaggerCheckHook();
     }
@@ -162,22 +161,6 @@ public class DS2HitService(IMemoryService memoryService, HookManager hookManager
         InstallHook(code, Hooks.CountAuxHit, [0x4C, 0x8B, 0x01, 0x48, 0x63, 0xC2]);
     }
 
-    private void InstallScholarLightPoiseStaggerHook()
-    {
-        var bytes = AsmLoader.GetAsmBytes(AsmScript.ScholarLightPoiseStagger);
-        var hit = Base + Hit;
-        var code = Base + LightPoiseStagger;
-
-        AsmHelper.WriteRelativeOffsets(bytes, [
-            (code + 0x6, GameManagerImp.Base, 7, 0x6 + 3),
-            (code + 0x19, hit, 6, 0x19 + 2),
-            (code + 0x26, Hooks.LightPoiseStagger + 5, 5, 0x26 + 1)
-        ]);
-
-        memoryService.WriteBytes(code, bytes);
-        InstallHook(code, Hooks.LightPoiseStagger, [0x8B, 0x42, 0x04, 0x89, 0x02]);
-    }
-
     private void InstallClearWetPoisonBitHook()
     {
         var bytes = AsmLoader.GetAsmBytes(AsmScript.ScholarClearWetPoisonBit);
@@ -223,7 +206,6 @@ public class DS2HitService(IMemoryService memoryService, HookManager hookManager
         InstallVanillaCountAuxHook();
         InstallVanillaGeneralDamageHook();
         InstallVanillaKillBoxHook();
-        InstallVanillaLightPoiseStaggerHook();
         InstallVanillaClearWetPoisonHook();
         InstallVanillaStaggerCheckHook();
     }
@@ -327,24 +309,7 @@ public class DS2HitService(IMemoryService memoryService, HookManager hookManager
         InstallHook(code, Hooks.KillBox, [0x8B, 0x01, 0x8B, 0x4D, 0x08]);
     }
 
-    private void InstallVanillaLightPoiseStaggerHook()
-    {
-        var bytes = AsmLoader.GetAsmBytes(AsmScript.VanillaLightPoiseStagger);
-        var hit = Base + Hit;
-        var code = Base + LightPoiseStagger;
-
-        AsmHelper.WriteImmediateDwords(bytes, [
-            ((int)GameManagerImp.Base, 0x1 + 2),
-            ((int)hit, 0x10 + 2),
-        ]);
-
-        AsmHelper.WriteRelativeOffset(bytes, code + 0x1D, Hooks.LightPoiseStagger + 6, 5, 0x1D + 1);
-
-
-        memoryService.WriteBytes(code, bytes);
-        InstallHook(code, Hooks.LightPoiseStagger, [0xD9, 0x80, 0xB0, 0x01, 0x00, 0x00]);
-    }
-
+    
     private void InstallVanillaClearWetPoisonHook()
     {
         var bytes = AsmLoader.GetAsmBytes(AsmScript.VanillaClearWetPoisonBit);
