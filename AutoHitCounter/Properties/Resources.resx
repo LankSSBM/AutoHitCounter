@@ -294,21 +294,37 @@ e9 00 00 00 00          jmp    3c &lt;skip_count+0x7&gt;</value>
 48 8b 88 08 e5 01 00    mov    rcx,QWORD PTR [rax+0x1e508]
 48 8b 81 90 01 00 00    mov    rax,QWORD PTR [rcx+0x190]
 48 3b 58 70             cmp    rbx,QWORD PTR [rax+0x70]
-75 25                   jne    47 &lt;skip&gt;
+75 42                   jne    64 &lt;skip&gt;
 52                      push   rdx
-ba c2 10 00 00          mov    edx,0x10c2
-48 8b 89 78 01 00 00    mov    rcx,QWORD PTR [rcx+0x178]
-48 83 ec 18             sub    rsp,0x18
-e8 00 00 00 00          call   38 &lt;_main+0x38&gt;
-48 83 c4 18             add    rsp,0x18
-5a                      pop    rdx
+41 50                   push   r8
+41 51                   push   r9
+41 52                   push   r10
+41 53                   push   r11
+48 8b 0d 00 00 00 00    mov    rcx,QWORD PTR [rip+0x0]        # 32 &lt;_main+0x32&gt;
+ba b1 c0 98 00          mov    edx,0x98c0b1
+e8 00 00 00 00          call   3c &lt;_main+0x3c&gt;
 84 c0                   test   al,al
-75 06                   jne    47 &lt;skip&gt;
-ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 47 &lt;skip&gt;
-000000000047 &lt;skip&gt;:
+74 15                   je     55 &lt;do_inc&gt;
+48 8b 0d 00 00 00 00    mov    rcx,QWORD PTR [rip+0x0]        # 47 &lt;_main+0x47&gt;
+ba 65 00 00 00          mov    edx,0x65
+e8 00 00 00 00          call   51 &lt;_main+0x51&gt;
+84 c0                   test   al,al
+74 06                   je     5b &lt;skip_full_epi&gt;
+
+000000000055 &lt;do_inc&gt;:
+ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 5b &lt;skip_full_epi&gt;
+
+00000000005b &lt;skip_full_epi&gt;:
+41 5b                   pop    r11
+41 5a                   pop    r10
+41 59                   pop    r9
+41 58                   pop    r8
+5a                      pop    rdx
+
+000000000064 &lt;skip&gt;:
 59                      pop    rcx
 58                      pop    rax
-e9 00 00 00 00          jmp    4e &lt;skip+0x7&gt;</value>
+e9 00 00 00 00          jmp    6b &lt;skip+0x7&gt;</value>
   </data>
   <data name="EldenRingEvents" xml:space="preserve">
     <value>BossName,DeathFlag

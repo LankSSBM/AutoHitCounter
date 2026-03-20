@@ -86,10 +86,15 @@ public static class EldenRingOffsets
 
     public static class CSTrophy
     {
-        public static IntPtr Base;
+        public static nint Base;
 
         public const int CSTrophyPlatformImp_forSteam = 0x8;
         public const int IsAwardAchievementEnabled = 0x4C;
+    }
+
+    public static class VirtualMemFlag
+    {
+        public static nint Base;
     }
 
     public static class Hooks
@@ -114,6 +119,7 @@ public static class EldenRingOffsets
     {
         public static nint ChrInsByHandle;
         public static nint HasSpEffectId;
+        public static nint GetEvent;
     }
 
     public static class Patches
@@ -201,6 +207,26 @@ public static class EldenRingOffsets
             Version2_2_3 or Version2_3_0 => 0x4589498,
             Version2_4_0 or Version2_5_0 or Version2_6_0
                 or Version2_6_1 => 0x4589478,
+            _ => 0
+        };
+
+        VirtualMemFlag.Base = moduleBase + Version switch
+        {
+            Version1_2_0 => 0x3C526E8,
+            Version1_2_1 => 0x3C52708,
+            Version1_2_2 => 0x3C52728,
+            Version1_2_3 => 0x3C55748,
+            Version1_3_0 or Version1_3_1 or Version1_3_2 => 0x3C672A8,
+            Version1_4_0 or Version1_4_1 => 0x3C0A538,
+            Version1_5_0 => 0x3C222E8,
+            Version1_6_0 => 0x3C33508,
+            Version1_7_0 => 0x3C4DEC8,
+            Version1_8_0 or Version1_8_1 => 0x3CDBDF8,
+            Version1_9_0 or Version1_9_1 or Version2_0_0 or Version2_0_1 => 0x3CDF238,
+            Version2_2_0 => 0x3D68448,
+            Version2_2_3 or Version2_3_0 => 0x3D68468,
+            Version2_4_0 or Version2_5_0 or Version2_6_0
+                or Version2_6_1 => 0x3D68448,
             _ => 0
         };
 
@@ -509,6 +535,29 @@ public static class EldenRingOffsets
             _ => 0
         };
 
+        Functions.GetEvent = moduleBase + Version switch
+        {
+            Version1_2_0 => 0x5D9650,
+            Version1_2_1 or Version1_2_2 => 0x5D96C0,
+            Version1_2_3 => 0x5D97E0,
+            Version1_3_0 or Version1_3_1 => 0x5DA870,
+            Version1_3_2 => 0x5DA850,
+            Version1_4_0 => 0x5DD550,
+            Version1_4_1 => 0x5DD460,
+            Version1_5_0 => 0x5DDF40,
+            Version1_6_0 => 0x5DF6E0,
+            Version1_7_0 => 0x5E0560,
+            Version1_8_0 or Version1_8_1 => 0x5ECC60,
+            Version1_9_0 => 0x5ED980,
+            Version1_9_1 => 0x5ED9E0,
+            Version2_0_0 or Version2_0_1 => 0x5EDC20,
+            Version2_2_0 or Version2_2_3 => 0x5F9180,
+            Version2_3_0 => 0x5F9300,
+            Version2_4_0 or Version2_5_0 => 0x5F9360,
+            Version2_6_0 or Version2_6_1 => 0x5F94E0,
+            _ => 0
+        };
+
         Patches.NoLogo = moduleBase + Version switch
         {
             Version1_2_0 => 0xAAAD4A,
@@ -543,6 +592,7 @@ public static class EldenRingOffsets
         PrintOffset("GameDataMan", GameDataMan.Base);
         PrintOffset("UserInputManager", UserInputManager.Base);
         PrintOffset("CSTrophy", CSTrophy.Base);
+        PrintOffset("VirtualMemFlag", VirtualMemFlag.Base);
 
         Console.WriteLine("\n--- Hooks ---");
         PrintOffset("Hit", Hooks.Hit);
@@ -564,6 +614,7 @@ public static class EldenRingOffsets
         Console.WriteLine("\n--- Functions ---");
         PrintOffset("ChrInsByHandle", Functions.ChrInsByHandle);
         PrintOffset("HasSpEffectId", Functions.HasSpEffectId);
+        PrintOffset("GetEvent", Functions.GetEvent);
 
 
         Console.WriteLine("\n--- Patches ---");

@@ -784,10 +784,10 @@ namespace AutoHitCounter.Properties {
         ///48 8b 88 08 e5 01 00    mov    rcx,QWORD PTR [rax+0x1e508]
         ///48 8b 81 90 01 00 00    mov    rax,QWORD PTR [rcx+0x190]
         ///48 3b 58 70             cmp    rbx,QWORD PTR [rax+0x70]
-        ///75 25                   jne    47 &lt;skip&gt;
+        ///75 42                   jne    64 &lt;skip&gt;
         ///52                      push   rdx
-        ///ba c2 10 00 00          mov    edx,0x10c2
-        ///48 8b 89  [rest of string was truncated]&quot;;.
+        ///41 50                   push   r8
+        ///41 51             [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EldenRingKillBox {
             get {

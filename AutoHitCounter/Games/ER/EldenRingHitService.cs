@@ -126,9 +126,12 @@ public class EldenRingHitService(IMemoryService memoryService, HookManager hookM
         var code = Base + KillBox;
         AsmHelper.WriteRelativeOffsets(bytes, [
             (code + 0x7, WorldChrMan.Base, 7, 0x7 + 3),
-            (code + 0x33, Functions.HasSpEffectId, 5, 0x33 + 1),
-            (code + 0x41, hit, 6, 0x41 + 2),
-            (code + 0x49, Hooks.KillBox + 5, 5, 0x49 + 1),
+            (code + 0x2B, VirtualMemFlag.Base, 7, 0x2B + 3),
+            (code + 0x37, Functions.GetEvent, 5, 0x37 + 1),
+            (code + 0x40, VirtualMemFlag.Base, 7, 0x40 + 3),
+            (code + 0x4C, Functions.GetEvent, 5, 0x4C + 1),
+            (code + 0x55, hit, 6, 0x55 + 2),
+            (code + 0x66, Hooks.KillBox + 5, 5, 0x66 + 1),
         ]);
         memoryService.WriteBytes(code, bytes);
         InstallHook(code, Hooks.KillBox, [0xC6, 0x44, 0x24, 0x28, 0x01]);
