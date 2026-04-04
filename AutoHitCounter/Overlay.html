@@ -129,11 +129,23 @@
             background: transparent;
         }
 
-        /* Hide numbers for parent rows */
+        /* Hide numbers for parent rows 
         .split-row.parent .col-hits,
         .split-row.parent .col-diff,
         .split-row.parent .col-pb {
             visibility: hidden;
+        } */
+
+        /* Hide numbers only on the active group header (children are visible) */
+        .split-row.parent:not(.group-inactive) .col-hits,
+        .split-row.parent:not(.group-inactive) .col-diff,
+        .split-row.parent:not(.group-inactive) .col-pb {
+            visibility: hidden;
+        }
+
+        /* Collapsed rows hidden */
+        .split-row.collapsed {
+            display: none;
         }
 
         /* Diff colors - overridden dynamically */
@@ -264,6 +276,7 @@
             splitNameOnHitColor: '#e0e0e0',
             splitNameOnHitlessColor: '#e0e0e0',
             groupNameColor: '#999999',
+            collapseInactiveGroups: true,
             pbColor: '#bbbbbb',
             showFooterTotals: true,
             igtFontFamily: 'Consolas',
@@ -485,43 +498,51 @@
                 + (config.showPb ? '<span>PB</span>' : '');
         }
 
+        function computeGroupVisibility(allSplits, currentIndex) {
+            const hasGroups = allSplits.some(s => s.isParent);
+            if (!hasGroups) return null;
+
+            const groupOf = new Array(allSplits.length).fill(-1);
+            let currentGroup = -1;
+
+            for (let i = 0; i < allSplits.length; i++) {
+                if (allSplits[i].isParent) currentGroup++;
+                groupOf[i] = currentGroup;
+            }
+
+            const anchor = currentIndex >= 0 ? currentIndex : 0;
+            const activeGroup = groupOf[anchor];
+
+            const groupTotals = {};
+            for (let i = 0; i < allSplits.length; i++) {
+                const s = allSplits[i];
+                if (s.isParent) continue;
+                const g = groupOf[i];
+                if (!groupTotals[g]) groupTotals[g] = { hits: 0, pb: 0 };
+                groupTotals[g].hits += s.hits ?? 0;
+                groupTotals[g].pb += s.pb ?? 0;
+            }
+
+            for (const g of Object.keys(groupTotals)) {
+                const t = groupTotals[g];
+                t.diff = t.hits - t.pb;
+            }
+
+            return { groupOf, activeGroup, groupTotals };
+        }
 
         function renderState(state) {
             const cols = getGridColumns();
             let html = '';
 
-
-            let splits = state.splits;
-            const currentIndex = splits.findIndex(s => s.isCurrent);
-            const total = splits.length;
+            const allSplits = state.splits;
+            const currentIndex = allSplits.findIndex(s => s.isCurrent);
+            const total = allSplits.length;
             const maxRows = getVisibleRowCount();
 
             if (currentIndex >= 0) lastCurrentIndex = currentIndex;
 
             const anchor = currentIndex >= 0 ? currentIndex : lastCurrentIndex >= 0 ? lastCurrentIndex : 0;
-
-            // Use prev/next as preferences, but redistribute unused slots
-            const prevAvailable = anchor;
-            const nextAvailable = total - anchor - 1;
-            let prevWanted = config.prevSplits;
-            let nextWanted = config.nextSplits;
-
-            // If we can't fill prev, give surplus to next and vice versa
-            const prevActual = Math.min(prevWanted, prevAvailable);
-            const nextActual = Math.min(nextWanted + (prevWanted - prevActual), nextAvailable);
-            const prevFinal = Math.min(prevWanted + (nextWanted - Math.min(nextWanted, nextAvailable)), prevAvailable);
-
-            let start = Math.max(0, anchor - prevFinal);
-            let end = Math.min(total, anchor + nextActual + 1);
-
-            if (end - start > maxRows) {
-                if (anchor - start >= maxRows) {
-                    start = Math.max(0, anchor - Math.min(prevFinal, maxRows - 1));
-                }
-                end = Math.min(total, start + maxRows);
-            }
-
-            splits = splits.slice(start, end);
 
             // Distance PB
             const dpbIndex = state.distancePb ?? -1;
@@ -530,9 +551,48 @@
                 ? -1
                 : dpbIndex;
 
-            for (let i = 0; i < splits.length; i++) {
-                html += buildRow(splits[i], cols, start + i, currentIndex, dpbHighlightIndex);
+            const groupInfo = config.collapseInactiveGroups
+                ? computeGroupVisibility(allSplits, anchor)
+                : null;
+
+            if (groupInfo) {
+                const { groupOf, activeGroup, groupTotals } = groupInfo;
+                for (let i = 0; i < allSplits.length; i++) {
+                    const s = allSplits[i];
+                    const isInActiveGroup = groupOf[i] === activeGroup;
+                    const collapsed = !s.isParent && !isInActiveGroup;
+                    const inactiveParent = s.isParent && !isInActiveGroup;
+                    const totals = (s.isParent && inactiveParent) ? (groupTotals[groupOf[i]] ?? null) : null;
+                    html += buildRow(s, cols, i, currentIndex, dpbHighlightIndex, collapsed, inactiveParent, totals);
+                }
+            } else {
+                // Use prev/next as preferences, but redistribute unused slots
+                const prevAvailable = anchor;
+                const nextAvailable = total - anchor - 1;
+                let prevWanted = config.prevSplits;
+                let nextWanted = config.nextSplits;
+
+                // If we can't fill prev, give surplus to next and vice versa
+                const prevActual = Math.min(prevWanted, prevAvailable);
+                const nextActual = Math.min(nextWanted + (prevWanted - prevActual), nextAvailable);
+                const prevFinal = Math.min(prevWanted + (nextWanted - Math.min(nextWanted, nextAvailable)), prevAvailable);
+
+                let start = Math.max(0, anchor - prevFinal);
+                let end = Math.min(total, anchor + nextActual + 1);
+
+                if (end - start > maxRows) {
+                    if (anchor - start >= maxRows) {
+                        start = Math.max(0, anchor - Math.min(prevFinal, maxRows - 1));
+                    }
+                    end = Math.min(total, start + maxRows);
+                }
+
+                const windowed = allSplits.slice(start, end);
+                for (let i = 0; i < windowed.length; i++) {
+                    html += buildRow(windowed[i], cols, start + i, currentIndex, dpbHighlightIndex, false, false, null);
+                }
             }
+
             splitsEl.innerHTML = html;
 
             const footerEl = document.getElementById('footer');
@@ -578,7 +638,7 @@
             return div.innerHTML;
         }
 
-        function buildRow(s, cols, index, currentIndex, dpbHighlightIndex) {
+        function buildRow(s, cols, index, currentIndex, dpbHighlightIndex, collapsed, inactiveParent, totals) {
             const current = s.isCurrent ? ' current' : '';
             const parent = s.isParent ? ' parent' : '';
             const diffClass = s.diff > 0 ? 'diff-pos' : s.diff < 0 ? 'diff-neg' : 'diff-zero';
@@ -587,12 +647,29 @@
             const cleared = isPast && !s.isParent && s.hits === 0 ? ' cleared' : '';
             const hit = (isPast && !s.isParent && s.hits > 0) || (s.isCurrent && s.hits > 0) ? ' hit' : '';
             const dpbhighlight = index === dpbHighlightIndex ? ' pb-dpbhighlight' : '';
+            const collapsedClass = collapsed ? ' collapsed' : '';
+            const inactiveClass = inactiveParent ? ' group-inactive' : '';
 
-            return `<div class="split-row${parent}${current}${cleared}${hit}${dpbhighlight}" style="grid-template-columns: ${cols}">
+            let hitsCell, diffCell, pbCell;
+
+            if (totals) {
+                const tDiffClass = totals.diff > 0 ? 'diff-pos' : totals.diff < 0 ? 'diff-neg' : 'diff-zero';
+                const tDiffText = totals.diff > 0 ? `+${totals.diff}` : `${totals.diff}`;
+                const hitsStyle = totals.hits > 0 ? `style="color:${config.hitsActiveColor}"` : '';
+                hitsCell = `<span class="col-hits" ${hitsStyle}>${totals.hits}</span>`;
+                diffCell = config.showDiff ? `<span class="col-diff ${tDiffClass}">${tDiffText}</span>` : '';
+                pbCell = config.showPb ? `<span class="col-pb">${totals.pb}</span>` : '';
+            } else {
+                hitsCell = `<span class="col-hits">${s.hits}</span>`;
+                diffCell = config.showDiff ? `<span class="col-diff ${diffClass}">${diffText}</span>` : '';
+                pbCell = config.showPb ? `<span class="col-pb">${s.pb}</span>` : '';
+            }
+
+            return `<div class="split-row${parent}${current}${cleared}${hit}${dpbhighlight}${collapsedClass}${inactiveClass}" style="grid-template-columns: ${cols}">
                 <span class="col-name">${escapeHtml(s.name)}</span>
-                <span class="col-hits">${s.hits}</span>
-                ${config.showDiff ? `<span class="col-diff ${diffClass}">${diffText}</span>` : ''}
-                ${config.showPb ? `<span class="col-pb">${s.pb}</span>` : ''}
+                ${hitsCell}
+                ${diffCell}
+                ${pbCell}
             </div>`;
         }
 
