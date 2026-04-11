@@ -509,7 +509,7 @@ namespace AutoHitCounter.Properties {
         ///Gwyndolin,11510900
         ///Gwyn,15
         ///Iron Golem,11
-        ///Kalameet,11215065
+        ///Kalameet,11210004
         ///Manus,11215025
         ///Moonlight Butterfly,11200900
         ///Nito,7
