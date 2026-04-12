@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 using AutoHitCounter.Core;
+using AutoHitCounter.Enums;
 using AutoHitCounter.Models;
 using AutoHitCounter.Services;
 using AutoHitCounter.Utilities;
@@ -25,6 +26,9 @@ public class OverlaySettingsViewModel : BaseViewModel
         .Select(f => f.Source)
         .OrderBy(f => f)
         .ToList();
+
+    public IReadOnlyList<OverlayGroupCollapseMode> GroupCollapseModes { get; } =
+        EnumExtensions.GetValues<OverlayGroupCollapseMode>().ToList();
 
     public OverlaySettingsViewModel(OverlayServerService overlayServerService, OverlayProfileManager profileManager)
     {
@@ -115,6 +119,7 @@ public class OverlaySettingsViewModel : BaseViewModel
     public bool ShowFooterTotals  { get => Get<bool>();   set => Set(value); }
     public int  PrevSplits        { get => Get<int>();    set => Set(value); }
     public int  NextSplits        { get => Get<int>();    set => Set(value); }
+    public OverlayGroupCollapseMode GroupCollapseMode { get => Get<OverlayGroupCollapseMode>(); set => Set(value); }
     public int  OverlayWidth      { get => Get<int>();    set => Set(value); }
     public int  OverlayHeight     { get => Get<int>();    set => Set(value); }
     public double BackgroundOpacity { get => Get<double>(); set => Set(value); }

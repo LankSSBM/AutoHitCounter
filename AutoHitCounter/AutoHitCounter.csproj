@@ -133,6 +133,7 @@
         <Compile Include="Enums\HotkeyActions.cs" />
         <Compile Include="Enums\SplitType.cs" />
         <Compile Include="Enums\NotesDisplayMode.cs" />
+        <Compile Include="Enums\OverlayGroupCollapseMode.cs" />
         <Compile Include="Enums\State.cs" />
         <Compile Include="Games\DS2\DS2EventService.cs" />
         <Compile Include="Games\DS2\DS2HitService.cs" />

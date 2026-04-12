@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using AutoHitCounter.Enums;
 using AutoHitCounter.Models;
 
 namespace AutoHitCounter.Utilities;
@@ -163,6 +164,7 @@ public class OverlayProfileManager
             ShowAttempts = true,
             PrevSplits = 4,
             NextSplits = 10,
+            GroupCollapseMode = OverlayGroupCollapseMode.None,
             ShowDiff = true,
             ShowPb = true,
             ShowIgt = true,

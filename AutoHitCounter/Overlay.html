@@ -276,7 +276,7 @@
             splitNameOnHitColor: '#e0e0e0',
             splitNameOnHitlessColor: '#e0e0e0',
             groupNameColor: '#999999',
-            collapseInactiveGroups: true,
+            groupCollapseMode: 2,
             pbColor: '#bbbbbb',
             showFooterTotals: true,
             igtFontFamily: 'Consolas',
@@ -312,6 +312,17 @@
             }
         }
 
+        function applyLegacyGroupCollapse() {
+            if (config.groupCollapseMode === undefined || config.groupCollapseMode === null) {
+                config.groupCollapseMode = config.collapseInactiveGroups === false ? 2 : 0;
+            } else {
+                const n = Number(config.groupCollapseMode);
+                config.groupCollapseMode = (n === 0 || n === 1 || n === 2) ? n : 0;
+            }
+        }
+
+        applyLegacyGroupCollapse();
+
         const overlay = document.getElementById('overlay');
         const headerEl = document.getElementById('header');
         const splitsEl = document.getElementById('splits');
@@ -343,6 +354,7 @@
                     }
                 } else if (msg.type === 'config') {
                     Object.assign(config, msg.data);
+                    applyLegacyGroupCollapse();
                     localStorage.setItem('overlayConfig', JSON.stringify(config));
                     applyLayout();
                     if (lastState) renderState(lastState);
@@ -554,14 +566,17 @@
             return { start, end };
         }
 
-        function buildCollapseVisibleIndices(allSplits, groupOf, activeGroup) {
+        /** @param mode 0 = all inactive collapsed, 1 = completed collapsed + future expanded */
+        function buildCollapseVisibleIndices(allSplits, groupOf, activeGroup, mode) {
             const indices = [];
             for (let i = 0; i < allSplits.length; i++) {
                 const s = allSplits[i];
-                const inActive = groupOf[i] === activeGroup;
+                const g = groupOf[i];
+                const inActive = g === activeGroup;
+                const inFuture = g > activeGroup;
                 if (s.isParent) {
                     indices.push(i);
-                } else if (inActive) {
+                } else if (mode === 1 ? (inActive || inFuture) : inActive) {
                     indices.push(i);
                 }
             }
@@ -588,13 +603,16 @@
                 ? -1
                 : dpbIndex;
 
-            const groupInfo = config.collapseInactiveGroups
+            let collapseMode = Number(config.groupCollapseMode);
+            if (collapseMode !== 0 && collapseMode !== 1 && collapseMode !== 2) collapseMode = 0;
+
+            const groupInfo = collapseMode !== 2
                 ? computeGroupVisibility(allSplits, anchor)
                 : null;
 
             if (groupInfo) {
                 const { groupOf, activeGroup, groupTotals } = groupInfo;
-                const visibleIndices = buildCollapseVisibleIndices(allSplits, groupOf, activeGroup);
+                const visibleIndices = buildCollapseVisibleIndices(allSplits, groupOf, activeGroup, collapseMode);
                 if (visibleIndices.length > 0) {
                     let anchorPos = visibleIndices.indexOf(anchor);
                     if (anchorPos < 0) {
@@ -614,9 +632,11 @@
                     for (let j = wStart; j < wEnd; j++) {
                         const i = visibleIndices[j];
                         const s = allSplits[i];
-                        const isInActiveGroup = groupOf[i] === activeGroup;
-                        const inactiveParent = s.isParent && !isInActiveGroup;
-                        const totals = (s.isParent && inactiveParent) ? (groupTotals[groupOf[i]] ?? null) : null;
+                        const g = groupOf[i];
+                        const inactiveParent = s.isParent && (collapseMode === 0
+                            ? g !== activeGroup
+                            : g < activeGroup);
+                        const totals = (s.isParent && inactiveParent) ? (groupTotals[g] ?? null) : null;
                         html += buildRow(s, cols, i, currentIndex, dpbHighlightIndex, false, inactiveParent, totals);
                     }
                 }
