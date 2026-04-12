@@ -1,4 +1,6 @@
-﻿// 
+﻿//
+
+using AutoHitCounter.Enums;
 
 namespace AutoHitCounter.Models;
 
@@ -8,6 +10,7 @@ public class OverlayConfig
     public bool ShowAttempts { get; set; }
     public int PrevSplits { get; set; }
     public int NextSplits { get; set; }
+    public OverlayGroupCollapseMode GroupCollapseMode { get; set; }
     public bool ShowDiff { get; set; }
     public bool ShowPb { get; set; }
     public bool ShowIgt { get; set; }
