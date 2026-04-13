@@ -199,6 +199,7 @@
     <Compile Include="Models\OverlayConfig.cs" />
     <Compile Include="Models\OverlayState.cs" />
     <Compile Include="Models\Profile.cs" />
+    <Compile Include="Models\RunSnapshot.cs" />
     <Compile Include="Models\RunState.cs" />
     <Compile Include="Models\SplitEntry.cs" />
     <Compile Include="Services\EventLogReader.cs" />
@@ -209,6 +210,7 @@
     <Compile Include="Services\MemoryService.cs" />
     <Compile Include="Services\OverlayServerService.cs" />
     <Compile Include="Services\ProfileService.cs" />
+    <Compile Include="Services\RunStateService.cs" />
     <Compile Include="Services\SplitNavigationService.cs" />
     <Compile Include="Services\StateService.cs" />
     <Compile Include="Services\ThemeService.cs" />

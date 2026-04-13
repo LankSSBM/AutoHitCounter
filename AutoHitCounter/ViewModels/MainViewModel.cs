@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Threading;
 using AutoHitCounter.Core;
 using AutoHitCounter.Enums;
 using AutoHitCounter.Games.Manual;
@@ -31,17 +30,8 @@ namespace AutoHitCounter.ViewModels
         private readonly ExternalIntegrationService _externalIntegrationService;
         private IGameModule _currentModule;
         private string _lastIgt;
-        private readonly DispatcherTimer _saveDebounce;
+        private readonly RunStateService _runStateService;
 
-        private class RunSnapshot(int currentSplitIndex, int[] hitCounts, bool isRunComplete, TimeSpan inGameTime)
-        {
-            public int CurrentSplitIndex { get; } = currentSplitIndex;
-            public int[] HitCounts { get; } = hitCounts;
-            public bool IsRunComplete { get; } = isRunComplete;
-            public TimeSpan InGameTime { get; } = inGameTime;
-        }
-
-        private readonly Dictionary<string, RunSnapshot> _runSnapshots = new();
 
         public SettingsViewModel Settings { get; }
         public HotkeyTabViewModel Hotkeys { get; }
@@ -73,15 +63,9 @@ namespace AutoHitCounter.ViewModels
             _splitNav.Load(Splits);
             _splitNav.StateChanged += OnSplitStateChanged;
 
-            RegisterHotkeys();
+            _runStateService = new RunStateService(profileService);
 
-            _saveDebounce = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
-            _saveDebounce.Tick += (_, _) =>
-            {
-                _saveDebounce.Stop();
-                if (_activeProfile?.SavedRun != null)
-                    Task.Run(() => _profileService.SaveProfile(_activeProfile));
-            };
+            RegisterHotkeys();
 
 
             _isUnlocked = SettingsManager.Default.IsUnlocked;
@@ -183,10 +167,8 @@ namespace AutoHitCounter.ViewModels
                 if (_selectedGame == value) return;
 
                 if (_activeProfile != null)
-                {
-                    var outKey = $"{_selectedGame?.GameName}|{_activeProfile.Name}";
-                    _runSnapshots[outKey] = CaptureSnapshot();
-                }
+                    _runStateService.Save(_selectedGame?.GameName, _activeProfile.Name,
+                        _runStateService.Capture(Splits, CurrentSplit, IsRunComplete, InGameTime));
 
                 SetProperty(ref _selectedGame, value);
                 _activeProfile = null;
@@ -292,10 +274,8 @@ namespace AutoHitCounter.ViewModels
                 if (_activeProfile == value) return;
 
                 if (_activeProfile != null)
-                {
-                    var outKey = $"{_selectedGame?.GameName}|{_activeProfile.Name}";
-                    _runSnapshots[outKey] = CaptureSnapshot();
-                }
+                    _runStateService.Save(_selectedGame?.GameName, _activeProfile.Name,
+                        _runStateService.Capture(Splits, CurrentSplit, IsRunComplete, InGameTime));
 
                 SetProperty(ref _activeProfile, value);
 
@@ -914,19 +894,10 @@ namespace AutoHitCounter.ViewModels
                 _profileEditorWindow = null;
 
                 if (_activeProfile != null)
-                {
-                    var key = $"{_selectedGame.GameName}|{_activeProfile.Name}";
-                    _runSnapshots.Remove(key);
-                }
+                    _runStateService.Invalidate(_selectedGame.GameName, _activeProfile.Name);
 
-                var validKeys = new HashSet<string>(
-                    _profileService.GetProfiles(_selectedGame.GameName)
-                        .Select(p => $"{_selectedGame.GameName}|{p.Name}"));
-                var staleKeys = _runSnapshots.Keys
-                    .Where(k => k.StartsWith($"{_selectedGame.GameName}|") && !validKeys.Contains(k))
-                    .ToList();
-                foreach (var stale in staleKeys)
-                    _runSnapshots.Remove(stale);
+                var validProfileNames = _profileService.GetProfiles(_selectedGame.GameName).Select(p => p.Name);
+                _runStateService.InvalidateStale(_selectedGame.GameName, validProfileNames);
             };
 
             _profileEditorWindow.Show();
@@ -1172,14 +1143,7 @@ namespace AutoHitCounter.ViewModels
             if (_activeGame == game)
                 AttachedText = $"Custom Game: {newName}";
 
-            // Re-key any cached run snapshots
-            var staleKeys = _runSnapshots.Keys.Where(k => k.StartsWith($"{oldName}|")).ToList();
-            foreach (var key in staleKeys)
-            {
-                var snapshot = _runSnapshots[key];
-                _runSnapshots.Remove(key);
-                _runSnapshots[key.Replace($"{oldName}|", $"{newName}|")] = snapshot;
-            }
+            _runStateService.RenameGame(oldName, newName);
         }
 
         private void SaveNotes()
@@ -1194,21 +1158,12 @@ namespace AutoHitCounter.ViewModels
             _profileService.SaveProfile(ActiveProfile);
         }
 
-        private RunSnapshot CaptureSnapshot()
-        {
-            var children = Splits.Where(s => s.Type == SplitType.Child).ToList();
-            var hits = children.Select(s => s.NumOfHits).ToArray();
-            var index = CurrentSplit != null ? Splits.IndexOf(CurrentSplit) : -1;
-            return new RunSnapshot(index, hits, IsRunComplete, InGameTime);
-        }
-
         private void LoadProfile(Profile profile)
         {
-            _saveDebounce.Stop();
+            _runStateService.CancelPendingSave();
             IsRunComplete = false;
             UpdateSplits();
-            var key = $"{_selectedGame?.GameName}|{profile?.Name}";
-            if (profile != null && _runSnapshots.TryGetValue(key, out var snapshot))
+            if (profile != null && _runStateService.TryGet(_selectedGame?.GameName, profile.Name, out var snapshot))
                 RestoreSnapshot(snapshot);
             else if (profile?.SavedRun != null)
                 RestoreFromSavedRun(profile.SavedRun);
@@ -1227,28 +1182,14 @@ namespace AutoHitCounter.ViewModels
 
         private void RestoreSnapshot(RunSnapshot snapshot)
         {
-            var children = Splits.Where(s => s.Type == SplitType.Child).ToList();
-            for (int i = 0; i < children.Count && i < snapshot.HitCounts.Length; i++)
-                children[i].NumOfHits = snapshot.HitCounts[i];
-
-            var toRestore = snapshot.CurrentSplitIndex >= 0 && snapshot.CurrentSplitIndex < Splits.Count
-                ? Splits[snapshot.CurrentSplitIndex]
-                : Splits.FirstOrDefault(s => s.Type == SplitType.Child);
-
+            var toRestore = _runStateService.RestoreSnapshot(Splits, snapshot);
             _splitNav.SetPosition(toRestore, snapshot.IsRunComplete);
             InGameTime = snapshot.InGameTime;
         }
 
         private void RestoreFromSavedRun(RunState state)
         {
-            var children = Splits.Where(s => s.Type == SplitType.Child).ToList();
-            for (int i = 0; i < children.Count && i < state.HitCounts.Length; i++)
-                children[i].NumOfHits = state.HitCounts[i];
-
-            var toRestore = state.CurrentSplitIndex >= 0 && state.CurrentSplitIndex < Splits.Count
-                ? Splits[state.CurrentSplitIndex]
-                : Splits.FirstOrDefault(s => s.Type == SplitType.Child);
-
+            var toRestore = _runStateService.RestoreFromSavedRun(Splits, state);
             _splitNav.SetPosition(toRestore, state.IsRunComplete);
             InGameTime = TimeSpan.FromMilliseconds(state.IgtMilliseconds);
         }
@@ -1260,7 +1201,7 @@ namespace AutoHitCounter.ViewModels
 
         private void ResetRun()
         {
-            _saveDebounce.Stop();
+            _runStateService.CancelPendingSave();
             UpdateDistancePb();
 
             if (_activeProfile != null)
@@ -1272,8 +1213,7 @@ namespace AutoHitCounter.ViewModels
                 RefreshDistancePbIndicator();
             }
 
-            var key = $"{_selectedGame?.GameName}|{_activeProfile?.Name}";
-            _runSnapshots.Remove(key);
+            _runStateService.Invalidate(_selectedGame?.GameName, _activeProfile?.Name);
             UpdateSplits();
             _splitNav.InitFresh();
 
@@ -1343,26 +1283,12 @@ namespace AutoHitCounter.ViewModels
 
         public void SaveRunState()
         {
-            if (_activeProfile == null) return;
-
-            var children = Splits.Where(s => s.Type == SplitType.Child).ToList();
-            _activeProfile.SavedRun = new RunState
-            {
-                CurrentSplitIndex = CurrentSplit != null ? Splits.IndexOf(CurrentSplit) : -1,
-                HitCounts = children.Select(s => s.NumOfHits).ToArray(),
-                IsRunComplete = IsRunComplete,
-                IgtMilliseconds = (long)InGameTime.TotalMilliseconds
-            };
-
-            _saveDebounce.Stop();
-            _saveDebounce.Start();
+            _runStateService.SaveRunState(_activeProfile, Splits, CurrentSplit, IsRunComplete, InGameTime);
         }
 
         public void FlushRunState()
         {
-            _saveDebounce.Stop();
-            if (_activeProfile?.SavedRun != null)
-                _profileService.SaveProfile(_activeProfile);
+            _runStateService.FlushRunState(_activeProfile);
         }
 
         #endregion

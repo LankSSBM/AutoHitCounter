@@ -56,6 +56,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\RunStateServiceTests.cs" />
     <Compile Include="Services\SplitNavigationServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
