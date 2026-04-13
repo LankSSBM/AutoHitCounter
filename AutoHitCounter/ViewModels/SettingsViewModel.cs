@@ -7,7 +7,6 @@ using System.Windows;
 using AutoHitCounter.Core;
 using AutoHitCounter.Enums;
 using AutoHitCounter.Interfaces;
-using AutoHitCounter.Models;
 using AutoHitCounter.Services;
 using AutoHitCounter.Utilities;
 using AutoHitCounter.Views.Windows;
@@ -32,8 +31,7 @@ public class SettingsViewModel : BaseViewModel
         set => SetProperty(ref _selectedSettingsGame, value);
     }
 
-    public SettingsViewModel(IStateService stateService, OverlaySettingsViewModel overlaySettingsViewModel,
-        HotkeyManager hotkeyManager)
+    public SettingsViewModel(IStateService stateService, OverlaySettingsViewModel overlaySettingsViewModel)
     {
         _overlaySettingsViewModel = overlaySettingsViewModel;
         SelectedSettingsGame = GameTitle.DarkSouls2;
