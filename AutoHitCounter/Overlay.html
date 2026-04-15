@@ -285,6 +285,7 @@
             pbColor: '#bbbbbb',
             showFooterTotals: true,
             showGroupHeaderTotals: false,
+            groupProgressMode: 0,
             igtFontFamily: 'Consolas',
             igtFontSize: 17,
             alternatingRows: 'rgba(255, 255, 255, 0.05)',
@@ -468,6 +469,7 @@
                     text-decoration: ${config.fontUnderline ? 'underline' : 'none'};
                 }
                 #progress { font-size: ${config.headerFontSize + 1}px; }
+                .group-progress { color: ${config.headerTextColor || '#bbbbbb'}; font-size: ${Math.max(10, (config.groupHeaderFontSize || 13) - 1)}px; font-weight: normal; }
                 #attempts { font-size: ${config.headerFontSize + 2}px; }
                 .header span:not(:first-child) { color: ${config.headerTextColor}; }
                 .igt { color: ${config.igtColor}; font-family: ${config.igtFontFamily || 'Consolas, monospace'}; font-size: ${config.igtFontSize || 16}px; }
@@ -562,6 +564,51 @@
             return { groupOf, activeGroup, groupTotals };
         }
 
+        /**
+         * @param mode 0 = hidden (caller skips), 1 = active group only, 2 = all groups
+         */
+        function computeGroupProgressStrings(allSplits, groupOf, activeGroup, anchorIdx, mode) {
+            const eff = allSplits.findIndex(s => s.isCurrent);
+            const resolved = eff >= 0 ? eff : anchorIdx;
+
+            const childrenByGroup = {};
+            for (let i = 0; i < allSplits.length; i++) {
+                if (allSplits[i].isParent) continue;
+                const g = groupOf[i];
+                if (!childrenByGroup[g]) childrenByGroup[g] = [];
+                childrenByGroup[g].push(i);
+            }
+
+            const out = {};
+            for (const g of Object.keys(childrenByGroup)) {
+                const gi = Number(g);
+                if (mode === 1 && gi !== activeGroup) {
+                    out[gi] = '';
+                    continue;
+                }
+
+                const children = childrenByGroup[g];
+                const total = children.length;
+                let cur;
+                if (children.includes(resolved)) {
+                    cur = children.indexOf(resolved) + 1;
+                } else if (gi < activeGroup) {
+                    cur = total;
+                } else if (gi > activeGroup) {
+                    cur = 0;
+                } else {
+                    let last = 0;
+                    for (const idx of children) {
+                        if (idx < resolved) last = children.indexOf(idx) + 1;
+                    }
+                    cur = last;
+                }
+
+                out[gi] = ` (${cur}/${total})`;
+            }
+            return out;
+        }
+
         function computeVisibleRowWindow(anchorPos, totalRows, maxRows) {
             const prevAvailable = anchorPos;
             const nextAvailable = totalRows - anchorPos - 1;
@@ -627,6 +674,22 @@
             if (currentIndex >= 0) lastCurrentIndex = currentIndex;
 
             const anchor = currentIndex >= 0 ? currentIndex : lastCurrentIndex >= 0 ? lastCurrentIndex : 0;
+
+            const progressModeRaw = config.groupProgressMode;
+            const progressMode = (progressModeRaw !== undefined && progressModeRaw !== null)
+                ? Number(progressModeRaw) : 0;
+            const normalizedProgressMode = (progressMode === 0 || progressMode === 1 || progressMode === 2)
+                ? progressMode : 0;
+            const hasGroups = allSplits.some(s => s.isParent);
+            const gvProgress = hasGroups ? computeGroupVisibility(allSplits, anchor) : null;
+            const groupProgressStrings = gvProgress && normalizedProgressMode > 0
+                ? computeGroupProgressStrings(
+                    allSplits,
+                    gvProgress.groupOf,
+                    gvProgress.activeGroup,
+                    anchor,
+                    normalizedProgressMode)
+                : null;
 
             // Distance PB
             const dpbIndex = state.distancePb ?? -1;
@@ -699,14 +762,23 @@
                             : g < activeGroup);
                         const showGroupSums = config.showGroupHeaderTotals === true;
                         const totals = (s.isParent && inactiveParent && showGroupSums) ? (groupTotals[g] ?? null) : null;
-                        html += buildRow(s, cols, i, currentIndex, dpbHighlightIndex, false, inactiveParent, totals);
+                        const nameSuffix = s.isParent && groupProgressStrings
+                            ? (groupProgressStrings[g] || '')
+                            : '';
+                        html += buildRow(s, cols, i, currentIndex, dpbHighlightIndex, false, inactiveParent, totals, nameSuffix);
                     }
                 }
             } else {
                 const { start, end } = computeVisibleRowWindow(anchor, total, maxRows);
                 const windowed = allSplits.slice(start, end);
                 for (let i = 0; i < windowed.length; i++) {
-                    html += buildRow(windowed[i], cols, start + i, currentIndex, dpbHighlightIndex, false, false, null);
+                    const idx = start + i;
+                    const s = windowed[i];
+                    const g = gvProgress ? gvProgress.groupOf[idx] : -1;
+                    const nameSuffix = s.isParent && groupProgressStrings && g >= 0
+                        ? (groupProgressStrings[g] || '')
+                        : '';
+                    html += buildRow(s, cols, idx, currentIndex, dpbHighlightIndex, false, false, null, nameSuffix);
                 }
             }
 
@@ -756,7 +828,14 @@
             return div.innerHTML;
         }
 
-        function buildRow(s, cols, index, currentIndex, dpbHighlightIndex, collapsed, inactiveParent, totals) {
+        function buildRow(s, cols, index, currentIndex, dpbHighlightIndex, collapsed, inactiveParent, totals, groupNameSuffix) {
+            const nameExtra = groupNameSuffix || '';
+            let nameHtml;
+            if (s.isParent && nameExtra) {
+                nameHtml = `${escapeHtml(s.name)}<span class="group-progress">${nameExtra}</span>`;
+            } else {
+                nameHtml = escapeHtml(s.name) + nameExtra;
+            }
             const current = s.isCurrent ? ' current' : '';
             const parent = s.isParent ? ' parent' : '';
             const diffClass = s.diff > 0 ? 'diff-pos' : s.diff < 0 ? 'diff-neg' : 'diff-zero';
@@ -789,7 +868,7 @@
             }
 
             return `<div class="split-row${parent}${current}${cleared}${hit}${dpbhighlight}${collapsedClass}${inactiveClass}" style="grid-template-columns: ${cols}">
-                <span class="col-name">${escapeHtml(s.name)}</span>
+                <span class="col-name">${nameHtml}</span>
                 ${hitsCell}
                 ${diffCell}
                 ${pbCell}

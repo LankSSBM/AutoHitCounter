@@ -30,6 +30,9 @@ public class OverlaySettingsViewModel : BaseViewModel
     public IReadOnlyList<OverlayGroupCollapseMode> GroupCollapseModes { get; } =
         EnumExtensions.GetValues<OverlayGroupCollapseMode>().ToList();
 
+    public IReadOnlyList<OverlayGroupProgressMode> GroupProgressModes { get; } =
+        EnumExtensions.GetValues<OverlayGroupProgressMode>().ToList();
+
     public OverlaySettingsViewModel(OverlayServerService overlayServerService, OverlayProfileManager profileManager)
     {
         _overlayServerService = overlayServerService;
@@ -118,6 +121,7 @@ public class OverlaySettingsViewModel : BaseViewModel
     public bool ShowIgt           { get => Get<bool>();   set => Set(value); }
     public bool ShowFooterTotals  { get => Get<bool>();   set => Set(value); }
     public bool ShowGroupHeaderTotals { get => Get<bool>(); set => Set(value); }
+    public OverlayGroupProgressMode GroupProgressMode { get => Get<OverlayGroupProgressMode>(); set => Set(value); }
     public int  PrevSplits        { get => Get<int>();    set => Set(value); }
     public int  NextSplits        { get => Get<int>();    set => Set(value); }
     public OverlayGroupCollapseMode GroupCollapseMode { get => Get<OverlayGroupCollapseMode>(); set => Set(value); }

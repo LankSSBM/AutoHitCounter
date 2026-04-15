@@ -200,6 +200,7 @@ public class OverlayProfileManager
             ShowProgress = true,
             ShowFooterTotals = true,
             ShowGroupHeaderTotals = false,
+            GroupProgressMode = OverlayGroupProgressMode.Hidden,
             TableMode = false,
             BackgroundOpacity = 0,
 

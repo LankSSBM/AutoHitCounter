@@ -168,6 +168,20 @@
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                         </StackPanel>
+                        <StackPanel Margin="0,0,0,4">
+                            <TextBlock Text="Group progress" Style="{StaticResource FieldLabel}" Width="Auto"
+                                       Margin="0,0,0,2" />
+                            <ComboBox ItemsSource="{Binding GroupProgressModes}"
+                                      SelectedItem="{Binding GroupProgressMode}"
+                                      FontSize="11" Width="184"
+                                      HorizontalAlignment="Left">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
 
                         <Separator Style="{StaticResource Separator}" />
                         <TextBlock Text="DIMENSIONS" Style="{StaticResource SectionLabel}" />
