@@ -24,15 +24,18 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
     private EldenRingEventService _eventService;
     private EldenRingSettingsService _settingsService;
     private EventLogReader _eventLogReader;
+    private IRunStartService _runStartService;
+    
     public string GameVersion => EldenRingOffsets.Version.GetDescription();
 
     private DateTime? _lastHit;
 
-    public event Action<int> OnHit;
+    public event Action OnHit;
 
     public event Action OnEventSet;
     public event Action<List<EventLogEntry>> OnEventLogEntriesReceived;
     public event Action<long> OnTimeChanged;
+    public event Action OnRunStart;
     public event Action OnVersionDetected;
     
     public EldenRingModule(IMemoryService memoryService, IStateService stateService, HookManager hookManager,
@@ -64,12 +67,14 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
         _eventLogReader = new EventLogReader(_memoryService,
             Base + EventLogWriteIdx,
             Base + EventLogBuffer);
+        _runStartService = new EldenRingRunStartService(_memoryService, _hookManager);
         _eventLogReader.EntriesReceived += entries => OnEventLogEntriesReceived?.Invoke(entries);
 
         ApplySettings(onlyEnabled: true);
         
         _eventService.InstallHook();
         _hitService.InstallHooks();
+        _runStartService.InstallHook();
         
         _tickService.RegisterGameTick(Tick);
         
@@ -87,6 +92,8 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
 
     private void Tick()
     {
+        if (_runStartService.IsNewGameStarted()) OnRunStart?.Invoke();
+        
         if (!IsLoaded())
         {
             _hitService.ResetFlags();
@@ -97,7 +104,7 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
 
         if (_hitService.HasHit() && (_lastHit == null || (DateTime.Now - _lastHit.Value).TotalSeconds > 3))
         {
-            OnHit?.Invoke(1);
+            OnHit?.Invoke();
             _lastHit = DateTime.Now;
         }
 
@@ -126,6 +133,7 @@ public class EldenRingModule : IGameModule, IDisposable, IVersionedGameModule
         OnEventSet = null;
         OnEventLogEntriesReceived = null;
         OnTimeChanged = null;
+        OnRunStart = null;
     }
     
     public void UpdateEvents(Dictionary<uint, (string Name, int Required, int Hit)> events)

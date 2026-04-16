@@ -45,12 +45,13 @@ namespace AutoHitCounter
 
             OverlayServerService overlayServerService = new OverlayServerService();
             SplitNavigationService splitNavigationService = new SplitNavigationService();
+            ExternalIntegrationService externalIntegrationService = new ExternalIntegrationService();
 
             HookManager hookManager = new HookManager(memoryService);
 
             var hotkeyManager = new HotkeyManager(memoryService);
 
-            GameModuleFactory gameModuleFactory =
+            IGameModuleFactory gameModuleFactory =
                 new GameModuleFactory(memoryService, stateService, hookManager, tickService);
 
             OverlayProfileManager.MigrateFromSettingsIfNeeded();
@@ -58,14 +59,19 @@ namespace AutoHitCounter
 
             var overlaySettingsViewModel = new OverlaySettingsViewModel(overlayServerService, overlayProfileManager);
 
-            var settingsViewModel = new SettingsViewModel(stateService, overlaySettingsViewModel, hotkeyManager);
+            var settingsViewModel = new SettingsViewModel(stateService, overlaySettingsViewModel);
 
             var hotkeysViewModel = new HotkeyTabViewModel(hotkeyManager, stateService);
 
 
-            _mainViewModel = new MainViewModel(memoryService, hotkeyManager, gameModuleFactory, profileService,
+            var runStateService = new RunStateService(profileService);
+            var customGameService = new CustomGameService(new SettingsCustomGamesStore(), profileService, runStateService);
+            var orchestrator = new GameSessionOrchestrator(memoryService, hotkeyManager, gameModuleFactory, stateService);
+
+            _mainViewModel = new MainViewModel(hotkeyManager, gameModuleFactory, profileService,
                 stateService,
-                settingsViewModel, hotkeysViewModel, overlayServerService, splitNavigationService);
+                settingsViewModel, hotkeysViewModel, overlayServerService, splitNavigationService, externalIntegrationService,
+                orchestrator, runStateService, customGameService);
             var mainWindow = new MainWindow
             {
                 DataContext = _mainViewModel

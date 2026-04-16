@@ -34,6 +34,7 @@ public class SettingsManager
     public bool AlwaysOnTop { get; set; }
     [DefaultValue(0)] public int NotesDisplayMode { get; set; }
     public bool PracticeMode { get; set; }
+    public bool AutoResetOnNewGameStart { get; set; }
     public bool IsUnlocked { get; set; }
     public bool DS3NoLogo { get; set; }
     public bool DS3StutterFix { get; set; }
@@ -45,6 +46,9 @@ public class SettingsManager
     public bool DS2NoBabyJump { get; set; }
     public bool DS2SkipCredits { get; set; }
     public bool DS2DisableDoubleClick { get; set; }
+    public bool ExternalIntegrationEnabled { get; set; }
+    public string ExternalIntegrationEndpointUrl { get; set; }
+    public string ExternalIntegrationUserIdentifier { get; set; }
 
     public string LastImportExportPath { get; set; }
 
@@ -59,7 +63,8 @@ public class SettingsManager
     [DefaultValue(0)] public int MigrationVersion { get; set; }
     
     [DefaultValue(2)] public int ThemeMode { get; set; }
-
+    [DefaultValue(false)] public bool HideAdded { get; set; }
+    [DefaultValue(false)] public bool AllowDuplicates { get; set; }
     public void Save()
     {
         try

@@ -7,7 +7,6 @@ using System.Windows;
 using AutoHitCounter.Core;
 using AutoHitCounter.Enums;
 using AutoHitCounter.Interfaces;
-using AutoHitCounter.Models;
 using AutoHitCounter.Services;
 using AutoHitCounter.Utilities;
 using AutoHitCounter.Views.Windows;
@@ -32,13 +31,15 @@ public class SettingsViewModel : BaseViewModel
         set => SetProperty(ref _selectedSettingsGame, value);
     }
 
-    public SettingsViewModel(IStateService stateService, OverlaySettingsViewModel overlaySettingsViewModel,
-        HotkeyManager hotkeyManager)
+    public SettingsViewModel(IStateService stateService, OverlaySettingsViewModel overlaySettingsViewModel)
     {
         _overlaySettingsViewModel = overlaySettingsViewModel;
         SelectedSettingsGame = GameTitle.DarkSouls2;
         stateService.Subscribe(State.AppStart, OnAppStart);
         OpenOverlaySettingsCommand = new DelegateCommand(OpenOverlaySettings);
+        IsExternalIntegrationEnabled = SettingsManager.Default.ExternalIntegrationEnabled;
+        ExternalIntegrationEndpoint = SettingsManager.Default.ExternalIntegrationEndpointUrl;
+        ExternalIntegrationUserId = SettingsManager.Default.ExternalIntegrationUserIdentifier;
     }
 
 
@@ -100,6 +101,19 @@ public class SettingsViewModel : BaseViewModel
         {
             if (!SetProperty(ref _notesDisplayMode, value)) return;
             SettingsManager.Default.NotesDisplayMode = (int)value;
+            SettingsManager.Default.Save();
+        }
+    }
+    
+    private bool _autoResetOnNewGameStart;
+
+    public bool AutoResetOnNewGameStart
+    {
+        get => _autoResetOnNewGameStart;
+        set
+        {
+            if (!SetProperty(ref _autoResetOnNewGameStart, value)) return;
+            SettingsManager.Default.AutoResetOnNewGameStart = value;
             SettingsManager.Default.Save();
         }
     }
@@ -261,6 +275,50 @@ public class SettingsViewModel : BaseViewModel
 
     #endregion
 
+    #region External Integration
+
+    private bool _isExternalIntegrationEnabled;
+
+    public bool IsExternalIntegrationEnabled
+    {
+        get => _isExternalIntegrationEnabled;
+        set
+        {
+            if (!SetProperty(ref _isExternalIntegrationEnabled, value)) return;
+            SettingsManager.Default.ExternalIntegrationEnabled = value;
+            SettingsManager.Default.Save();
+            OnGameSettingChanged?.Invoke();
+        }
+    }
+
+    private string _externalIntegrationEndpoint;
+    public string ExternalIntegrationEndpoint
+        {
+        get => _externalIntegrationEndpoint;
+        set
+        {
+            if (!SetProperty(ref _externalIntegrationEndpoint, value)) return;
+            SettingsManager.Default.ExternalIntegrationEndpointUrl = value;
+            SettingsManager.Default.Save();
+            OnGameSettingChanged?.Invoke();
+        }
+    }
+
+    private string _externalIntegrationUserId;
+    public string ExternalIntegrationUserId
+    {
+        get => _externalIntegrationUserId;
+        set
+        {
+            if (!SetProperty(ref _externalIntegrationUserId, value)) return;
+            SettingsManager.Default.ExternalIntegrationUserIdentifier = value;
+            SettingsManager.Default.Save();
+            OnGameSettingChanged?.Invoke();
+        }
+    }
+
+    #endregion
+
     #endregion
 
     #region Private Methods
@@ -280,6 +338,10 @@ public class SettingsViewModel : BaseViewModel
 
         _notesDisplayMode = (NotesDisplayMode)SettingsManager.Default.NotesDisplayMode;
         OnPropertyChanged(nameof(NotesDisplayMode));
+        
+        _autoResetOnNewGameStart = SettingsManager.Default.AutoResetOnNewGameStart;
+        OnPropertyChanged(nameof(AutoResetOnNewGameStart));
+        
     }
 
 

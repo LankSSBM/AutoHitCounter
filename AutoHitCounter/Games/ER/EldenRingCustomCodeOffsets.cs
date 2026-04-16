@@ -12,6 +12,7 @@ public static class EldenRingCustomCodeOffsets
     public const int DeflectTearCheckFlag = 0x3;
     public const int InThrowFlag = 0x4;
     public const int HasRaptorFlag = 0x5;
+    public const int HasCountedKillBoxFlag = 0x6;
     public const int Hit = 0x10;
     public const int CheckPlayerDead = 0x20;
 
@@ -31,7 +32,10 @@ public static class EldenRingCustomCodeOffsets
     public const int SetThrowState = 0x1800;
     public const int ClearThrowState = 0x1900;
 
-    public const int EventLogWriteIdx = 0x2000;
-    public const int EventLogCode = 0x2020;
-    public const int EventLogBuffer = 0x2100; //0x1000
+    public const int RunStartFlag = 0x2000;
+    public const int RunStartCode = 0x2010;
+    
+    public const int EventLogWriteIdx = 0x3000;
+    public const int EventLogCode = 0x3020;
+    public const int EventLogBuffer = 0x3100; //0x1000
 }

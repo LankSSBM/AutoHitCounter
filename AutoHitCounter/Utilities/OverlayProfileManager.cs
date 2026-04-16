@@ -203,6 +203,9 @@ public class OverlayProfileManager
             GroupProgressMode = OverlayGroupProgressMode.Hidden,
             TableMode = false,
             BackgroundOpacity = 0,
+            ShowProgressBar = false,
+            
+            ProgressBarHeight = 5,
 
             ShowTitle = false,
             TitleText = "",
@@ -213,6 +216,7 @@ public class OverlayProfileManager
             HeaderTextColor = "#bbbbbb",
             HeaderFontFamily = "Segoe UI",
             HeaderFontSize = 13,
+            ShowHeaderBorder = true,
 
             GroupHeaderFontFamily = "Segoe UI",
             GroupHeaderFontSize = 13,
@@ -232,6 +236,9 @@ public class OverlayProfileManager
             FontBold = false,
             FontItalic = false,
             FontUnderline = false,
+            
+            ProgressBarColor = "#c47fd4",
+            ProgressBarBgColor = "rgba(255,255,255,0.08)",
 
             GroupNameColor = "#999999",
             SplitNameColor = "#e0e0e0",
@@ -261,6 +268,7 @@ public class OverlayProfileManager
             PbColor = "#bbbbbb",
             PbMatchesHit = false,
 
+            ShowFooterBorder = true,
             FooterHitFontColor = "#c8843a",
             FooterHitsCurrentColor = "#888888",
             FooterPbFontColor = "#bbbbbb",

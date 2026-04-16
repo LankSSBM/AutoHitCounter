@@ -27,7 +27,7 @@ public class SplitNavigationService
         if (CurrentSplit != null) CurrentSplit.IsCurrent = true;
     }
     
-    public void InitFresh()
+    public void  InitFresh()
     {
         if (CurrentSplit != null) CurrentSplit.IsCurrent = false;
         IsRunComplete = false;
@@ -66,9 +66,6 @@ public class SplitNavigationService
         }
         else
         {
-            if (IsRunComplete)
-                IsRunComplete = false;
- 
             while (CurrentSplit != target)
             {
                 if (!PreviousInternal()) break;
@@ -115,6 +112,7 @@ public class SplitNavigationService
         CurrentSplit.IsCurrent = false;
         prev.IsCurrent = true;
         CurrentSplit = prev;
+        IsRunComplete = false;
         return true;
     }
 }

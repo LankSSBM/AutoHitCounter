@@ -4,13 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Threading;
 using AutoHitCounter.Core;
 using AutoHitCounter.Enums;
-using AutoHitCounter.Games.Manual;
 using AutoHitCounter.Interfaces;
 using AutoHitCounter.Mappers;
 using AutoHitCounter.Models;
@@ -22,72 +19,74 @@ namespace AutoHitCounter.ViewModels
 {
     public class MainViewModel : BaseViewModel, IReorderHandler, IHitRulesProvider
     {
-        private readonly IMemoryService _memoryService;
         private readonly HotkeyManager _hotkeyManager;
-        private readonly GameModuleFactory _gameModuleFactory;
+        private readonly IGameModuleFactory _gameModuleFactory;
         private readonly IProfileService _profileService;
         private readonly SplitNavigationService _splitNav;
         private readonly OverlayServerService _overlayServerService;
-        private IGameModule _currentModule;
+        private readonly ExternalIntegrationService _externalIntegrationService;
+        private readonly CustomGameService _customGameService;
         private string _lastIgt;
-        private readonly DispatcherTimer _saveDebounce;
-
-        private class RunSnapshot(int currentSplitIndex, int[] hitCounts, bool isRunComplete, TimeSpan inGameTime)
-        {
-            public int CurrentSplitIndex { get; } = currentSplitIndex;
-            public int[] HitCounts { get; } = hitCounts;
-            public bool IsRunComplete { get; } = isRunComplete;
-            public TimeSpan InGameTime { get; } = inGameTime;
-        }
-
-        private readonly Dictionary<string, RunSnapshot> _runSnapshots = new();
+        private readonly RunStateService _runStateService;
+        private readonly IGameSessionOrchestrator _orchestrator;
 
         public SettingsViewModel Settings { get; }
         public HotkeyTabViewModel Hotkeys { get; }
 
-        public MainViewModel(IMemoryService memoryService, HotkeyManager hotkeyManager,
-            GameModuleFactory gameModuleFactory,
+        public MainViewModel(HotkeyManager hotkeyManager,
+            IGameModuleFactory gameModuleFactory,
             IProfileService profileService, IStateService stateService, SettingsViewModel settings,
             HotkeyTabViewModel hotkeyTabViewModel, OverlayServerService overlayServerService,
-            SplitNavigationService splitNavigationService)
+            SplitNavigationService splitNavigationService, ExternalIntegrationService externalIntegrationService,
+            IGameSessionOrchestrator orchestrator,
+            RunStateService runStateService, CustomGameService customGameService)
         {
             Settings = settings;
             Hotkeys = hotkeyTabViewModel;
-            _memoryService = memoryService;
+            _orchestrator = orchestrator;
+            _orchestrator.Initialize(this, GetActiveEvents);
             _hotkeyManager = hotkeyManager;
             _gameModuleFactory = gameModuleFactory;
             _profileService = profileService;
             _overlayServerService = overlayServerService;
+            _externalIntegrationService = externalIntegrationService;
             _overlayServerService.Start();
 
-
             stateService.Subscribe(State.AppStart, OnAppStart);
-            stateService.Subscribe(State.Attached, OnAttached);
-            stateService.Subscribe(State.NotAttached, OnNotAttached);
 
-            Settings.OnGameSettingChanged += () => _currentModule?.ApplySettings();
+            Settings.OnGameSettingChanged += () => _orchestrator.ApplyCurrentSettings();
+
+            _orchestrator.AttachmentChanged += OnOrchestratorAttachmentChanged;
+            _orchestrator.HitReceived += async () =>
+            {
+                if (IsRunComplete || CurrentSplit == null || IsPracticeMode) return;
+                if (_selectedGame != _orchestrator.ActiveGame) return;
+                CurrentSplit.NumOfHits++;
+                SaveRunState();
+                _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
+
+                var payload = new HitPayload(_orchestrator.ActiveGame, ActiveProfile, CurrentSplit, TotalHits, TotalPb, InGameTime);
+                await _externalIntegrationService.SendHitAsync(payload);
+            };
+            _orchestrator.RunStartDetected += HandleRunStart;
+            _orchestrator.EventSetDetected += AutoAdvanceSplit;
+            _orchestrator.EventLogEntries += entries => _eventLogViewModel?.RefreshEventLogs(entries);
+            _orchestrator.TimeChangedMs += UpdateInGameTime;
 
             _splitNav = splitNavigationService;
             _splitNav.Load(Splits);
             _splitNav.StateChanged += OnSplitStateChanged;
 
+            _runStateService = runStateService;
+            _customGameService = customGameService;
+
             RegisterHotkeys();
-
-            _saveDebounce = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
-            _saveDebounce.Tick += (_, _) =>
-            {
-                _saveDebounce.Stop();
-                if (_activeProfile?.SavedRun != null)
-                    Task.Run(() => _profileService.SaveProfile(_activeProfile));
-            };
-
-
+            
             _isUnlocked = SettingsManager.Default.IsUnlocked;
 
             ThemeService.ThemeChanged += OnThemeChanged;
             InitialiseCommands();
-
-
+            
             foreach (var game in _gameModuleFactory.GetRegisteredGames())
                 Games.Add(game);
 
@@ -181,10 +180,8 @@ namespace AutoHitCounter.ViewModels
                 if (_selectedGame == value) return;
 
                 if (_activeProfile != null)
-                {
-                    var outKey = $"{_selectedGame?.GameName}|{_activeProfile.Name}";
-                    _runSnapshots[outKey] = CaptureSnapshot();
-                }
+                    _runStateService.Save(_selectedGame?.GameName, _activeProfile.Name,
+                        _runStateService.Capture(Splits, CurrentSplit, IsRunComplete, InGameTime));
 
                 SetProperty(ref _selectedGame, value);
                 _activeProfile = null;
@@ -226,27 +223,13 @@ namespace AutoHitCounter.ViewModels
             }
         }
 
-        private Game _activeGame;
+        public Game ActiveGame => _orchestrator.ActiveGame;
 
-        public Game ActiveGame
-        {
-            get => _activeGame;
-            private set
-            {
-                if (SetProperty(ref _activeGame, value))
-                {
-                    SwapModule();
-                    OnPropertyChanged(nameof(TrackingText));
-                    OnPropertyChanged(nameof(TimerLabel));
-                }
-            }
-        }
-
-        public string TrackingText => _activeGame != null
-            ? $"Track hits for the currently selected game.\nCurrently Tracking: {_activeGame.GameName}"
+        public string TrackingText => _orchestrator.ActiveGame != null
+            ? $"Track hits for the currently selected game.\nCurrently Tracking: {_orchestrator.ActiveGame.GameName}"
             : "Not tracking";
 
-        public string TimerLabel => _activeGame?.IsManual == true ? "RTA" : "IGT";
+        public string TimerLabel => _orchestrator.ActiveGame?.IsManual == true ? "RTA" : "IGT";
 
         public ObservableCollection<SplitViewModel> Splits { get; } = new();
 
@@ -290,10 +273,8 @@ namespace AutoHitCounter.ViewModels
                 if (_activeProfile == value) return;
 
                 if (_activeProfile != null)
-                {
-                    var outKey = $"{_selectedGame?.GameName}|{_activeProfile.Name}";
-                    _runSnapshots[outKey] = CaptureSnapshot();
-                }
+                    _runStateService.Save(_selectedGame?.GameName, _activeProfile.Name,
+                        _runStateService.Capture(Splits, CurrentSplit, IsRunComplete, InGameTime));
 
                 SetProperty(ref _activeProfile, value);
 
@@ -304,9 +285,10 @@ namespace AutoHitCounter.ViewModels
                 }
 
                 LoadProfile(value);
+                SetDistancePbCommand?.RaiseCanExecuteChanged();
 
-                if (_activeGame == _selectedGame && _currentModule != null)
-                    _currentModule.UpdateEvents(GetActiveEvents());
+                if (_orchestrator.ActiveGame == _selectedGame)
+                    _orchestrator.UpdateEvents(GetActiveEvents());
 
                 OnHitRulesChanged?.Invoke();
             }
@@ -514,44 +496,6 @@ namespace AutoHitCounter.ViewModels
             NotifyProfileSplitsChanged();
         }
 
-        private void MoveSplitUp()
-        {
-            if (!CanMoveSplitUp()) return;
-            var split = SelectedSplit;
-            var index = Splits.IndexOf(split);
-            MoveItem(split, index - 1);
-            SelectedSplit = split;
-            MoveSplitUpCommand.RaiseCanExecuteChanged();
-            MoveSplitDownCommand.RaiseCanExecuteChanged();
-            NotifyProfileSplitsChanged();
-        }
-
-        private void MoveSplitDown()
-        {
-            if (!CanMoveSplitDown()) return;
-            var split = SelectedSplit;
-            var index = Splits.IndexOf(split);
-            MoveItem(split, index + 2);
-            SelectedSplit = split;
-            MoveSplitUpCommand.RaiseCanExecuteChanged();
-            MoveSplitDownCommand.RaiseCanExecuteChanged();
-            NotifyProfileSplitsChanged();
-        }
-
-        private bool CanMoveSplitUp()
-        {
-            if (!IsUnlocked || SelectedSplit == null || SelectedSplit.IsParent) return false;
-            var index = Splits.IndexOf(SelectedSplit);
-            return index > 0 && !Splits[index - 1].IsParent;
-        }
-
-        private bool CanMoveSplitDown()
-        {
-            if (!IsUnlocked || SelectedSplit == null || SelectedSplit.IsParent) return false;
-            var index = Splits.IndexOf(SelectedSplit);
-            return index < Splits.Count - 1 && !Splits[index + 1].IsParent;
-        }
-
         public void CommitAttemptsEdit(string value)
         {
             if (int.TryParse(value, out var count) && count >= 0)
@@ -567,15 +511,15 @@ namespace AutoHitCounter.ViewModels
 
         public void JumpToSplit(SplitViewModel target) => _splitNav.JumpTo(target);
 
-        private void OnThemeChanged()
-        {
-            OnPropertyChanged(nameof(TotalHitsBrush));
-        }
-
         public override void Dispose()
         {
             ThemeService.ThemeChanged -= OnThemeChanged;
         }
+
+        public void SaveRunState() =>
+            _runStateService.SaveRunState(_activeProfile, Splits, CurrentSplit, IsRunComplete, InGameTime);
+
+        public void FlushRunState() => _runStateService.FlushRunState(_activeProfile);
 
         #endregion
 
@@ -673,6 +617,7 @@ namespace AutoHitCounter.ViewModels
                 if (!IsUnlocked) SelectedSplit = null;
                 MoveSplitUpCommand.RaiseCanExecuteChanged();
                 MoveSplitDownCommand.RaiseCanExecuteChanged();
+                SetDistancePbCommand.RaiseCanExecuteChanged();
             });
 
             MoveSplitUpCommand = new DelegateCommand(MoveSplitUp, () => CanMoveSplitUp());
@@ -687,18 +632,12 @@ namespace AutoHitCounter.ViewModels
             _hotkeyManager.RegisterAction(HotkeyActions.Reset, ResetSplits);
             _hotkeyManager.RegisterAction(HotkeyActions.IncrementHit, IncrementHit);
             _hotkeyManager.RegisterAction(HotkeyActions.DecrementHit, DecrementHit);
-            _hotkeyManager.RegisterAction(HotkeyActions.StartTimer, () =>
-            {
-                if (_currentModule is ManualGameModule manual) manual.StartTimer();
-            });
-            _hotkeyManager.RegisterAction(HotkeyActions.PauseTimer, () =>
-            {
-                if (_currentModule is ManualGameModule manual) manual.StopTimer();
-            });
+            _hotkeyManager.RegisterAction(HotkeyActions.StartTimer, () => _orchestrator.ManualStart());
+            _hotkeyManager.RegisterAction(HotkeyActions.PauseTimer, () => _orchestrator.ManualStop());
             _hotkeyManager.RegisterAction(HotkeyActions.TogglePracticeMode,
                 () =>
                 {
-                    if (_activeGame?.IsManual != true) IsPracticeMode = !IsPracticeMode;
+                    if (_orchestrator.ActiveGame?.IsManual != true) IsPracticeMode = !IsPracticeMode;
                 });
         }
 
@@ -715,90 +654,45 @@ namespace AutoHitCounter.ViewModels
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
 
-        private void UpdateAttachedText()
+        private void OnOrchestratorAttachmentChanged()
         {
-            var moduleGame = _activeGame;
-            if (_currentModule is IVersionedGameModule versioned)
-                versioned.OnVersionDetected += () =>
-                {
-                    var version = versioned.GameVersion;
-                    AttachedText = string.IsNullOrEmpty(version)
-                        ? $"Attached to {moduleGame.GameName}"
-                        : $"Attached to {moduleGame.GameName} ({version})";
-                };
-        }
-
-        private void OnAttached()
-        {
-            IsAttached = true;
-            UpdateAttachedText();
-        }
-
-        private void OnNotAttached()
-        {
-            if (_activeGame?.IsManual == true) return;
-            IsAttached = false;
-            AttachedText = _activeGame != null ? $"Waiting for {_activeGame.GameName}..." : "Not attached";
+            IsAttached = _orchestrator.IsAttached;
+            AttachedText = _orchestrator.AttachedText;
             OnPropertyChanged(nameof(TrackingText));
         }
 
         private void StartTrackingGame()
         {
             if (_selectedGame == null) return;
-            ActiveGame = _selectedGame;
-        }
-
-        private void SwapModule()
-        {
-            (_currentModule as IDisposable)?.Dispose();
-
-            if (_activeGame == null) return;
-
-            _currentModule = _gameModuleFactory.CreateModule(_activeGame, GetActiveEvents(), this);
-            _hotkeyManager.SetManualGameActive(_activeGame.IsManual);
-
-            if (_activeGame.IsManual)
-            {
-                IsAttached = true;
-                AttachedText = $"Custom Game: {_activeGame.GameName}";
-
-                if (_currentModule is ManualGameModule m && InGameTime.TotalMilliseconds > 0)
-                    m.SetElapsed((long)InGameTime.TotalMilliseconds);
-            }
-            else
-            {
-                if (_currentModule is IVersionedGameModule versioned)
-                    versioned.OnVersionDetected += UpdateAttachedText;
-
-                _memoryService.StartAutoAttach(_activeGame.ProcessName);
-            }
-
-            _currentModule.OnHit += count =>
-            {
-                if (IsRunComplete || CurrentSplit == null || IsPracticeMode) return;
-                if (_selectedGame != _activeGame) return;
-                CurrentSplit.NumOfHits += count;
-                SaveRunState();
-                _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
-            };
-            _currentModule.OnEventSet += AutoAdvanceSplit;
-            _currentModule.OnEventLogEntriesReceived += entries => _eventLogViewModel?.RefreshEventLogs(entries);
-            _currentModule.OnTimeChanged += UpdateInGameTime;
-
-            if (_eventLogWindow != null)
-                _currentModule.SetEventLogEnabled(true);
-
-            SettingsManager.Default.LastSelectedGame = _activeGame.GameName;
+            _orchestrator.Track(_selectedGame);
+            if (_selectedGame.IsManual && InGameTime.TotalMilliseconds > 0)
+                _orchestrator.ManualSetElapsed((long)InGameTime.TotalMilliseconds);
+            SettingsManager.Default.LastSelectedGame = _selectedGame.GameName;
             SettingsManager.Default.Save();
+            OnPropertyChanged(nameof(TrackingText));
+            OnPropertyChanged(nameof(TimerLabel));
         }
 
         private void AutoAdvanceSplit()
         {
-            if (_selectedGame != _activeGame) return;
+            if (_selectedGame != _orchestrator.ActiveGame) return;
             if (IsPracticeMode) return;
             if (CurrentSplit == null) return;
             _splitNav.Advance();
         }
+
+        private void HandleRunStart()
+        {
+            if (_orchestrator.ActiveGame?.IsManual == true) return;
+            if (_selectedGame != _orchestrator.ActiveGame) return;
+            if (IsPracticeMode) return;
+            if (!SettingsManager.Default.AutoResetOnNewGameStart) return;
+            if (!HasRunProgress()) return;
+
+            ResetRun();
+        }
+
+        private bool HasRunProgress() => CurrentSplitNumber > 1 || TotalHits > 0 || InGameTime > TimeSpan.Zero;
 
         private void ManualAdvanceSplit()
         {
@@ -833,11 +727,11 @@ namespace AutoHitCounter.ViewModels
             _eventLogViewModel = new EventLogViewModel();
             _eventLogWindow = new EventLogWindow { DataContext = _eventLogViewModel };
 
-            _currentModule?.SetEventLogEnabled(true);
+            _orchestrator.SetEventLogEnabled(true);
 
             _eventLogWindow.Closed += (s, e) =>
             {
-                _currentModule?.SetEventLogEnabled(false);
+                _orchestrator.SetEventLogEnabled(false);
                 _eventLogWindow = null;
                 _eventLogViewModel = null;
             };
@@ -883,6 +777,7 @@ namespace AutoHitCounter.ViewModels
                     Profiles.Add(p);
 
                 ActiveProfile = Profiles.FirstOrDefault(p => p.Name == vm.SelectedProfile?.Name);
+                _orchestrator.UpdateEvents(GetActiveEvents());
             };
             vm.OnSaved += onSaved;
 
@@ -891,19 +786,10 @@ namespace AutoHitCounter.ViewModels
                 _profileEditorWindow = null;
 
                 if (_activeProfile != null)
-                {
-                    var key = $"{_selectedGame.GameName}|{_activeProfile.Name}";
-                    _runSnapshots.Remove(key);
-                }
+                    _runStateService.Invalidate(_selectedGame.GameName, _activeProfile.Name);
 
-                var validKeys = new HashSet<string>(
-                    _profileService.GetProfiles(_selectedGame.GameName)
-                        .Select(p => $"{_selectedGame.GameName}|{p.Name}"));
-                var staleKeys = _runSnapshots.Keys
-                    .Where(k => k.StartsWith($"{_selectedGame.GameName}|") && !validKeys.Contains(k))
-                    .ToList();
-                foreach (var stale in staleKeys)
-                    _runSnapshots.Remove(stale);
+                var validProfileNames = _profileService.GetProfiles(_selectedGame.GameName).Select(p => p.Name);
+                _runStateService.InvalidateStale(_selectedGame.GameName, validProfileNames);
             };
 
             _profileEditorWindow.Show();
@@ -937,9 +823,49 @@ namespace AutoHitCounter.ViewModels
                     OnPropertyChanged(nameof(TotalDiff));
                     OnPropertyChanged(nameof(TotalHitsBrush));
                     OnPropertyChanged(nameof(TotalPb));
+                    RefreshDistancePbIndicator();
                 };
                 Splits.Add(vm);
             }
+        }
+
+        private void MoveSplitUp()
+        {
+            if (!CanMoveSplitUp()) return;
+            var split = SelectedSplit;
+            var index = Splits.IndexOf(split);
+            MoveItem(split, index - 1);
+            SelectedSplit = split;
+            MoveSplitUpCommand.RaiseCanExecuteChanged();
+            MoveSplitDownCommand.RaiseCanExecuteChanged();
+            SetDistancePbCommand?.RaiseCanExecuteChanged();
+            NotifyProfileSplitsChanged();
+        }
+
+        private void MoveSplitDown()
+        {
+            if (!CanMoveSplitDown()) return;
+            var split = SelectedSplit;
+            var index = Splits.IndexOf(split);
+            MoveItem(split, index + 2);
+            SelectedSplit = split;
+            MoveSplitUpCommand.RaiseCanExecuteChanged();
+            MoveSplitDownCommand.RaiseCanExecuteChanged();
+            NotifyProfileSplitsChanged();
+        }
+
+        private bool CanMoveSplitUp()
+        {
+            if (!IsUnlocked || SelectedSplit == null || SelectedSplit.IsParent) return false;
+            var index = Splits.IndexOf(SelectedSplit);
+            return index > 0 && !Splits[index - 1].IsParent;
+        }
+
+        private bool CanMoveSplitDown()
+        {
+            if (!IsUnlocked || SelectedSplit == null || SelectedSplit.IsParent) return false;
+            var index = Splits.IndexOf(SelectedSplit);
+            return index < Splits.Count - 1 && !Splits[index + 1].IsParent;
         }
 
         private static Brush GetBrush(string key)
@@ -964,6 +890,7 @@ namespace AutoHitCounter.ViewModels
             if (index < 0) return;
 
             _activeProfile.DistancePb = index;
+            RefreshDistancePbIndicator();
             _profileService.SaveProfile(_activeProfile);
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
@@ -981,12 +908,21 @@ namespace AutoHitCounter.ViewModels
             }
         }
 
+        private void RefreshDistancePbIndicator()
+        {
+            if (_activeProfile == null) return;
+            for (int i = 0; i < Splits.Count; i++)
+                Splits[i].IsDistancePb = i == _activeProfile.DistancePb;
+        }
+
         private void RefreshSplitValues()
         {
             var hits = Splits.Select(s => s.NumOfHits).ToArray();
             var currentIndex = CurrentSplit != null ? Splits.IndexOf(CurrentSplit) : -1;
+            var selectedIndex = SelectedSplit != null ? Splits.IndexOf(SelectedSplit) : -1;
 
             UpdateSplits();
+            RefreshDistancePbIndicator();
 
             for (int i = 0; i < Splits.Count && i < hits.Length; i++)
                 Splits[i].NumOfHits = hits[i];
@@ -996,6 +932,9 @@ namespace AutoHitCounter.ViewModels
                 CurrentSplit = Splits[currentIndex];
                 CurrentSplit.IsCurrent = true;
             }
+
+            if (selectedIndex >= 0 && selectedIndex < Splits.Count)
+                SelectedSplit = Splits[selectedIndex];
         }
 
         private Dictionary<uint, (string Name, int Required, int Hit)> GetActiveEvents()
@@ -1015,29 +954,24 @@ namespace AutoHitCounter.ViewModels
 
         private void LoadCustomGames()
         {
-            var raw = SettingsManager.Default.CustomGames;
-            if (string.IsNullOrWhiteSpace(raw)) return;
-
-            foreach (var name in raw.Split(','))
-            {
-                var trimmed = name.Trim();
-                if (string.IsNullOrEmpty(trimmed)) continue;
-                Games.Add(new Game
-                {
-                    Title = GameTitle.Manual,
-                    GameName = trimmed,
-                    ProcessName = null,
-                    IsManual = true
-                });
-            }
+            foreach (var game in _customGameService.Load())
+                Games.Add(game);
         }
 
         private void CreateCustomGame()
         {
-            var name = MsgBox.ShowInput(
+            var input = MsgBox.ShowInput(
                 "Create a game to add profiles and splits to.\nAuto hit counting and auto splitting are not supported,\nbut you can use a timer and track hits manually.",
                 "", "New Custom Game");
-            if (string.IsNullOrWhiteSpace(name)) return;
+            if (string.IsNullOrWhiteSpace(input)) return;
+
+            var name = input.Trim();
+
+            if (!CustomGameService.IsValidName(name))
+            {
+                MsgBox.Show("Name cannot contain ','.", "New Custom Game");
+                return;
+            }
 
             if (Games.Any(g => g.GameName == name))
             {
@@ -1045,18 +979,8 @@ namespace AutoHitCounter.ViewModels
                 return;
             }
 
-            var game = new Game
-            {
-                Title = GameTitle.Manual,
-                GameName = name,
-                ProcessName = null,
-                IsManual = true
-            };
+            var game = _customGameService.Add(name);
             Games.Add(game);
-
-            var existing = SettingsManager.Default.CustomGames;
-            SettingsManager.Default.CustomGames = string.IsNullOrEmpty(existing) ? name : $"{existing},{name}";
-            SettingsManager.Default.Save();
 
             SelectedGame = game;
             StartTrackingGame();
@@ -1078,24 +1002,14 @@ namespace AutoHitCounter.ViewModels
                     "Delete Custom Game"))
                 return;
 
-            foreach (var profile in profiles.ToList())
-                _profileService.DeleteProfile(name, profile.Name);
+            _customGameService.Delete(name);
 
-            (_currentModule as IDisposable)?.Dispose();
-            _currentModule = null;
-            ActiveGame = null;
-            IsAttached = false;
-            AttachedText = "Not attached";
+            _orchestrator.Stop();
+            OnPropertyChanged(nameof(TrackingText));
+            OnPropertyChanged(nameof(TimerLabel));
 
             Games.Remove(_selectedGame);
             SelectedGame = Games.FirstOrDefault();
-
-            var names = (SettingsManager.Default.CustomGames ?? "")
-                .Split(',')
-                .Select(n => n.Trim())
-                .Where(n => n != name);
-            SettingsManager.Default.CustomGames = string.Join(",", names);
-            SettingsManager.Default.Save();
         }
 
         private void RenameCustomGame()
@@ -1103,8 +1017,17 @@ namespace AutoHitCounter.ViewModels
             if (_selectedGame == null || !_selectedGame.IsManual) return;
 
             var oldName = _selectedGame.GameName;
-            var newName = MsgBox.ShowInput("Rename Game", oldName, "Rename Custom Game");
-            if (string.IsNullOrWhiteSpace(newName) || newName == oldName) return;
+            var input = MsgBox.ShowInput("Rename Game", oldName, "Rename Custom Game");
+            if (string.IsNullOrWhiteSpace(input)) return;
+
+            var newName = input.Trim();
+            if (newName == oldName) return;
+
+            if (!CustomGameService.IsValidName(newName))
+            {
+                MsgBox.Show("Name cannot contain ','.", "Rename Custom Game");
+                return;
+            }
 
             if (Games.Any(g => g.GameName == newName))
             {
@@ -1112,7 +1035,7 @@ namespace AutoHitCounter.ViewModels
                 return;
             }
 
-            _profileService.RenameGame(oldName, newName);
+            _customGameService.Rename(oldName, newName);
 
             var game = _selectedGame;
             game.GameName = newName;
@@ -1124,25 +1047,11 @@ namespace AutoHitCounter.ViewModels
             _selectedGame = null;
             SelectedGame = game;
 
-            var customNames = (SettingsManager.Default.CustomGames ?? "")
-                .Split(',')
-                .Select(n => n.Trim())
-                .Select(n => n == oldName ? newName : n);
-            SettingsManager.Default.CustomGames = string.Join(",", customNames);
             SettingsManager.Default.LastSelectedGame = newName;
             SettingsManager.Default.Save();
 
-            if (_activeGame == game)
+            if (_orchestrator.ActiveGame == game)
                 AttachedText = $"Custom Game: {newName}";
-
-            // Re-key any cached run snapshots
-            var staleKeys = _runSnapshots.Keys.Where(k => k.StartsWith($"{oldName}|")).ToList();
-            foreach (var key in staleKeys)
-            {
-                var snapshot = _runSnapshots[key];
-                _runSnapshots.Remove(key);
-                _runSnapshots[key.Replace($"{oldName}|", $"{newName}|")] = snapshot;
-            }
         }
 
         private void SaveNotes()
@@ -1157,21 +1066,12 @@ namespace AutoHitCounter.ViewModels
             _profileService.SaveProfile(ActiveProfile);
         }
 
-        private RunSnapshot CaptureSnapshot()
-        {
-            var children = Splits.Where(s => s.Type == SplitType.Child).ToList();
-            var hits = children.Select(s => s.NumOfHits).ToArray();
-            var index = CurrentSplit != null ? Splits.IndexOf(CurrentSplit) : -1;
-            return new RunSnapshot(index, hits, IsRunComplete, InGameTime);
-        }
-
         private void LoadProfile(Profile profile)
         {
-            _saveDebounce.Stop();
+            _runStateService.CancelPendingSave();
             IsRunComplete = false;
             UpdateSplits();
-            var key = $"{_selectedGame?.GameName}|{profile?.Name}";
-            if (profile != null && _runSnapshots.TryGetValue(key, out var snapshot))
+            if (profile != null && _runStateService.TryGet(_selectedGame?.GameName, profile.Name, out var snapshot))
                 RestoreSnapshot(snapshot);
             else if (profile?.SavedRun != null)
                 RestoreFromSavedRun(profile.SavedRun);
@@ -1184,40 +1084,32 @@ namespace AutoHitCounter.ViewModels
             OnPropertyChanged(nameof(TotalHits));
             OnPropertyChanged(nameof(TotalPb));
             OnPropertyChanged(nameof(TotalDiff));
+            RefreshDistancePbIndicator();
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
 
         private void RestoreSnapshot(RunSnapshot snapshot)
         {
-            var children = Splits.Where(s => s.Type == SplitType.Child).ToList();
-            for (int i = 0; i < children.Count && i < snapshot.HitCounts.Length; i++)
-                children[i].NumOfHits = snapshot.HitCounts[i];
-
-            var toRestore = snapshot.CurrentSplitIndex >= 0 && snapshot.CurrentSplitIndex < Splits.Count
-                ? Splits[snapshot.CurrentSplitIndex]
-                : Splits.FirstOrDefault(s => s.Type == SplitType.Child);
-
+            var toRestore = _runStateService.RestoreSnapshot(Splits, snapshot);
             _splitNav.SetPosition(toRestore, snapshot.IsRunComplete);
             InGameTime = snapshot.InGameTime;
         }
 
         private void RestoreFromSavedRun(RunState state)
         {
-            var children = Splits.Where(s => s.Type == SplitType.Child).ToList();
-            for (int i = 0; i < children.Count && i < state.HitCounts.Length; i++)
-                children[i].NumOfHits = state.HitCounts[i];
-
-            var toRestore = state.CurrentSplitIndex >= 0 && state.CurrentSplitIndex < Splits.Count
-                ? Splits[state.CurrentSplitIndex]
-                : Splits.FirstOrDefault(s => s.Type == SplitType.Child);
-
+            var toRestore = _runStateService.RestoreFromSavedRun(Splits, state);
             _splitNav.SetPosition(toRestore, state.IsRunComplete);
             InGameTime = TimeSpan.FromMilliseconds(state.IgtMilliseconds);
         }
 
         private void ResetSplits()
         {
-            _saveDebounce.Stop();
+            ResetRun();
+        }
+
+        private void ResetRun()
+        {
+            _runStateService.CancelPendingSave();
             UpdateDistancePb();
 
             if (_activeProfile != null)
@@ -1226,27 +1118,26 @@ namespace AutoHitCounter.ViewModels
                 _activeProfile.SavedRun = null;
                 _profileService.SaveProfile(_activeProfile);
                 OnPropertyChanged(nameof(AttemptCount));
+                RefreshDistancePbIndicator();
             }
 
-            var key = $"{_selectedGame?.GameName}|{_activeProfile?.Name}";
-            _runSnapshots.Remove(key);
+            _runStateService.Invalidate(_selectedGame?.GameName, _activeProfile?.Name);
             UpdateSplits();
             _splitNav.InitFresh();
 
-            if (_currentModule is ManualGameModule manualModule)
-            {
-                manualModule.ResetTimer();
-                InGameTime = TimeSpan.Zero;
-                InGameTimeFormatted = "0:00:00";
-            }
+            _orchestrator.ManualReset();
 
-            if (_activeGame == _selectedGame && _currentModule != null)
-                _currentModule.UpdateEvents(GetActiveEvents());
+            InGameTime = TimeSpan.Zero;
+            InGameTimeFormatted = "0:00:00";
+
+            if (_orchestrator.ActiveGame == _selectedGame)
+                _orchestrator.UpdateEvents(GetActiveEvents());
 
             OnPropertyChanged(nameof(IsRunComplete));
             OnPropertyChanged(nameof(CurrentSplit));
             OnPropertyChanged(nameof(CurrentSplitNumber));
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
+            _overlayServerService.BroadcastIgt(InGameTimeFormatted);
         }
 
         private void SetPb()
@@ -1277,6 +1168,7 @@ namespace AutoHitCounter.ViewModels
 
             split.IsEditingPb = false;
             RefreshSplitValues();
+            SetDistancePbCommand?.RaiseCanExecuteChanged();
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
 
@@ -1296,28 +1188,9 @@ namespace AutoHitCounter.ViewModels
             _overlayServerService.BroadcastState(OverlayMapper.MapFrom(this));
         }
 
-        public void SaveRunState()
+        private void OnThemeChanged()
         {
-            if (_activeProfile == null) return;
-
-            var children = Splits.Where(s => s.Type == SplitType.Child).ToList();
-            _activeProfile.SavedRun = new RunState
-            {
-                CurrentSplitIndex = CurrentSplit != null ? Splits.IndexOf(CurrentSplit) : -1,
-                HitCounts = children.Select(s => s.NumOfHits).ToArray(),
-                IsRunComplete = IsRunComplete,
-                IgtMilliseconds = (long)InGameTime.TotalMilliseconds
-            };
-
-            _saveDebounce.Stop();
-            _saveDebounce.Start();
-        }
-
-        public void FlushRunState()
-        {
-            _saveDebounce.Stop();
-            if (_activeProfile?.SavedRun != null)
-                _profileService.SaveProfile(_activeProfile);
+            OnPropertyChanged(nameof(TotalHitsBrush));
         }
 
         #endregion
