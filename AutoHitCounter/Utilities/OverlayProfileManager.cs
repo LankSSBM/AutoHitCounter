@@ -199,7 +199,6 @@ public class OverlayProfileManager
             OverlayHeight = 500,
             ShowProgress = true,
             ShowFooterTotals = true,
-            ShowGroupHeaderTotals = false,
             GroupProgressMode = OverlayGroupProgressMode.Hidden,
             TableMode = false,
             BackgroundOpacity = 0,

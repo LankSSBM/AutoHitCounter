@@ -139,7 +139,6 @@
                         <CheckBox Content="Show Progress Bar" IsChecked="{Binding ShowProgressBar}" Margin="0,2,0,2" />
                         <CheckBox Content="Show Distance PB" IsChecked="{Binding ShowDpbHighlight}" Margin="0,2,0,2" />
                         <CheckBox Content="Show Footer Totals" IsChecked="{Binding ShowFooterTotals}" Margin="0,2,0,2" />
-                        <CheckBox Content="Show Group Totals" IsChecked="{Binding ShowGroupHeaderTotals}" Margin="0,2,0,2" />
                         <CheckBox Content="Show Header Border" IsChecked="{Binding ShowHeaderBorder}" Margin="0,2,0,2" />
                         <CheckBox Content="Show Footer Border" IsChecked="{Binding ShowFooterBorder}" Margin="0,2,0,2" />
                         <CheckBox Content="Show Run Complete" IsChecked="{Binding ShowRunComplete}" Margin="0,2,0,2" />

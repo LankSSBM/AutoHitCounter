@@ -124,7 +124,6 @@ public class OverlaySettingsViewModel : BaseViewModel
     public bool ShowPb            { get => Get<bool>();   set => Set(value); }
     public bool ShowIgt           { get => Get<bool>();   set => Set(value); }
     public bool ShowFooterTotals  { get => Get<bool>();   set => Set(value); }
-    public bool ShowGroupHeaderTotals { get => Get<bool>(); set => Set(value); }
     public OverlayGroupProgressMode GroupProgressMode { get => Get<OverlayGroupProgressMode>(); set => Set(value); }
     public int  PrevSplits        { get => Get<int>();    set => Set(value); }
     public int  NextSplits        { get => Get<int>();    set => Set(value); }

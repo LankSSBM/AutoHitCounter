@@ -287,7 +287,6 @@
                 groupCollapseMode: 2,
                 pbColor: '#bbbbbb',
                 showFooterTotals: true,
-                showGroupHeaderTotals: false,
                 groupProgressMode: 0,
                 igtFontFamily: 'Consolas',
                 igtFontSize: 17,
@@ -774,7 +773,7 @@
                         const inactiveParent = s.isParent && (collapseMode === 0
                             ? g !== activeGroup
                             : g < activeGroup);
-                        const showGroupSums = config.showGroupHeaderTotals === true;
+                        const showGroupSums = normalizedProgressMode === 2;
                         const totals = (s.isParent && inactiveParent && showGroupSums) ? (groupTotals[g] ?? null) : null;
                         const nameSuffix = s.isParent && groupProgressStrings
                             ? (groupProgressStrings[g] || '')
@@ -879,7 +878,7 @@
                 hitsCell = `<span class="col-hits" ${hitsStyle}>${totals.hits}</span>`;
                 diffCell = config.showDiff ? `<span class="col-diff ${tDiffClass}">${tDiffText}</span>` : '';
                 pbCell = config.showPb ? `<span class="col-pb">${totals.pb}</span>` : '';
-            } else if (s.isParent && inactiveParent && config.showGroupHeaderTotals !== true) {
+            } else if (s.isParent && inactiveParent && Number(config.groupProgressMode) !== 2) {
                 hitsCell = `<span class="col-hits"></span>`;
                 diffCell = config.showDiff ? `<span class="col-diff"></span>` : '';
                 pbCell = config.showPb ? `<span class="col-pb"></span>` : '';

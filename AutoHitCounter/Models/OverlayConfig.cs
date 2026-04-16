@@ -18,7 +18,6 @@ public class OverlayConfig
     public int OverlayHeight { get; set; }
     public bool ShowProgress { get; set; }
     public bool ShowFooterTotals { get; set; }
-    public bool ShowGroupHeaderTotals { get; set; }
     public OverlayGroupProgressMode GroupProgressMode { get; set; }
     public bool TableMode { get; set; }
     public double BackgroundOpacity { get; set; }
